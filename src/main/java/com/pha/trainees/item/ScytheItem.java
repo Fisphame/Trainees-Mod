@@ -1,0 +1,45 @@
+package com.pha.trainees.item;
+
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.phys.AABB;
+
+import java.util.List;
+
+public class ScytheItem extends SwordItem {
+    public ScytheItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
+        super(tier, attackDamage, attackSpeed, properties);
+    }
+    private static final float SWEEP_RADIUS = 2F; // 横扫范围（原版为1.0）
+    private static final float SWEEP_DAMAGE_MULTIPLIER = 3F; // 伤害倍率（原版为1.0）
+
+    @Override
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        // 仅在主线程处理，避免客户端逻辑干扰
+        if (!attacker.level().isClientSide && attacker instanceof Player player) {
+            // 检测是否满足横扫条件（原版逻辑）
+            float attackStrength = player.getAttackStrengthScale(0.5F);
+            if (attackStrength > 0.9F) {
+                // 获取范围内的所有生物
+                AABB area = target.getBoundingBox().inflate(SWEEP_RADIUS, 0.25, SWEEP_RADIUS);
+                List<LivingEntity> entities = player.level().getEntitiesOfClass(
+                        LivingEntity.class,
+                        area,
+                        e -> e != player && e != target && !e.isAlliedTo(player)
+                );
+
+                // 对每个生物应用伤害
+                for (LivingEntity entity : entities) {
+                    float baseDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+                    float sweepDamage = baseDamage * SWEEP_DAMAGE_MULTIPLIER;
+                    entity.hurt(player.damageSources().playerAttack(player), sweepDamage);
+                }
+            }
+        }
+        return super.hurtEnemy(stack, target, attacker);
+    }
+}

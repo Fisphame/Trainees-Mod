@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AUM",
+    "TST",
+    " S "
+  ],
+  "key": {
+    "T": { "item": "trainees:two_half_ingot_block" },
+    "S": { "item": "trainees:stone_stick" },
+    "U": { "item": "trainees:upgrade_theme"},
+    "A": { "item": "trainees:kun_axe"},
+    "M": { "item": "trainees:kun_mace"}
+  },
+  "result": {
+    "item": "trainees:kun_axemace"
+  },
+  "unlockedBy": {
+    "trigger": "minecraft:inventory_changed",
+    "conditions": {
+      "items": [
+        {
+          "items": ["trainees:upgrade_theme"]
+        }
+      ]
+    }
+  }
+}

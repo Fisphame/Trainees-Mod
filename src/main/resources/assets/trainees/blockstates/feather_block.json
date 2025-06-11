@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "trainees:block/feather_block"
+      },
+      {
+        "model": "trainees:block/feather_block",
+        "y": 90
+      },
+      {
+        "model": "trainees:block/feather_block",
+        "y": 180
+      },
+      {
+        "model": "trainees:block/feather_block",
+        "y": 270
+      }
+    ]
+  }
+}

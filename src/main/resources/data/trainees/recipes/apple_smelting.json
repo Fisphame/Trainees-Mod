@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "trainees:real_apple"
+  },
+  "result": {
+    "item": "minecraft:apple",
+    "count": 1
+  },
+  "experience": 0.2,
+  "cookingtime": 200
+}

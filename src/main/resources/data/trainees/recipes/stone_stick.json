@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    " C ",
+    " C "
+  ],
+  "key": {
+    "C": { "item": "minecraft:cobblestone" }
+  },
+  "result": {
+    "item": "trainees:stone_stick",
+    "count": 4
+  },
+  "unlockedBy": {
+    "trigger": {
+      "trigger": "minecraft:tick",
+      "conditions": {}
+    }
+  }
+}

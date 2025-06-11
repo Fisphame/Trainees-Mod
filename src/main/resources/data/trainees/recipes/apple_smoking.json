@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smoking",
+  "ingredient": {
+    "item": "trainees:real_apple"
+  },
+  "result": {
+    "item": "minecraft:apple",
+    "count": 1
+  },
+  "experience": 0.5,
+  "cookingtime": 100
+}

@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "trainees:kun_axe"
+    },
+    "title": {
+      "translate": "advancements.trainees.root.title"
+    },
+    "description": {
+      "translate": "advancements.trainees.root.description"
+    },
+    "background": "trainees:textures/block/myblock.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:tick",
+      "conditions": {}
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "trainees:real_apple",
+      "trainees:real_diamond_pickaxe",
+      "trainees:stone_stick",
+      "trainees:enchanted_golden_apple"
+    ]
+  }
+}

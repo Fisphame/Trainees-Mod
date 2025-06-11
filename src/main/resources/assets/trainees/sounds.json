@@ -1,0 +1,44 @@
+{
+  "ahkun_sound": {
+    "sounds": [
+      "trainees:ahkun_sound"
+    ],
+    "subtitle": "subtitles.trainees.ahkun_sound"
+  },
+  "mining_sound_1": {
+    "sounds": [
+      "trainees:mining_sound_1"
+    ],
+    "subtitle": "subtitles.trainees.mining_sound_1"
+  },
+  "mining_sound_2": {
+    "sounds": [
+      "trainees:mining_sound_2"
+    ],
+    "subtitle": "subtitles.trainees.mining_sound_2"
+  },
+  "mining_sound_3": {
+    "sounds": [
+      "trainees:mining_sound_3"
+    ],
+    "subtitle": "subtitles.trainees.mining_sound_3"
+  },
+  "mining_sound_4": {
+    "sounds": [
+      "trainees:mining_sound_4"
+    ],
+    "subtitle": "subtitles.trainees.mining_sound_4"
+  },
+  "mining_sound_5": {
+    "sounds": [
+      "trainees:mining_sound_5"
+    ],
+    "subtitle": "subtitles.trainees.mining_sound_5"
+  },
+  "mining_sound_6": {
+    "sounds": [
+      "trainees:mining_sound_6"
+    ],
+    "subtitle": "subtitles.trainees.mining_sound_6"
+  }
+}

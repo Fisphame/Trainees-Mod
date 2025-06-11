@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:sweet_barries" }
+  ],
+  "result": {
+    "item": "minecraft:red_dye",
+    "count": 1
+  },
+  "unlockedBy": {
+    "trigger": {
+      "trigger": "minecraft:tick",
+      "conditions": {}
+    }
+  }
+}

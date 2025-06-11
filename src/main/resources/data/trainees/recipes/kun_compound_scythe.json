@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DUW",
+    "TCT",
+    " S "
+  ],
+  "key": {
+    "T": { "item": "trainees:two_half_ingot_block" },
+    "S": { "item": "trainees:stone_stick" },
+    "U": { "item": "trainees:upgrade_theme"},
+    "D": { "item": "trainees:kun_dagger"},
+    "W": { "item": "trainees:kun_sword"},
+    "C": { "item": "trainees:kun_scythe"}
+  },
+  "result": {
+    "item": "trainees:kun_compound_scythe"
+  },
+  "unlockedBy": {
+    "trigger": "minecraft:inventory_changed",
+    "conditions": {
+      "items": [
+        {
+          "items": ["trainees:upgrade_theme"]
+        }
+      ]
+    }
+  }
+}

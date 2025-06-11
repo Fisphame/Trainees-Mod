@@ -1,0 +1,79 @@
+{
+  "item.trainees.kun_axe": "只因斧",
+  "item.trainees.kun_hoe": "只因锄",
+  "item.trainees.kun_pickaxe": "只因镐",
+  "item.trainees.kun_shovel": "只因锹",
+  "item.trainees.real_diamond_pickaxe":"“钻石镐”",
+  "item.trainees.long_real_diamond_pickaxe":"“钻 石 镐”",
+  "item.trainees.longer_real_diamond_pickaxe":"“钻  石  镐”",
+  "item.trainees.longest_real_diamond_pickaxe":"“钻   石   镐”",
+  "item.trainees.the_longest_real_diamond_pickaxe":"“钻    石    镐”",
+  "item.trainees.the_the_longest_real_diamond_pickaxe":"“钻     石     镐”",
+  "item.trainees.real_diamond_pickaxe_zip":"“钻石镐”.zip",
+
+
+
+
+  "item.trainees.kun_sword": "只因剑",
+  "item.trainees.kun_dagger": "只因短匕",
+  "item.trainees.kun_mace": "只因锤",
+  "item.trainees.kun_axemace": "只因阔斧锤",
+  "item.trainees.kun_scythe": "只因镰刀",
+  "item.trainees.kun_compound_scythe": "只因复合镰刀",
+  "item.trainees.kun_basketball": "只因篮球",
+
+  "item.trainees.duihuanquan": "兑换券",
+  "item.trainees.kun_nugget": "只因粒",
+  "item.trainees.two_half_ingot": "两锭半",
+  "item.trainees.stone_stick": "石棍",
+  "item.trainees.polyester": "醋酯纤维",
+  "item.trainees.elastomeric_material": "弹性材料",
+  "item.trainees.elastomeric_core": "弹性核心",
+  "item.trainees.upgrade_theme": "升级模版",
+  "item.trainees.left_of_diamond_pickaxe":"左半镐",
+  "item.trainees.right_of_diamond_pickaxe":"右半镐",
+  "item.trainees.long_stick":"长木棍",
+  "item.trainees.longer_stick":"长长木棍",
+  "item.trainees.longest_stick":"长长长木棍",
+
+
+
+  "item.trainees.ahkun_apple": "阿只因苹果",
+  "item.trainees.big_ahkun_apple": "大阿只因苹果",
+  "item.trainees.real_apple": "“苹果”",
+
+  "block.trainees.myblock": "只因方块",
+  "block.trainees.two_half_ingot_block": "两锭半块",
+  "block.trainees.polyester_block": "醋酯纤维矿",
+  "block.trainees.feather_block": "羽毛方块",
+
+
+
+  "enchantment.trainees.ten_thousand_sword": "万剑归宗",
+
+  "advancements.trainees.root.title": "练习生",
+  "advancements.trainees.root.description": "谁人踏上不归的练习之路……",
+  "advancements.trainees.kun_nugget.title": "不寻常的鸡……",
+  "advancements.trainees.kun_nugget.description": "获得只因粒。",
+  "advancements.trainees.two_half_ingot.title": "5/2=2.5！",
+  "advancements.trainees.two_half_ingot.description": "获得两锭半。",
+  "advancements.trainees.stone_stick.title": "来硬的……棍子",
+  "advancements.trainees.stone_stick.description": "获得石棍。",
+  "advancements.trainees.enchanted_golden_apple.title": "时代的眼泪",
+  "advancements.trainees.enchanted_golden_apple.description": "获得附魔金苹果。",
+  "advancements.trainees.eat_big_kun.title": "大只因的力量",
+  "advancements.trainees.eat_big_kun.description": "吃下传说中那故人遗留下的苹果……",
+  "advancements.trainees.real_diamond_pickaxe.title": "这是钻石镐么……？",
+  "advancements.trainees.real_diamond_pickaxe.description": "合成出不明觉厉的东西……",
+  "advancements.trainees.the_the_longest_real_diamond_pickaxe.title": "滴水穿石……",
+  "advancements.trainees.the_the_longest_real_diamond_pickaxe.description": "合成出最！不明觉厉的东西……！",
+  "advancements.trainees.upgrade_theme.title": "你渴望「合成」之力么？",
+  "advancements.trainees.upgrade_theme.description": "获得升级模版",
+  "advancements.trainees.real_apple.title": "人造苹果！",
+  "advancements.trainees.real_apple.description": "食品安全…………",
+
+
+
+  "itemGroup.trainees.kun_tab": "练习生"
+
+}
