@@ -1,12 +1,77 @@
 {
-  "block.trainees.myblock": "Chicken Block",
-  "item.trainees.duihuanquan": "Coin Certificate for Chicken",
   "item.trainees.kun_axe": "Kun Axe",
   "item.trainees.kun_hoe": "Kun Hoe",
   "item.trainees.kun_pickaxe": "Kun Pickaxe",
   "item.trainees.kun_shovel": "Kun Shovel",
+  "item.trainees.real_diamond_pickaxe":"REAL Diamond Pickaxe",
+  "item.trainees.long_real_diamond_pickaxe":"REAL Diam ond Pickaxe",
+  "item.trainees.longer_real_diamond_pickaxe":"REAL Di a mon d Pickaxe",
+  "item.trainees.longest_real_diamond_pickaxe":"REAL D i a m o n d Pickaxe",
+  "item.trainees.the_longest_real_diamond_pickaxe":"REAL D  i  a  m  o  n  d Pickaxe",
+  "item.trainees.the_the_longest_real_diamond_pickaxe":"REAL D   i   a   m   o   n   d Pickaxe",
+  "item.trainees.real_diamond_pickaxe_zip":"REAL Diamond Pickaxe.zip",
+
   "item.trainees.kun_sword": "Kun Sword",
+  "item.trainees.kun_dagger": "Kun Dagger",
+  "item.trainees.kun_mace": "Kun Mace",
+  "item.trainees.kun_axemace": "Kun Axe Hammer",
+  "item.trainees.kun_scythe": "Kun Scythe",
+  "item.trainees.kun_compound_scythe": "Kun Compound Scythe",
+  "item.trainees.kun_basketball": "Kun Basketball",
+
+  "item.trainees.duihuanquan": "Coin Certificate",
   "item.trainees.kun_nugget": "Kun Nugget",
   "item.trainees.two_half_ingot": "2.5Ingot",
-  "block.trainees.two_half_ingot_block": "2.5Block"
+  "item.trainees.stone_stick": "Stone Stick",
+  "item.trainees.polyester": "Polyester",
+  "item.trainees.elastomeric_material": "Elastic Material",
+  "item.trainees.elastomeric_core": "Elastic Core",
+  "item.trainees.upgrade_theme": "Upgrade Theme",
+  "item.trainees.left_of_diamond_pickaxe":"Left Half Diamond Pickaxe",
+  "item.trainees.right_of_diamond_pickaxe":"Right Half Diamond Pickaxe",
+  "item.trainees.long_stick":"Long stick",
+  "item.trainees.longer_stick":"Longer stick",
+  "item.trainees.longest_stick":"Longest stick",
+
+
+
+  "item.trainees.ahkun_apple": "AhKin Apple",
+  "item.trainees.big_ahkun_apple": "BIG AhKin Apple",
+  "item.trainees.real_apple": "REAL Apple",
+
+  "block.trainees.myblock": "Chicken Block",
+  "block.trainees.two_half_ingot_block": "2.5Block",
+  "block.trainees.polyester_block": "Polyester Ore",
+  "block.trainees.feather_block": "Feather Block",
+
+
+
+  "enchantment.trainees.ten_thousand_sword": "Wanjian Guizong",
+
+  "advancements.trainees.root.title": "Trainees",
+  "advancements.trainees.root.description": "Who has embarked on an irreversible path of train...",
+  "advancements.trainees.kun_nugget.title": "Unusual Chicken",
+  "advancements.trainees.kun_nugget.description": "Get kun nugget.",
+  "advancements.trainees.two_half_ingot.title": "5 divided by 2 equals 2.5!",
+  "advancements.trainees.two_half_ingot.description": "Get 2.5ingot.",
+  "advancements.trainees.stone_stick.title": "To get tough,but stone stick",
+  "advancements.trainees.stone_stick.description": "Get stone stick.",
+  "advancements.trainees.real_diamond_pickaxe.title": "Is THIS a diamond pickaxe?",
+  "advancements.trainees.real_diamond_pickaxe.description": "Synthesize something imperceptible and sharp.",
+  "advancements.trainees.the_the_longest_real_diamond_pickaxe.title": "Constant dropping wears away a stone",
+  "advancements.trainees.the_the_longest_real_diamond_pickaxe.description": "Synthesize something the most imperceptible.",
+  "advancements.trainees.upgrade_theme.title": "Do you crave the power of「Synthesize」?",
+  "advancements.trainees.upgrade_theme.description": "Get upgrade theme.",
+  "advancements.trainees.myblock.title": "Circumstances change with the passage of time",
+  "advancements.trainees.myblock.description": "Get Kun block, but its meanings is unfathomable.",
+  "advancements.trainees.real_apple.title": "Artificial apple!",
+  "advancements.trainees.real_apple.description": "WHERE IS food Safety.",
+  "advancements.trainees.eat_big_kun.title": "The Power of BIG AhKin",
+  "advancements.trainees.eat_big_kun.description": "Eat the apple left behind by the legendary old man.",
+
+  "subtitles.trainees.ahkun_sound": "Just because you're too beautiful!",
+
+
+  "itemGroup.trainees.kun_tab": "Trainees"
+
 }

@@ -2,7 +2,6 @@ package com.pha.trainees;
 
 import com.mojang.logging.LogUtils;
 import com.pha.trainees.event.*;
-import com.pha.trainees.item.Duihuanquan;
 import com.pha.trainees.registry.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -22,48 +21,44 @@ public class Main {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "trainees";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     private static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
-
-    //兑换券
-    public static final RegistryObject<Item> duihuanquan = ITEMS.register("duihuanquan", () -> new Duihuanquan(
-            new Item.Properties()
-    ));
-    public static final RegistryObject<CreativeModeTab> kun_tab = CREATIVE_MODE_TABS.register("kun_tab",() -> CreativeModeTab.builder()
-            .title(Component.translatable("kun_tab"))
-            .icon(() -> new ItemStack(ModItems.AHKUN_APPLE.get()))
-            .displayItems((parm,output) -> {
-                output.accept(ModItems.myblockitem.get());
-                output.accept(duihuanquan.get());
-            })
-
-            .build()
-    );
-
 
     public Main() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         var ebus = MinecraftForge.EVENT_BUS;
         BLOCKS.register(bus);
         ITEMS.register(bus);
-        ModEntities.ENTITIES.register(bus);
+        CREATIVE_MODE_TABS.register(bus);
+
+
         ModBlocks.BLOCKS.register(bus);
         ModSounds.SOUNDS.register(bus);
         ModEnchantments.ENCHANTMENTS.register(bus);
         ModItems.ITEMS.register(bus);
+        ModEntities.ENTITIES.register(bus);
 
         ebus.register(AbilityHandler.class);
-        ebus.register(ClientModEvents.class);
+        //ebus.register(ClientEvents.class);
         ebus.register(FoodHandler.class);
         ebus.register(PickupHandler.class);
         ebus.register(RealPickaxeEvents.class);
         ebus.register(SweepHandler.class);
         ebus.register(ThrowHandler.class);
-    }
 
+    }
+    //创造模式物品栏
+    public static final RegistryObject<CreativeModeTab> kun_tab = CREATIVE_MODE_TABS.register("kun_tab",() -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.trainees.kun_tab"))
+            .icon(() -> new ItemStack(ModItems.KUN_NUGGET.get()))
+            .displayItems((parm,output) -> {
+                ModItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()));
+            })
+            .build()
+    );
 
 
 }

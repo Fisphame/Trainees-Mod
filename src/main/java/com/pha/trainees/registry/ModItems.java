@@ -1,13 +1,10 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.item.CompoundScytheItem;
-import com.pha.trainees.item.EnchantedFoodItem;
-import com.pha.trainees.item.ScytheItem;
+import com.pha.trainees.item.*;
 import com.pha.trainees.util.ModTiers;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -15,6 +12,8 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
+
+    //顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 -> 刷怪蛋
 
     //两锭半块
     public static final RegistryObject<Item> TWO_HALF_INGOT_BLOCK_ITEM = ITEMS.register("two_half_ingot_block",
@@ -35,6 +34,7 @@ public class ModItems {
     public static final RegistryObject<Item> myblockitem = ITEMS.register("myblock",
             () -> new BlockItem(ModBlocks.myblock.get(),
             new Item.Properties()
+                    .rarity(Rarity.RARE)
     ));
 
 
@@ -42,7 +42,7 @@ public class ModItems {
 
     //“钻石镐”
     public static final RegistryObject<Item> REAL_DIAMOND_PICKAXE = ITEMS.register("real_diamond_pickaxe",
-            () -> new PickaxeItem(
+            () -> new RealPickaxeItem(
                     Tiers.DIAMOND,
                     1,
                     -2.8F,
@@ -53,7 +53,7 @@ public class ModItems {
 
     //“钻 石 镐”
     public static final RegistryObject<Item> LONG_REAL_DIAMOND_PICKAXE = ITEMS.register("long_real_diamond_pickaxe",
-            () -> new PickaxeItem(
+            () -> new RealPickaxeItem(
                     Tiers.DIAMOND,
                     2,
                     -2.9F,
@@ -64,7 +64,7 @@ public class ModItems {
 
     //“钻  石  镐”
     public static final RegistryObject<Item> LONGER_REAL_DIAMOND_PICKAXE = ITEMS.register("longer_real_diamond_pickaxe",
-            () -> new PickaxeItem(
+            () -> new RealPickaxeItem(
                     Tiers.DIAMOND,
                     2,
                     -2.9F,
@@ -75,7 +75,7 @@ public class ModItems {
 
     //“钻   石   镐”
     public static final RegistryObject<Item> LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("longest_real_diamond_pickaxe",
-            () -> new PickaxeItem(
+            () -> new RealPickaxeItem(
                     Tiers.DIAMOND,
                     3,
                     -3.0F,
@@ -86,7 +86,7 @@ public class ModItems {
 
     //“钻    石    镐”
     public static final RegistryObject<Item> THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_longest_real_diamond_pickaxe",
-            () -> new PickaxeItem(
+            () -> new RealPickaxeItem(
                     Tiers.DIAMOND,
                     3,
                     -3.0F,
@@ -97,7 +97,7 @@ public class ModItems {
 
     //“钻     石     镐”
     public static final RegistryObject<Item> THE_THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_the_longest_real_diamond_pickaxe",
-            () -> new PickaxeItem(
+            () -> new RealPickaxeItem(
                     Tiers.DIAMOND,
                     4,
                     -3.0F,
@@ -136,6 +136,19 @@ public class ModItems {
                             .durability(913)
             )
     );
+    //终极只因镐
+    public static final RegistryObject<Item> KUN_PICKAXE_FINAL= ITEMS.register("kun_pickaxe_final" ,
+            ()-> new KunPickaxeFinal(
+                    Tiers.DIAMOND,
+                    2,
+                    -2.4F,
+                    new Item.Properties()
+                            .durability(913 * 2)
+                            .rarity(Rarity.UNCOMMON)
+            )
+    );
+    //四倍挖掘 -> 提升4倍
+
     //只因斧
     public static final RegistryObject<Item> KUN_AXE= ITEMS.register("kun_axe" ,
             ()-> new AxeItem(
@@ -175,7 +188,7 @@ public class ModItems {
     public static final RegistryObject<Item> KUN_SWORD = ITEMS.register("kun_sword" ,
             ()-> new SwordItem(
                     Tiers.DIAMOND,
-                    4,
+                    2,
                     -2.4F,
                     new Item.Properties()
                             .durability(913)
@@ -243,6 +256,18 @@ public class ModItems {
     );
     //15*4=60 提升4倍
 
+    //“苹果”
+    public static final RegistryObject<Item> REAL_APPLE = ITEMS.register("real_apple",
+            () -> new Item(new Item.Properties()
+                    .food(new FoodProperties.Builder()
+                            .nutrition(4)
+                            .saturationMod(0.3f)
+                            .alwaysEat()
+                            .build()
+                    )
+                    .rarity(Rarity.COMMON)
+            ));
+
     //阿只因苹果
     public static final RegistryObject<Item> AHKUN_APPLE = ITEMS.register("ahkun_apple",
             () -> new EnchantedFoodItem(new Item.Properties()
@@ -267,20 +292,29 @@ public class ModItems {
                     .rarity(Rarity.EPIC)
             ));
 
-    //“苹果”
-    public static final RegistryObject<Item> REAL_APPLE = ITEMS.register("real_apple",
-            () -> new Item(new Item.Properties()
-                    .food(new FoodProperties.Builder()
-                            .nutrition(4)
-                            .saturationMod(0.3f)
-                            .alwaysEat()
-                            .build()
-                    )
-                    .rarity(Rarity.COMMON)
-            ));
 
     //石棍
     public static final RegistryObject<Item> STONE_STICK = ITEMS.register("stone_stick",
+            ()-> new Item(new Item.Properties())
+    );
+    //长木棍
+    public static final RegistryObject<Item> LONG_STICK = ITEMS.register("long_stick",
+            ()-> new Item(new Item.Properties())
+    );
+    //长长木棍
+    public static final RegistryObject<Item> LONGER_STICK = ITEMS.register("longer_stick",
+            ()-> new Item(new Item.Properties())
+    );
+    //长长长木棍
+    public static final RegistryObject<Item> LONGEST_STICK = ITEMS.register("longest_stick",
+            ()-> new Item(new Item.Properties())
+    );
+    //左半镐
+    public static final RegistryObject<Item> LEFT_OF_DIAMOND_PICKAXE = ITEMS.register("left_of_diamond_pickaxe",
+            ()-> new Item(new Item.Properties())
+    );
+    //右半镐
+    public static final RegistryObject<Item> RIGHT_OF_DIAMOND_PICKAXE = ITEMS.register("right_of_diamond_pickaxe",
             ()-> new Item(new Item.Properties())
     );
     //只因粒
@@ -303,29 +337,14 @@ public class ModItems {
     public static final RegistryObject<Item> ELASTOMERIC_CORE = ITEMS.register("elastomeric_core",
             ()-> new Item(new Item.Properties())
     );
+    //兑换券
+    public static final RegistryObject<Item> duihuanquan = ITEMS.register("duihuanquan",
+            ()-> new Duihuanquan(new Item.Properties()
+                    .rarity(Rarity.RARE)
+            ));
     //升级模版
     public static final RegistryObject<Item> UPGRADE_THEME = ITEMS.register("upgrade_theme",
             ()-> new Item(new Item.Properties()
                     .rarity(Rarity.RARE)
             ));
-    //左半镐
-    public static final RegistryObject<Item> LEFT_OF_DIAMOND_PICKAXE = ITEMS.register("left_of_diamond_pickaxe",
-            ()-> new Item(new Item.Properties())
-    );
-    //右半镐
-    public static final RegistryObject<Item> RIGHT_OF_DIAMOND_PICKAXE = ITEMS.register("right_of_diamond_pickaxe",
-            ()-> new Item(new Item.Properties())
-    );
-    //长木棍
-    public static final RegistryObject<Item> LONG_STICK = ITEMS.register("long_stick",
-            ()-> new Item(new Item.Properties())
-    );
-    //长长木棍
-    public static final RegistryObject<Item> LONGER_STICK = ITEMS.register("longer_stick",
-            ()-> new Item(new Item.Properties())
-    );
-    //长长长木棍
-    public static final RegistryObject<Item> LONGEST_STICK = ITEMS.register("longest_stick",
-            ()-> new Item(new Item.Properties())
-    );
 }

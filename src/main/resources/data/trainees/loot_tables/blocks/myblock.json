@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "trainees:two_half_ingot_block"
+          "name": "trainees:myblock"
         }
       ],
       "conditions": [
