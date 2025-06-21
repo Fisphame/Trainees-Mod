@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    " S ",
+    " S "
+  ],
+  "key": {
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": {
+    "item": "trainees:long_stick",
+    "count": 1
+  },
+  "unlockedBy": {
+    "trigger": {
+      "trigger": "minecraft:tick",
+      "conditions": {
+        "items": [
+          {
+            "items": ["minecraft:stick"]
+          }
+        ]
+      }
+    }
+  }
+}
