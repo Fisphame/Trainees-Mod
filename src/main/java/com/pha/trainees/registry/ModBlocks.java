@@ -31,7 +31,7 @@ public class ModBlocks {
                     .noCollission()
     ));
 
-    public static final RegistryObject<Block> POLYESTER_BLOCK = BLOCKS.register("polyester_block", () -> new Block(
+    public static final RegistryObject<Block> POLYESTER_ORE = BLOCKS.register("polyester_ore", () -> new Block(
             BlockBehaviour.Properties.of()
                     .strength(2f,2f)
                     .sound(SoundType.STONE)
@@ -40,7 +40,7 @@ public class ModBlocks {
 
     public static final RegistryObject<Block> myblock = BLOCKS.register("myblock", () -> new Block(
             BlockBehaviour.Properties.of()
-                    .strength(1.0f,1200f)
+                    .strength(15.0f,1200f)
                     .sound(SoundType.NETHERITE_BLOCK)
                     .requiresCorrectToolForDrops()
                     .lightLevel(state -> 7)

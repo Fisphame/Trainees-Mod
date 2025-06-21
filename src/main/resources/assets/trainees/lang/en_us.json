@@ -27,8 +27,8 @@
   "item.trainees.elastomeric_material": "Elastic Material",
   "item.trainees.elastomeric_core": "Elastic Core",
   "item.trainees.upgrade_theme": "Upgrade Theme",
-  "item.trainees.left_of_diamond_pickaxe":"Left Half Diamond Pickaxe",
-  "item.trainees.right_of_diamond_pickaxe":"Right Half Diamond Pickaxe",
+  "item.trainees.left_half_diamond_pickaxe":"Left Half Diamond Pickaxe",
+  "item.trainees.right_half_diamond_pickaxe":"Right Half Diamond Pickaxe",
   "item.trainees.long_stick":"Long stick",
   "item.trainees.longer_stick":"Longer stick",
   "item.trainees.longest_stick":"Longest stick",
@@ -41,7 +41,7 @@
 
   "block.trainees.myblock": "Chicken Block",
   "block.trainees.two_half_ingot_block": "2.5Block",
-  "block.trainees.polyester_block": "Polyester Ore",
+  "block.trainees.polyester_ore": "Polyester Ore",
   "block.trainees.feather_block": "Feather Block",
 
 

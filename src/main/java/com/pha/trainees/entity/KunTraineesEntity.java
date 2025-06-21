@@ -1,35 +1,26 @@
-
 package com.pha.trainees.entity;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.Entity;
+import com.pha.trainees.Main;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.level.Level;
 
-public class KunTraineesEntity extends Entity {
-    public KunTraineesEntity(EntityType<?> type, Level level) {
+public class KunTraineesEntity extends Chicken {
+    public KunTraineesEntity(EntityType<? extends Chicken> type, Level level) {
         super(type, level);
     }
 
-    @Override
-    protected void defineSynchedData() {
-        // 不需要同步数据，留空
+    public static AttributeSupplier.Builder createAttributes() {
+        return Chicken.createAttributes()
+                .add(Attributes.MAX_HEALTH, 6.0) // 可调整属性值
+                .add(Attributes.MOVEMENT_SPEED, 0.25);
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
-    }
-
-    @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        // 从 NBT 标签读取数据（若需持久化数据）
-    }
-
-    @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
-        // 将数据写入 NBT 标签（若需持久化数据）
+    protected ResourceLocation getDefaultLootTable() {
+        return new ResourceLocation(Main.MODID, "entities/kun_trainees"); // 指向自定义战利品表
     }
 }
-

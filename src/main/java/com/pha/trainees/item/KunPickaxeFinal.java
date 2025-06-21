@@ -30,18 +30,14 @@ public class KunPickaxeFinal extends PickaxeItem {
         return state.is(BlockTags.MINEABLE_WITH_PICKAXE);
     }
 
-//    @Override
-//    public float getDestroySpeed(ItemStack stack, BlockState state) {
-//        if (!state.is(ModBlocks.myblock.get())) {
-//            if (state.is(BlockTags.MINEABLE_WITH_PICKAXE)) {
-//                return super.getDestroySpeed(stack, state) * 4.0f;
-//            }
-//            return super.getDestroySpeed(stack, state);
-//        }
-//        else if (AdvancementUtil.hasPlayerAchievement(serverPlayer, MYBLOCK_ADVANCEMENT)){
-//            return super.getDestroySpeed(stack,state) * 4.0f;
-//        }
-//       return super.getDestroySpeed(stack, state);
-//    }
-
+    @Override
+    public float getDestroySpeed(ItemStack stack, BlockState state) {
+        if (!state.is(ModBlocks.myblock.get())) {
+            if (state.is(BlockTags.MINEABLE_WITH_PICKAXE)) {
+                return super.getDestroySpeed(stack, state) * 4.0f;
+            }
+            return super.getDestroySpeed(stack, state);
+        }
+        return super.getDestroySpeed(stack, state);
+    }
 }

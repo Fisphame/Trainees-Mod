@@ -31,8 +31,8 @@
     "experience": 5,
     "recipes": [
       "long_real_diamond_pickaxe",
-      "left_of_diamond_pickaxe",
-      "right_of_diamond_pickaxe"
+      "left_half_diamond_pickaxe",
+      "right_half_diamond_pickaxe"
     ]
   }
 }

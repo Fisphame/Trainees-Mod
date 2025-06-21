@@ -1,5 +1,6 @@
 package com.pha.trainees.client;
 
+import com.pha.trainees.Main;
 import com.pha.trainees.entity.CalledSwordEntity;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -12,9 +13,7 @@ public class CalledSwordRenderer extends EntityRenderer<CalledSwordEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(CalledSwordEntity entity) {
-        return new ResourceLocation("trainees", "textures/entity/called_sword.png");
+        return new ResourceLocation(Main.MODID, "textures/entity/called_sword.png");
     }
-
-
 }
 

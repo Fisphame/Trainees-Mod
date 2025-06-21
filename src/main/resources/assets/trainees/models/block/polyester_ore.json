@@ -3,8 +3,8 @@
 	"parent": "minecraft:block/cube_all",
 	"texture_size": [64, 64],
 	"textures": {
-		"3": "trainees:block/polyester_block",
-		"particle": "trainees:block/polyester_block"
+		"3": "trainees:block/polyester_ore",
+		"particle": "trainees:block/polyester_ore"
 	},
 	"elements": [
 		{

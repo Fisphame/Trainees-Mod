@@ -2,9 +2,11 @@ package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.item.*;
+import com.pha.trainees.materials.TRAIN;
 import com.pha.trainees.util.ModTiers;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -26,8 +28,8 @@ public class ModItems {
             new Item.Properties()
     ));
     //聚酯纤维矿
-    public static final RegistryObject<Item> POLYESTER_BLOCK_ITEM = ITEMS.register("polyester_block",
-            () -> new BlockItem(ModBlocks.POLYESTER_BLOCK.get(),
+    public static final RegistryObject<Item> POLYESTER_ORE_ITEM = ITEMS.register("polyester_ore",
+            () -> new BlockItem(ModBlocks.POLYESTER_ORE.get(),
             new Item.Properties()
     ));
     //只因方块
@@ -37,85 +39,6 @@ public class ModItems {
                     .rarity(Rarity.RARE)
     ));
 
-
-
-
-    //“钻石镐”
-    public static final RegistryObject<Item> REAL_DIAMOND_PICKAXE = ITEMS.register("real_diamond_pickaxe",
-            () -> new RealPickaxeItem(
-                    Tiers.DIAMOND,
-                    1,
-                    -2.8F,
-                    new Item.Properties()
-                            .durability(1561)
-                            .rarity(Rarity.UNCOMMON)
-            ));
-
-    //“钻 石 镐”
-    public static final RegistryObject<Item> LONG_REAL_DIAMOND_PICKAXE = ITEMS.register("long_real_diamond_pickaxe",
-            () -> new RealPickaxeItem(
-                    Tiers.DIAMOND,
-                    2,
-                    -2.9F,
-                    new Item.Properties()
-                            .durability(1561)
-                            .rarity(Rarity.UNCOMMON)
-            ));
-
-    //“钻  石  镐”
-    public static final RegistryObject<Item> LONGER_REAL_DIAMOND_PICKAXE = ITEMS.register("longer_real_diamond_pickaxe",
-            () -> new RealPickaxeItem(
-                    Tiers.DIAMOND,
-                    2,
-                    -2.9F,
-                    new Item.Properties()
-                            .durability(1561)
-                            .rarity(Rarity.UNCOMMON)
-            ));
-
-    //“钻   石   镐”
-    public static final RegistryObject<Item> LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("longest_real_diamond_pickaxe",
-            () -> new RealPickaxeItem(
-                    Tiers.DIAMOND,
-                    3,
-                    -3.0F,
-                    new Item.Properties()
-                            .durability(1561)
-                            .rarity(Rarity.UNCOMMON)
-            ));
-
-    //“钻    石    镐”
-    public static final RegistryObject<Item> THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_longest_real_diamond_pickaxe",
-            () -> new RealPickaxeItem(
-                    Tiers.DIAMOND,
-                    3,
-                    -3.0F,
-                    new Item.Properties()
-                            .durability(1561)
-                            .rarity(Rarity.UNCOMMON)
-            ));
-
-    //“钻     石     镐”
-    public static final RegistryObject<Item> THE_THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_the_longest_real_diamond_pickaxe",
-            () -> new RealPickaxeItem(
-                    Tiers.DIAMOND,
-                    4,
-                    -3.0F,
-                    new Item.Properties()
-                            .durability(1561)
-                            .rarity(Rarity.UNCOMMON)
-            ));
-
-    //“钻石镐”.zip
-    public static final RegistryObject<Item> REAL_DIAMOND_PICKAXE_ZIP = ITEMS.register("real_diamond_pickaxe_zip",
-            () -> new PickaxeItem(
-                    Tiers.DIAMOND,
-                    20,
-                    -1.5F,
-                    new Item.Properties()
-                            .durability(114514)
-                            .rarity(Rarity.EPIC)
-            ));
     //只因锹
     public static final RegistryObject<Item> KUN_SHOVEL= ITEMS.register("kun_shovel" ,
             ()-> new ShovelItem(
@@ -153,7 +76,7 @@ public class ModItems {
     public static final RegistryObject<Item> KUN_AXE= ITEMS.register("kun_axe" ,
             ()-> new AxeItem(
                     Tiers.DIAMOND,
-                    6,
+                    5,
                     -3.1F,
                     new Item.Properties()
                             .durability(913)
@@ -256,6 +179,111 @@ public class ModItems {
     );
     //15*4=60 提升4倍
 
+    //盔甲lv1
+    public static final RegistryObject<Item> TRAIN_I_HELMET = ITEMS.register("train_i_helmet",
+            () -> new ArmorItem(
+                    new TRAIN.I(),
+                    ArmorItem.Type.HELMET,
+                    new Item.Properties()
+            )
+    );
+    public static final RegistryObject<Item> TRAIN_I_CHESTPLATE = ITEMS.register("train_i_chestplate",
+            () -> new ArmorItem(
+                    new TRAIN.I(),
+                    ArmorItem.Type.CHESTPLATE,
+                    new Item.Properties()
+            )
+    );
+
+    public static final RegistryObject<Item> TRAIN_I_LEGGINGS = ITEMS.register("train_i_leggings",
+            () -> new ArmorItem(
+                    new TRAIN.I(),
+                    ArmorItem.Type.LEGGINGS,
+                    new Item.Properties()
+            )
+    );
+
+    public static final RegistryObject<Item> TRAIN_I_BOOTS = ITEMS.register("train_i_boots",
+            () -> new ArmorItem(
+                    new TRAIN.I(),
+                    ArmorItem.Type.BOOTS,
+                    new Item.Properties()
+            )
+    );
+
+    //盔甲lv2
+    public static final RegistryObject<Item> TRAIN_II_HELMET = ITEMS.register("train_ii_helmet",
+            () -> new ArmorItem(
+                    new TRAIN.II(),
+                    ArmorItem.Type.HELMET,
+                    new Item.Properties()
+                            .rarity(Rarity.UNCOMMON)
+            )
+    );
+    public static final RegistryObject<Item> TRAIN_II_CHESTPLATE = ITEMS.register("train_ii_chestplate",
+            () -> new ArmorItem(
+                    new TRAIN.II(),
+                    ArmorItem.Type.CHESTPLATE,
+                    new Item.Properties()
+                            .rarity(Rarity.UNCOMMON)
+            )
+    );
+
+    public static final RegistryObject<Item> TRAIN_II_LEGGINGS = ITEMS.register("train_ii_leggings",
+            () -> new ArmorItem(
+                    new TRAIN.II(),
+                    ArmorItem.Type.LEGGINGS,
+                    new Item.Properties()
+                            .rarity(Rarity.UNCOMMON)
+            )
+    );
+
+    public static final RegistryObject<Item> TRAIN_II_BOOTS = ITEMS.register("train_ii_boots",
+            () -> new ArmorItem(
+                    new TRAIN.II(),
+                    ArmorItem.Type.BOOTS,
+                    new Item.Properties()
+                            .rarity(Rarity.UNCOMMON)
+            )
+    );
+
+    //盔甲lv3
+    public static final RegistryObject<Item> TRAIN_III_HELMET = ITEMS.register("train_iii_helmet",
+            () -> new ArmorItem(
+                    new TRAIN.III(),
+                    ArmorItem.Type.HELMET,
+                    new Item.Properties()
+                            .rarity(Rarity.RARE)
+            )
+    );
+    public static final RegistryObject<Item> TRAIN_III_CHESTPLATE = ITEMS.register("train_iii_chestplate",
+            () -> new ArmorItem(
+                    new TRAIN.III(),
+                    ArmorItem.Type.CHESTPLATE,
+                    new Item.Properties()
+                            .rarity(Rarity.RARE)
+            )
+    );
+
+    public static final RegistryObject<Item> TRAIN_III_LEGGINGS = ITEMS.register("train_iii_leggings",
+            () -> new ArmorItem(
+                    new TRAIN.III(),
+                    ArmorItem.Type.LEGGINGS,
+                    new Item.Properties()
+                            .rarity(Rarity.RARE)
+            )
+    );
+
+    public static final RegistryObject<Item> TRAIN_III_BOOTS = ITEMS.register("train_iii_boots",
+            () -> new ArmorItem(
+                    new TRAIN.III(),
+                    ArmorItem.Type.BOOTS,
+                    new Item.Properties()
+                            .rarity(Rarity.RARE)
+            )
+    );
+
+
     //“苹果”
     public static final RegistryObject<Item> REAL_APPLE = ITEMS.register("real_apple",
             () -> new Item(new Item.Properties()
@@ -297,26 +325,7 @@ public class ModItems {
     public static final RegistryObject<Item> STONE_STICK = ITEMS.register("stone_stick",
             ()-> new Item(new Item.Properties())
     );
-    //长木棍
-    public static final RegistryObject<Item> LONG_STICK = ITEMS.register("long_stick",
-            ()-> new Item(new Item.Properties())
-    );
-    //长长木棍
-    public static final RegistryObject<Item> LONGER_STICK = ITEMS.register("longer_stick",
-            ()-> new Item(new Item.Properties())
-    );
-    //长长长木棍
-    public static final RegistryObject<Item> LONGEST_STICK = ITEMS.register("longest_stick",
-            ()-> new Item(new Item.Properties())
-    );
-    //左半镐
-    public static final RegistryObject<Item> LEFT_OF_DIAMOND_PICKAXE = ITEMS.register("left_of_diamond_pickaxe",
-            ()-> new Item(new Item.Properties())
-    );
-    //右半镐
-    public static final RegistryObject<Item> RIGHT_OF_DIAMOND_PICKAXE = ITEMS.register("right_of_diamond_pickaxe",
-            ()-> new Item(new Item.Properties())
-    );
+
     //只因粒
     public static final RegistryObject<Item> KUN_NUGGET = ITEMS.register("kun_nugget",
             ()-> new Item(new Item.Properties())
@@ -347,4 +356,20 @@ public class ModItems {
             ()-> new Item(new Item.Properties()
                     .rarity(Rarity.RARE)
             ));
+    //盔甲升级模版
+    public static final RegistryObject<Item> UPGRADE_THEME_ARMOR = ITEMS.register("upgrade_theme_armor",
+            ()-> new Item(new Item.Properties()
+                    .rarity(Rarity.RARE)
+            ));
+
+    //练习鸡刷怪蛋
+    public static final RegistryObject<Item> KUN_TRAINEES_SPAWN_EGG = ITEMS.register("kun_trainees_spawn_egg",
+            () -> new ForgeSpawnEggItem(
+                    ModEntities.KUN_TRAINEES,
+                    0xFFFFFF,// 主颜色（蛋底色）
+                    0x000000,// 副颜色（斑点色）
+                    new Item.Properties()
+                            .stacksTo(64) // 物品属性
+            )
+    );
 }

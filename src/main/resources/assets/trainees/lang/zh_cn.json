@@ -1,59 +1,4 @@
 {
-  "itemGroup.trainees.kun_tab": "练习生",
-
-
-  "item.trainees.kun_axe": "只因斧",
-  "item.trainees.kun_hoe": "只因锄",
-  "item.trainees.kun_pickaxe": "只因镐",
-  "item.trainees.kun_pickaxe_final": "终极只因镐",
-  "item.trainees.kun_shovel": "只因锹",
-  "item.trainees.real_diamond_pickaxe":"“钻石镐”",
-  "item.trainees.long_real_diamond_pickaxe":"“钻 石 镐”",
-  "item.trainees.longer_real_diamond_pickaxe":"“钻  石  镐”",
-  "item.trainees.longest_real_diamond_pickaxe":"“钻   石   镐”",
-  "item.trainees.the_longest_real_diamond_pickaxe":"“钻    石    镐”",
-  "item.trainees.the_the_longest_real_diamond_pickaxe":"“钻     石     镐”",
-  "item.trainees.real_diamond_pickaxe_zip":"“钻石镐”.zip",
-
-  "item.trainees.kun_sword": "只因剑",
-  "item.trainees.kun_dagger": "只因短匕",
-  "item.trainees.kun_mace": "只因锤",
-  "item.trainees.kun_axemace": "只因阔斧锤",
-  "item.trainees.kun_scythe": "只因镰刀",
-  "item.trainees.kun_compound_scythe": "只因复合镰刀",
-  "item.trainees.kun_basketball": "只因篮球",
-
-  "item.trainees.duihuanquan": "兑换券",
-  "item.trainees.kun_nugget": "只因粒",
-  "item.trainees.two_half_ingot": "两锭半",
-  "item.trainees.stone_stick": "石棍",
-  "item.trainees.polyester": "醋酯纤维",
-  "item.trainees.elastomeric_material": "弹性材料",
-  "item.trainees.elastomeric_core": "弹性核心",
-  "item.trainees.upgrade_theme": "升级模版",
-  "item.trainees.left_of_diamond_pickaxe":"左半镐",
-  "item.trainees.right_of_diamond_pickaxe":"右半镐",
-  "item.trainees.long_stick":"长木棍",
-  "item.trainees.longer_stick":"长长木棍",
-  "item.trainees.longest_stick":"长长长木棍",
-
-  "item.trainees.ahkun_apple": "阿只因苹果",
-  "item.trainees.big_ahkun_apple": "大阿只因苹果",
-  "item.trainees.real_apple": "“苹果”",
-
-
-
-  "block.trainees.myblock": "只因方块",
-  "block.trainees.two_half_ingot_block": "两锭半块",
-  "block.trainees.polyester_block": "醋酯纤维矿",
-  "block.trainees.feather_block": "羽毛方块",
-
-
-
-  "enchantment.trainees.ten_thousand_sword": "万剑归宗",
-
-
-
   "advancements.trainees.root.title": "练习生",
   "advancements.trainees.root.description": "谁人踏上不归的练习之路……",
   "advancements.trainees.kun_nugget.title": "不寻常的鸡……",
@@ -77,13 +22,85 @@
 
 
 
+
+
+
+  "itemGroup.trainees.kun_tab": "练习生",
+
+  "item.trainees.kun_axe": "只因斧",
+  "item.trainees.kun_hoe": "只因锄",
+  "item.trainees.kun_pickaxe": "只因镐",
+  "item.trainees.kun_pickaxe_final": "终极只因镐",
+  "item.trainees.kun_shovel": "只因锹",
+
+  "item.trainees.kun_sword": "只因剑",
+  "item.trainees.kun_dagger": "只因短匕",
+  "item.trainees.kun_mace": "只因锤",
+  "item.trainees.kun_axemace": "只因阔斧锤",
+  "item.trainees.kun_scythe": "只因镰刀",
+  "item.trainees.kun_compound_scythe": "只因复合镰刀",
+  "item.trainees.kun_basketball": "只因篮球",
+  "item.trainees.train_i_helmet": "练习头盔",
+  "item.trainees.train_i_chestplate": "练习胸甲",
+  "item.trainees.train_i_leggings": "练习护腿",
+  "item.trainees.train_i_boots": "练习靴子",
+  "item.trainees.train_ii_helmet": "练习头盔II",
+  "item.trainees.train_ii_chestplate": "练习胸甲II",
+  "item.trainees.train_ii_leggings": "练习护腿II",
+  "item.trainees.train_ii_boots": "练习靴子II",
+  "item.trainees.train_iii_helmet": "超练习头盔",
+  "item.trainees.train_iii_chestplate": "超练习胸甲",
+  "item.trainees.train_iii_leggings": "超练习护腿",
+  "item.trainees.train_iii_boots": "超练习靴子",
+
+  "item.trainees.duihuanquan": "兑换券",
+  "item.trainees.kun_nugget": "只因粒",
+  "item.trainees.two_half_ingot": "两锭半",
+  "item.trainees.stone_stick": "石棍",
+  "item.trainees.polyester": "醋酯纤维",
+  "item.trainees.elastomeric_material": "弹性材料",
+  "item.trainees.elastomeric_core": "弹性核心",
+  "item.trainees.upgrade_theme": "升级模版",
+  "item.trainees.upgrade_theme_armor": "盔甲升级模版",
+
+  "item.trainees.ahkun_apple": "阿只因苹果",
+  "item.trainees.big_ahkun_apple": "大阿只因苹果",
+  "item.trainees.real_apple": "“苹果”",
+
+  "block.trainees.myblock": "只因方块",
+  "block.trainees.two_half_ingot_block": "两锭半块",
+  "block.trainees.polyester_ore": "醋酯纤维矿",
+  "block.trainees.feather_block": "羽毛方块",
+
+  "enchantment.trainees.ten_thousand_sword": "万剑归宗",
+
+  "entity.trainees.kun_trainees": "练习鸡",
+  "item.trainees.kun_trainees_spawn_egg": "练习鸡刷怪蛋",
+
+  "itemGroup.trainees.hao_tab": "豪哥",
+
+  "item.trainees.hao_ge": "豪哥",
+
+
+
+  "itemGroup.trainees.prank_tab":"整蛊",
+
+  "item.trainees.left_half_diamond_pickaxe":"左半镐",
+  "item.trainees.right_half_diamond_pickaxe":"右半镐",
+  "item.trainees.long_stick":"长木棍",
+  "item.trainees.longer_stick":"长长木棍",
+  "item.trainees.longest_stick":"长长长木棍",
+  "item.trainees.real_diamond_pickaxe":"“钻石镐”",
+  "item.trainees.long_real_diamond_pickaxe":"“钻 石 镐”",
+  "item.trainees.longer_real_diamond_pickaxe":"“钻  石  镐”",
+  "item.trainees.longest_real_diamond_pickaxe":"“钻   石   镐”",
+  "item.trainees.the_longest_real_diamond_pickaxe":"“钻    石    镐”",
+  "item.trainees.the_the_longest_real_diamond_pickaxe":"“钻     石     镐”",
+  "item.trainees.real_diamond_pickaxe_zip":"“钻石镐”.zip",
+
   "subtitles.trainees.ahkun_sound": "只因你太美！",
   "subtitles.trainees.mining_sound_1": "鸡",
   "subtitles.trainees.mining_sound_2": "你",
   "subtitles.trainees.mining_sound_3": "太",
-  "subtitles.trainees.mining_sound_4": "美",
-
-
-
-  "message.trainees.mining_myblock": "你需要虔诚"
+  "subtitles.trainees.mining_sound_4": "美"
 }

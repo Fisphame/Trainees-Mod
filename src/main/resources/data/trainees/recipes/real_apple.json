@@ -18,7 +18,13 @@
   "unlockedBy": {
     "trigger": {
       "trigger": "minecraft:tick",
-      "conditions": {}
+      "conditions": {
+        "items": [
+          {
+            "items": ["minecraft:egg"]
+          }
+        ]
+      }
     }
   }
 }

@@ -10,7 +10,7 @@
     "S": { "item": "minecraft:stick" }
   },
   "result": {
-    "item": "trainees:left_of_diamond_pickaxe"
+    "item": "trainees:left_half_diamond_pickaxe"
   },
   "unlockedBy": {
     "trigger": "minecraft:inventory_changed",
