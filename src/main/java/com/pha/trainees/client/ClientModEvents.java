@@ -13,5 +13,6 @@ public class ClientModEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.CALLED_SWORD.get(), CalledSwordRenderer::new);
         event.registerEntityRenderer(ModEntities.KUN_TRAINEES.get(), KunTraineesRenderer::new);
+        event.registerEntityRenderer(ModEntities.KUN_ANTI.get(), KunAntiRenderer::new);
     }
 }

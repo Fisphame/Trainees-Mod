@@ -18,7 +18,8 @@
   },
   "rewards": {
     "recipes": [
-      "trainees:two_half_ingot2"
+      "trainees:two_half_ingot2",
+      "trainees:upgrade_theme"
     ]
   }
 }

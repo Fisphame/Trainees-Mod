@@ -38,11 +38,25 @@ public class ModItems {
             new Item.Properties()
                     .rarity(Rarity.RARE)
     ));
+    //提纯台
+    public static final RegistryObject<Item> PURIFICATION_STATION_ITEM = ITEMS.register("purification_station",
+            () -> new BlockItem(ModBlocks.PURIFICATION_STATION.get(),
+                    new Item.Properties()
+            )
+    );
+    //反相篮球
+    public static final RegistryObject<Item> BASKETBALL_ANTI_BLOCK_ITEM = ITEMS.register("basketball_anti_block",
+            () -> new BlockItem(ModBlocks.BASKETBALL_ANTI_BLOCK.get(),
+                    new Item.Properties()
+            )
+
+
+    );
 
     //只因锹
     public static final RegistryObject<Item> KUN_SHOVEL= ITEMS.register("kun_shovel" ,
             ()-> new ShovelItem(
-                    Tiers.DIAMOND,
+                    Tiers.IRON,
                     1,
                     -3F,
                     new Item.Properties()
@@ -52,8 +66,8 @@ public class ModItems {
     //只因镐
     public static final RegistryObject<Item> KUN_PICKAXE= ITEMS.register("kun_pickaxe" ,
             ()-> new PickaxeItem(
-                    Tiers.DIAMOND,
-                    0,
+                    Tiers.IRON,
+                    1,
                     -2.8F,
                     new Item.Properties()
                             .durability(913)
@@ -63,8 +77,8 @@ public class ModItems {
     public static final RegistryObject<Item> KUN_PICKAXE_FINAL= ITEMS.register("kun_pickaxe_final" ,
             ()-> new KunPickaxeFinal(
                     Tiers.DIAMOND,
-                    2,
-                    -2.4F,
+                    3,
+                    -2.8F,
                     new Item.Properties()
                             .durability(913 * 2)
                             .rarity(Rarity.UNCOMMON)
@@ -75,8 +89,8 @@ public class ModItems {
     //只因斧
     public static final RegistryObject<Item> KUN_AXE= ITEMS.register("kun_axe" ,
             ()-> new AxeItem(
-                    Tiers.DIAMOND,
-                    5,
+                    Tiers.IRON,
+                    6,
                     -3.1F,
                     new Item.Properties()
                             .durability(913)
@@ -85,8 +99,8 @@ public class ModItems {
     //只因锄
     public static final RegistryObject<Item> KUN_HOE= ITEMS.register("kun_hoe" ,
             ()-> new HoeItem(
-                    Tiers.DIAMOND,
-                    -3,
+                    Tiers.IRON,
+                    -2,
                     -1.0F,
                     new Item.Properties()
                             .durability(913)
@@ -110,8 +124,8 @@ public class ModItems {
     //只因剑
     public static final RegistryObject<Item> KUN_SWORD = ITEMS.register("kun_sword" ,
             ()-> new SwordItem(
-                    Tiers.DIAMOND,
-                    2,
+                    Tiers.IRON,
+                    3,
                     -2.4F,
                     new Item.Properties()
                             .durability(913)
@@ -121,9 +135,9 @@ public class ModItems {
     //只因短匕
     public static final RegistryObject<Item> KUN_DAGGER = ITEMS.register("kun_dagger" ,
             ()-> new SwordItem(
-                    Tiers.DIAMOND,
+                    Tiers.IRON,
                     0,
-                    -1.8F,
+                    0F,
                     new Item.Properties()
                             .durability(913)
             )
@@ -132,8 +146,8 @@ public class ModItems {
     public static final RegistryObject<Item> KUN_SCYTHE = ITEMS.register("kun_scythe",
             () -> new ScytheItem(
                     ModTiers.SCYTHE, // 自定义工具等级（见步骤2）
-                    0,               // 基础攻击伤害（实际伤害 = 5 + 等级加成）
-                    -2.6F,           // 攻击速度（原版钻石剑为-2.4）
+                    2,               // 基础攻击伤害（实际伤害 = 5 + 等级加成）
+                    -2.8F,           // 攻击速度（原版钻石剑为-2.4）
                     new Item.Properties().durability(913)
                             .rarity(Rarity.COMMON)
             )
@@ -143,10 +157,10 @@ public class ModItems {
 
     //只因锤
     public static final RegistryObject<Item> KUN_MACE = ITEMS.register("kun_mace" ,
-            ()-> new AxeItem(
-                    Tiers.DIAMOND,
+            ()-> new AxeMaceItem(
+                    Tiers.IRON,
                     11,
-                    -3.3F,
+                    -3.4F,
                     new Item.Properties()
                             .durability(913)
             )
@@ -157,7 +171,7 @@ public class ModItems {
             () -> new CompoundScytheItem(
                     ModTiers.SCYTHE,
                     4,
-                    -2.0F,
+                    -2.4F,
                     new Item.Properties().durability(913 * 2)
                             .rarity(Rarity.UNCOMMON)
             )
@@ -168,10 +182,10 @@ public class ModItems {
 
     //只因阔斧锤
     public static final RegistryObject<Item> KUN_ACXEMACE = ITEMS.register("kun_axemace" ,
-            ()-> new AxeItem(
-                    Tiers.DIAMOND,
-                    56,
-                    -2.6F,
+            ()-> new AxeMaceItem(
+                    Tiers.IRON,
+                    53,
+                    -3F,
                     new Item.Properties()
                             .durability(913 * 2)
                             .rarity(Rarity.UNCOMMON)
@@ -321,6 +335,8 @@ public class ModItems {
             ));
 
 
+
+
     //石棍
     public static final RegistryObject<Item> STONE_STICK = ITEMS.register("stone_stick",
             ()-> new Item(new Item.Properties())
@@ -348,7 +364,7 @@ public class ModItems {
     );
     //兑换券
     public static final RegistryObject<Item> duihuanquan = ITEMS.register("duihuanquan",
-            ()-> new Duihuanquan(new Item.Properties()
+            () -> new Duihuanquan(new Item.Properties()
                     .rarity(Rarity.RARE)
             ));
     //升级模版
@@ -362,6 +378,24 @@ public class ModItems {
                     .rarity(Rarity.RARE)
             ));
 
+    //黑粉
+    public static final RegistryObject<Item> POWDER_ANTI = ITEMS.register("powder_anti",
+            () -> new Item(new Item.Properties()
+            ));
+
+    //黑蛋
+    public static final RegistryObject<Item> BLACK_EGG = ITEMS.register("black_egg",
+            () -> new BlackEggItem(new Item.Properties()
+            ));
+
+    //反相篮球
+    public static final RegistryObject<Item> BASKETBALL_ANTI = ITEMS.register("basketball_anti",
+            () -> new BasketballAntiItem(new Item.Properties()
+                    .stacksTo(16)
+                    .rarity(Rarity.UNCOMMON)
+
+            ));
+
     //练习鸡刷怪蛋
     public static final RegistryObject<Item> KUN_TRAINEES_SPAWN_EGG = ITEMS.register("kun_trainees_spawn_egg",
             () -> new ForgeSpawnEggItem(
@@ -372,4 +406,16 @@ public class ModItems {
                             .stacksTo(64) // 物品属性
             )
     );
+    //黑粉刷怪蛋
+    public static final RegistryObject<Item> KUN_ANTI_SPAWN_EGG = ITEMS.register("kun_anti_spawn_egg",
+            () -> new ForgeSpawnEggItem(
+                    ModEntities.KUN_ANTI,
+                    0xFFFFFF,// 主颜色（蛋底色）
+                    0x000000,// 副颜色（斑点色）
+                    new Item.Properties()
+                            .stacksTo(64) // 物品属性
+            )
+    );
+
+
 }

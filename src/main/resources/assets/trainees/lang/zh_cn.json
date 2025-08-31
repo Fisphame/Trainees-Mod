@@ -1,26 +1,32 @@
 {
   "advancements.trainees.root.title": "练习生",
   "advancements.trainees.root.description": "谁人踏上不归的练习之路……",
-  "advancements.trainees.kun_nugget.title": "不寻常的鸡……",
-  "advancements.trainees.kun_nugget.description": "获得只因粒。",
+  "advancements.trainees.kun_nugget.title": "不寻常的鸡",
+  "advancements.trainees.kun_nugget.description": "或许你该建一个养鸡场……",
   "advancements.trainees.two_half_ingot.title": "5/2=2.5！",
-  "advancements.trainees.two_half_ingot.description": "获得两锭半。",
+  "advancements.trainees.two_half_ingot.description": "两锭半，非常形象的名字。",
   "advancements.trainees.stone_stick.title": "来硬的……棍子",
-  "advancements.trainees.stone_stick.description": "获得石棍。",
+  "advancements.trainees.stone_stick.description": "石棍可能不硬，但砸到人脑壳人就硬了。",
   "advancements.trainees.real_diamond_pickaxe.title": "这是钻石镐么……？",
   "advancements.trainees.real_diamond_pickaxe.description": "合成出不明觉厉的东西……",
-  "advancements.trainees.the_the_longest_real_diamond_pickaxe.title": "滴水穿石……",
-  "advancements.trainees.the_the_longest_real_diamond_pickaxe.description": "合成出最不明觉厉的东西……？",
-  "advancements.trainees.upgrade_theme.title": "你渴望「合成」之力么？",
-  "advancements.trainees.upgrade_theme.description": "获得升级模版。",
+  "advancements.trainees.the_the_longest_real_diamond_pickaxe.title": "滴水穿石，海枯石烂",
+  "advancements.trainees.the_the_longest_real_diamond_pickaxe.description": "合成出最不明觉厉的东西……",
+  "advancements.trainees.upgrade_theme.title": "你渴望「升级」之力么？",
+  "advancements.trainees.upgrade_theme.description": "升级你的工具和武器吧！",
+  "advancements.trainees.kun_pickaxe_final.title": "献给挖掘",
+  "advancements.trainees.kun_pickaxe_final.description": "意为「终极」之镐，欲采「只因」之块",
   "advancements.trainees.myblock.title": "时过境迁",
-  "advancements.trainees.myblock.description": "获得只因方块，但其意蕴深不可测…………",
+  "advancements.trainees.myblock.description": "沧海桑田，过往云烟，深不可测？但终有人揽之入怀。",
   "advancements.trainees.real_apple.title": "人造苹果！",
   "advancements.trainees.real_apple.description": "食品安全……",
-  "advancements.trainees.eat_big_kun.title": "大只因的力量",
-  "advancements.trainees.eat_big_kun.description": "吃下传说中那故人遗留下的苹果……",
-
-
+  "advancements.trainees.eat_big_kun.title": "这股力量不属于你",
+  "advancements.trainees.eat_big_kun.description": "吃下传说中故人遗留下的苹果……",
+  "advancements.trainees.pei_fang_block.title": "是个块！",
+  "advancements.trainees.pei_fang_block.description": "刘浩然是个块！",
+  "advancements.trainees.pei_fang_ball.title": "是个球！",
+  "advancements.trainees.pei_fang_ball.description": "刘浩然是个球！！",
+  "advancements.trainees.kun_anti.title": "小黑子！",
+  "advancements.trainees.kun_anti.description": "食不食油饼？",
 
 
 
@@ -32,7 +38,6 @@
   "item.trainees.kun_pickaxe": "只因镐",
   "item.trainees.kun_pickaxe_final": "终极只因镐",
   "item.trainees.kun_shovel": "只因锹",
-
   "item.trainees.kun_sword": "只因剑",
   "item.trainees.kun_dagger": "只因短匕",
   "item.trainees.kun_mace": "只因锤",
@@ -52,35 +57,73 @@
   "item.trainees.train_iii_chestplate": "超练习胸甲",
   "item.trainees.train_iii_leggings": "超练习护腿",
   "item.trainees.train_iii_boots": "超练习靴子",
-
   "item.trainees.duihuanquan": "兑换券",
   "item.trainees.kun_nugget": "只因粒",
   "item.trainees.two_half_ingot": "两锭半",
   "item.trainees.stone_stick": "石棍",
-  "item.trainees.polyester": "醋酯纤维",
+  "item.trainees.polyester": "聚酯纤维",
   "item.trainees.elastomeric_material": "弹性材料",
   "item.trainees.elastomeric_core": "弹性核心",
   "item.trainees.upgrade_theme": "升级模版",
   "item.trainees.upgrade_theme_armor": "盔甲升级模版",
-
   "item.trainees.ahkun_apple": "阿只因苹果",
   "item.trainees.big_ahkun_apple": "大阿只因苹果",
   "item.trainees.real_apple": "“苹果”",
-
+  "item.trainees.kun_trainees_spawn_egg": "练习鸡刷怪蛋",
+  "item.trainees.powder_anti": "黑粉",
+  "item.trainees.black_egg": "黑蛋",
+  "item.trainees.kun_anti_spawn_egg": "黑粉刷怪蛋",
+  "item.trainees.basketball_anti": "反相篮球",
+  "item.trainees.basketball_anti.effect.empty": "反相篮球",
+  "item.trainees.basketball_anti.effect.harming": "[瞬伤]反相篮球",
+  
+  "tooltip.trainees.axemace_item": "§l斧锤",
+  "tooltip.trainees.axemace_item.2": "保留了斧头的工具功能。",
+  "tooltip.trainees.basketball_anti_item": "§l反相篮球",
+  "tooltip.trainees.basketball_anti_item.2": "按住潜行键右键放置为方块，直接右键投掷。\n投掷后产生瞬间伤害药水效果。\n挖掘放置后的方块会掉落无效果的物品，需再次使用以激活。",
+  "tooltip.trainees.black_egg_item": "§l黑蛋",
+  "tooltip.trainees.black_egg_item.2": "投掷后固定生成幼年“黑粉”。（由于不可抗力低概率同时生成幼年鸡，或许可以理解为净化？）",
+  "tooltip.trainees.compound_scythe_item": "§l镰刀",
+  "tooltip.trainees.compound_scythe_item.2": "横扫伤害为主手伤害的6倍，范围提升至4倍。（主手伤害不变）",
+  "tooltip.trainees.duihuanquan": "§l兑换券",
+  "tooltip.trainees.duihuanquan.2": "与只因方块交互可获得升级模版。",
+  "tooltip.trainees.kun_pickaxe_final_item": "§l终极镐",
+  "tooltip.trainees.kun_pickaxe_final_item.2": "挖掘速度提升至4倍。唯一能采集“只因方块”的工具……",
+  "tooltip.trainees.real_pickaxe_item": "§l真·镐",
+  "tooltip.trainees.real_pickaxe_item.2": "生存模式下挖掘方块会播放随机音效……不来听听看吗，嘻嘻^v^",
+  "tooltip.trainees.scythe_item": "§l镰刀",
+  "tooltip.trainees.scythe_item.2": "横扫伤害为主手伤害的2倍，范围提升至2倍。（主手伤害不变）",
+  
   "block.trainees.myblock": "只因方块",
   "block.trainees.two_half_ingot_block": "两锭半块",
-  "block.trainees.polyester_ore": "醋酯纤维矿",
+  "block.trainees.polyester_ore": "聚酯纤维矿",
   "block.trainees.feather_block": "羽毛方块",
+  "block.trainees.purification_station": "提纯台",
+  "block.trainees.basketball_anti_block": "[方块]反相篮球",
 
   "enchantment.trainees.ten_thousand_sword": "万剑归宗",
-
+  
   "entity.trainees.kun_trainees": "练习鸡",
-  "item.trainees.kun_trainees_spawn_egg": "练习鸡刷怪蛋",
+  "entity.trainees.kun_anti": "黑粉",
 
-  "itemGroup.trainees.hao_tab": "豪哥",
 
+  "itemGroup.trainees.hao_tab": "一些东西",
+
+  "block.trainees.pei_fang_block": "配方块",
   "item.trainees.hao_ge": "豪哥",
+  "item.trainees.pei_fang": "配方",
+  "item.trainees.pei_fang_ball": "配方是个球",
 
+  "painting.trainees.spf1.title": "月牙天冲",
+  "painting.trainees.spf1.author": "Phamoce - 塑料瓶匿迹于残影，也乱他脸于不可见…………",
+  "painting.trainees.spf2.title": "旋耳炫光",
+  "painting.trainees.spf2.author": "Phamoce - 俯仰绕耳，光冲脸过，独留他耳旋…………",
+  "painting.trainees.spf3.title": "光抚视慈",
+  "painting.trainees.spf3.author": "Phamoce - 白光抚摸着他视线慈和的脸，勾出笑来…………",
+  "painting.trainees.spf4.title": "平观光洒",
+  "painting.trainees.spf4.author": "Phamoce - 他捧着惨白与狂烈，任光洒在前胸与脸颊…………",
+  "painting.trainees.p1.title": "好臭啊（悲）",
+  "painting.trainees.p1.author": "Homo",
 
 
   "itemGroup.trainees.prank_tab":"整蛊",
@@ -97,10 +140,19 @@
   "item.trainees.the_longest_real_diamond_pickaxe":"“钻    石    镐”",
   "item.trainees.the_the_longest_real_diamond_pickaxe":"“钻     石     镐”",
   "item.trainees.real_diamond_pickaxe_zip":"“钻石镐”.zip",
+  "item.trainees.fast_kun_dagger":"杂鱼",
+  
+  "itemGroup.trainees.gun_mu_tab":" ",
+  "item.trainees.gun_mu":" ",
 
   "subtitles.trainees.ahkun_sound": "只因你太美！",
   "subtitles.trainees.mining_sound_1": "鸡",
   "subtitles.trainees.mining_sound_2": "你",
   "subtitles.trainees.mining_sound_3": "太",
-  "subtitles.trainees.mining_sound_4": "美"
+  "subtitles.trainees.mining_sound_4": "美",
+
+  "container.trainees.purification_station": "提纯台",
+  "container.trainees.purification_station.input_slot": "材料",
+  "container.trainees.purification_station.fuel_slot": "升级/提纯物……",
+  "button.trainees.purify": "提升"
 }

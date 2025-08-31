@@ -1,13 +1,17 @@
 package com.pha.trainees.item;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ScytheItem extends SwordItem {
@@ -15,7 +19,7 @@ public class ScytheItem extends SwordItem {
         super(tier, attackDamage, attackSpeed, properties);
     }
     private static final float SWEEP_RADIUS = 2F; // 横扫范围（原版为1.0）
-    private static final float SWEEP_DAMAGE_MULTIPLIER = 3F; // 伤害倍率（原版为1.0）
+    private static final float SWEEP_DAMAGE_MULTIPLIER = 2F; // 伤害倍率（原版为1.0）
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
@@ -41,5 +45,15 @@ public class ScytheItem extends SwordItem {
             }
         }
         return super.hurtEnemy(stack, target, attacker);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level,
+                                List<Component> tooltipComponents, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltipComponents, flag);
+
+        // 添加本地化的工具提示
+        tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item"));
+        tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item.2"));
     }
 }

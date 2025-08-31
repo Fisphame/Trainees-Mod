@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "trainees:items/stone_stick",
+  "parent": "trainees:items/kun_pickaxe_final",
   "criteria": {
     "obtain_myblock": {
       "trigger": "minecraft:inventory_changed",

@@ -1,13 +1,17 @@
 package com.pha.trainees.item;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class CompoundScytheItem extends SwordItem {
@@ -41,5 +45,15 @@ public class CompoundScytheItem extends SwordItem {
             }
         }
         return super.hurtEnemy(stack, target, attacker);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level,
+                                List<Component> tooltipComponents, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltipComponents, flag);
+
+        // 添加本地化的工具提示
+        tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item"));
+        tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item.2"));
     }
 }

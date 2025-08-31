@@ -1,7 +1,10 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.block.BasketballAntiBlock;
+import com.pha.trainees.block.PurificationStationBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.registries.DeferredRegister;
@@ -38,6 +41,10 @@ public class ModBlocks {
                     .requiresCorrectToolForDrops()
     ));
 
+    public static final RegistryObject<Block> DEEPSLATE_POLYESTER_ORE = BLOCKS.register("deepslate_polyester_ore",() ->
+            new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_IRON_ORE))
+    );
+
     public static final RegistryObject<Block> myblock = BLOCKS.register("myblock", () -> new Block(
             BlockBehaviour.Properties.of()
                     .strength(15.0f,1200f)
@@ -46,6 +53,31 @@ public class ModBlocks {
                     .lightLevel(state -> 7)
                     .emissiveRendering((state,world,pos) -> true)
     ));
+
+
+    //提纯台
+    public static final RegistryObject<Block> PURIFICATION_STATION = BLOCKS.register(
+            "purification_station",
+            () -> new PurificationStationBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(3.0f, 6.0f)
+                            .sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops()
+            )
+    );
+
+    //反相篮球
+    public static final RegistryObject<Block> BASKETBALL_ANTI_BLOCK = BLOCKS.register(
+            "basketball_anti_block",
+            () -> new BasketballAntiBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(0.5f,0.5f) // 较软的方块
+                            .sound(SoundType.WOOL) // 羊毛般的声音
+                            .noOcclusion() // 不阻挡视线
+                            .instabreak()
+            )
+    );
+
 
 }
 

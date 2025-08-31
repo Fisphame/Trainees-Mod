@@ -16,9 +16,9 @@ import java.util.function.Supplier;
 
 public class TRAIN{
     private static final int[][] PROTECTION_PER_SLOT ={
-            new int[]{2,5,4,2},
-            new int[]{4,8,6,4},
-            new int[]{6,11,8,6}
+            new int[]{3,6,4,1},
+            new int[]{5,8,5,2},
+            new int[]{5,8,5,2}
     }; //盔甲值
     private static final int[] DURABILITY_PER_SLOT = new int[]{
             13, 15, 16, 11
@@ -30,10 +30,10 @@ public class TRAIN{
             10, 15, 20
     }; //附魔能力
     private static final float[] TOUGHNESS_VALUE = new float[]{
-            0.0f, 1.0f, 3.0f
+            0.0f, 2.5f, 4.0f
     }; //韧性
     private static final float[] KNOCKBACK_RESISTANCE_VALUE = new float[]{
-            0.0f, 0.05f, 0.10f
+            0.0f, 0.0f, 0.15f
     }; //击退抗性
     private static final SoundEvent[] SOUND_EVENTS = new SoundEvent[]{
             SoundEvents.ARMOR_EQUIP_IRON, SoundEvents.ARMOR_EQUIP_DIAMOND, SoundEvents.ARMOR_EQUIP_NETHERITE

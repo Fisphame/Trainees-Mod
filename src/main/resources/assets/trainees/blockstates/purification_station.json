@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "trainees:block/purification_station"
+      },
+      {
+        "model": "trainees:block/purification_station",
+        "y": 90
+      },
+      {
+        "model": "trainees:block/purification_station",
+        "y": 180
+      },
+      {
+        "model": "trainees:block/purification_station",
+        "y": 270
+      }
+    ]
+  }
+}

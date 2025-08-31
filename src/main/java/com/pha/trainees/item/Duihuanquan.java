@@ -3,6 +3,7 @@ package com.pha.trainees.item;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -10,10 +11,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 
 public class Duihuanquan extends Item {
@@ -35,4 +40,15 @@ public class Duihuanquan extends Item {
         }
         return super.useOn(context);
     }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level,
+                                List<Component> tooltipComponents, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltipComponents, flag);
+
+        // 添加本地化的工具提示
+        tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan"));
+        tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan.2"));
+    }
 }
+
