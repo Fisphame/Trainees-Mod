@@ -1,8 +1,7 @@
 package com.pha.trainees.event;
 
-import com.pha.trainees.item.RealPickaxeItem;
-import com.pha.trainees.network.NetworkHandler;
-import com.pha.trainees.network.PlaySoundPacket;
+
+import com.pha.trainees.item.LongCourseItem;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.registry.ModSounds;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,7 +32,7 @@ public class RealPickaxeEvents {
 
         // 检查玩家是否使用 RealPickaxe类镐子
         ItemStack heldItem = player.getMainHandItem();
-        if (heldItem.getItem() instanceof RealPickaxeItem){
+        if (heldItem.getItem() instanceof LongCourseItem.RealPickaxeItem){
             if (!player.level().isClientSide) {
                 // 随机选择音效
                 int index = player.getRandom().nextInt(MINING_SOUNDS.size());

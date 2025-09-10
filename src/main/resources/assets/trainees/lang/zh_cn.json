@@ -27,8 +27,22 @@
   "advancements.trainees.pei_fang_ball.description": "刘浩然是个球！！",
   "advancements.trainees.kun_anti.title": "小黑子！",
   "advancements.trainees.kun_anti.description": "食不食油饼？",
-
-
+  "advancements.trainees.powder_anti_92.title": "压缩包压缩压缩包",
+  "advancements.trainees.powder_anti_92.description": "9^2=81",
+  "advancements.trainees.powder_anti_93.title": "不对劲……",
+  "advancements.trainees.powder_anti_93.description": "9^3=729！",
+  "advancements.trainees.powder_anti_94.title": "你真的对指数有概念吗……",
+  "advancements.trainees.powder_anti_94.description": "9^4=6,561！！",
+  "advancements.trainees.powder_anti_95.title": "其实没必要这样的……我害怕……",
+  "advancements.trainees.powder_anti_95.description": "9^5=59,049！！！",
+  "advancements.trainees.powder_anti_96.title": "是什么在支撑着你……快收了神通吧……",
+  "advancements.trainees.powder_anti_96.description": "9^6=531,441！！！！……",
+  "advancements.trainees.powder_anti_97.title": "你真的是用生存做到的吗？……",
+  "advancements.trainees.powder_anti_97.description": "9^7=4,782,969！！！！！…………",
+  "advancements.trainees.powder_anti_98.title": "………………",
+  "advancements.trainees.powder_anti_98.description": "9^8=43,046,721………………………………",
+  "advancements.trainees.powder_anti_99.title": "你就是模组作者……",
+  "advancements.trainees.powder_anti_99.description": "9^9=387,420,489………………！",
 
 
   "itemGroup.trainees.kun_tab": "练习生",
@@ -71,18 +85,28 @@
   "item.trainees.real_apple": "“苹果”",
   "item.trainees.kun_trainees_spawn_egg": "练习鸡刷怪蛋",
   "item.trainees.powder_anti": "黑粉",
+  "item.trainees.powder_anti_4": "四撮黑粉",
+  "item.trainees.powder_anti_9": "一小堆黑粉",
   "item.trainees.black_egg": "黑蛋",
   "item.trainees.kun_anti_spawn_egg": "黑粉刷怪蛋",
   "item.trainees.basketball_anti": "反相篮球",
   "item.trainees.basketball_anti.effect.empty": "反相篮球",
   "item.trainees.basketball_anti.effect.harming": "[瞬伤]反相篮球",
+  "item.trainees.kun_egg": "只因蛋",
+  "item.trainees.che_jioh": "鸡碱",
+  "item.trainees.che_hbp": "黑酸",
+  "item.trainees.che_jibp": "反向篮球素",
+  "item.trainees.che_ji2o": "一氧化二鸡",
+  
   
   "tooltip.trainees.axemace_item": "§l斧锤",
   "tooltip.trainees.axemace_item.2": "保留了斧头的工具功能。",
   "tooltip.trainees.basketball_anti_item": "§l反相篮球",
   "tooltip.trainees.basketball_anti_item.2": "按住潜行键右键放置为方块，直接右键投掷。\n投掷后产生瞬间伤害药水效果。\n挖掘放置后的方块会掉落无效果的物品，需再次使用以激活。",
   "tooltip.trainees.black_egg_item": "§l黑蛋",
-  "tooltip.trainees.black_egg_item.2": "投掷后固定生成幼年“黑粉”。（由于不可抗力低概率同时生成幼年鸡，或许可以理解为净化？）",
+  "tooltip.trainees.black_egg_item.2": "投掷后固定生成幼年“黑粉”。（由于不可抗力低概率同时生成幼年鸡，或许可以理解为黑转粉？）",
+  "tooltip.trainees.kun_egg_item": "§l只因蛋",
+  "tooltip.trainees.kun_egg_item.2": "投掷后固定生成幼年“练习鸡”。（由于不可抗力低概率同时生成幼年鸡，或许可以理解纯路人？）",
   "tooltip.trainees.compound_scythe_item": "§l镰刀",
   "tooltip.trainees.compound_scythe_item.2": "横扫伤害为主手伤害的6倍，范围提升至4倍。（主手伤害不变）",
   "tooltip.trainees.duihuanquan": "§l兑换券",
@@ -93,6 +117,16 @@
   "tooltip.trainees.real_pickaxe_item.2": "生存模式下挖掘方块会播放随机音效……不来听听看吗，嘻嘻^v^",
   "tooltip.trainees.scythe_item": "§l镰刀",
   "tooltip.trainees.scythe_item.2": "横扫伤害为主手伤害的2倍，范围提升至2倍。（主手伤害不变）",
+  "tooltip.trainees.black_powder_scythe_item": "§l§8镰刀?",
+  "tooltip.trainees.black_powder_scythe_item.2": "横扫伤害为主手的38742倍，范围提升至38742倍。（主手伤害不变）\n注：实际伤害范围取决于模拟距离[范围半径(区块)=1×模拟距离]，所以不用担心电脑爆炸啦qwq\n",
+  "tooltip.trainees.jioh": "§l鸡碱",
+  "tooltip.trainees.jioh.2": "JiOH 又称氢氧化鸡\n  2Ji + 2H2O == 2JiOH + H2↑ 危险！",
+  "tooltip.trainees.hpb": "§l黑酸",
+  "tooltip.trainees.hpb.2":"HBp 黑酸\n  4Bp + 2H2O == 4HBp + O2↑",
+  "tooltip.trainees.jibp": "§l反相篮球素",
+  "tooltip.trainees.jibp.2": "JiBp 又称黑鸡\n  Ji + Bp == JiBp 极度危险！！\n  JiOH + HBp == JiBp + H2O 谨慎",
+  "tooltip.trainees.ji2o": "§l一氧化二鸡",
+  "tooltip.trainees.ji2o.2": "Ji2O 一氧化二鸡\n  2Ji + O2 =点燃= Ji2O",
   
   "block.trainees.myblock": "只因方块",
   "block.trainees.two_half_ingot_block": "两锭半块",
@@ -100,6 +134,7 @@
   "block.trainees.feather_block": "羽毛方块",
   "block.trainees.purification_station": "提纯台",
   "block.trainees.basketball_anti_block": "[方块]反相篮球",
+
 
   "enchantment.trainees.ten_thousand_sword": "万剑归宗",
   
@@ -127,6 +162,8 @@
 
 
   "itemGroup.trainees.prank_tab":"整蛊",
+  
+  "block.trainees.powder_anti_99": "黑粉块",
 
   "item.trainees.left_half_diamond_pickaxe":"左半镐",
   "item.trainees.right_half_diamond_pickaxe":"右半镐",
@@ -141,6 +178,13 @@
   "item.trainees.the_the_longest_real_diamond_pickaxe":"“钻     石     镐”",
   "item.trainees.real_diamond_pickaxe_zip":"“钻石镐”.zip",
   "item.trainees.fast_kun_dagger":"杂鱼",
+  "item.trainees.powder_anti_92": "一堆黑粉",
+  "item.trainees.powder_anti_93": "一大堆黑粉",
+  "item.trainees.powder_anti_94": "一小坨黑粉",
+  "item.trainees.powder_anti_95": "一坨黑粉",
+  "item.trainees.powder_anti_96": "一大坨黑粉",
+  "item.trainees.powder_anti_97": "一小块黑粉",
+  "item.trainees.powder_anti_98": "一块黑粉",
   
   "itemGroup.trainees.gun_mu_tab":" ",
   "item.trainees.gun_mu":" ",

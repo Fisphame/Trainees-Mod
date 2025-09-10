@@ -5,6 +5,7 @@ import com.mojang.serialization.Codec;
 import com.pha.trainees.entity.KunAntiEntity;
 import com.pha.trainees.entity.KunTraineesEntity;
 import com.pha.trainees.event.*;
+import com.pha.trainees.loot.DuihuanquanLootModifier;
 import com.pha.trainees.registry.*;
 //import com.pha.trainees.structure.Chicken_2;
 import net.minecraft.core.registries.Registries;
@@ -24,7 +25,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
-
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Main.MODID)
 public class Main {
@@ -32,6 +32,9 @@ public class Main {
     public static final String MODID = "trainees";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
+
+    //实际上应该是387420489F，电脑算力还是有限的（，但其实也受加载距离影响。
+    public static final float MATH99 = 38742F;
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
@@ -84,6 +87,7 @@ public class Main {
         ebus.register(SweepHandler.class);
 //        ebus.register(ThrowHandler.class);
 
+
     }
 
 
@@ -103,4 +107,10 @@ public class Main {
             event.put(ModEntities.KUN_ANTI.get(), KunAntiEntity.createAttributes().build());
         }
     }
+
+    public static final DeferredRegister<GlobalLootModifierSerializer<?>> GLM =
+            DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, MODID);
+
+    public static final RegistryObject<DuihuanquanLootModifier.Serializer> DUIHUANQUAN_LOOT =
+            GLM.register("duihuanquan_loot", DuihuanquanLootModifier.Serializer::new);
 }

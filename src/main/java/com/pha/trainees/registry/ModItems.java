@@ -6,6 +6,7 @@ import com.pha.trainees.materials.TRAIN;
 import com.pha.trainees.util.ModTiers;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -15,7 +16,7 @@ public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
 
-    //顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 -> 刷怪蛋
+    ///顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 （化学最后）-> 刷怪蛋
 
     //两锭半块
     public static final RegistryObject<Item> TWO_HALF_INGOT_BLOCK_ITEM = ITEMS.register("two_half_ingot_block",
@@ -118,6 +119,15 @@ public class ModItems {
             )
     );
 
+    //反相篮球
+    public static final RegistryObject<Item> BASKETBALL_ANTI = ITEMS.register("basketball_anti",
+            () -> new BasketballAntiItem(new Item.Properties()
+                    .stacksTo(16)
+                    .rarity(Rarity.UNCOMMON)
+
+            ));
+
+
 
 
 
@@ -144,7 +154,7 @@ public class ModItems {
     );
     //只因镰刀
     public static final RegistryObject<Item> KUN_SCYTHE = ITEMS.register("kun_scythe",
-            () -> new ScytheItem(
+            () -> new ScytheCourseItem.ScytheItem(
                     ModTiers.SCYTHE, // 自定义工具等级（见步骤2）
                     2,               // 基础攻击伤害（实际伤害 = 5 + 等级加成）
                     -2.8F,           // 攻击速度（原版钻石剑为-2.4）
@@ -168,7 +178,7 @@ public class ModItems {
 
     //只因复合镰刀
     public static final RegistryObject<Item> KUN_COMPOUND_SCYTHE = ITEMS.register("kun_compound_scythe",
-            () -> new CompoundScytheItem(
+            () -> new ScytheCourseItem.CompoundScytheItem(
                     ModTiers.SCYTHE,
                     4,
                     -2.4F,
@@ -341,15 +351,27 @@ public class ModItems {
     public static final RegistryObject<Item> STONE_STICK = ITEMS.register("stone_stick",
             ()-> new Item(new Item.Properties())
     );
-
     //只因粒
     public static final RegistryObject<Item> KUN_NUGGET = ITEMS.register("kun_nugget",
-            ()-> new Item(new Item.Properties())
+            ()-> new KunCourseItem.KunNuggetItem(new Item.Properties())
     );
     //两锭半
     public static final RegistryObject<Item> TWO_HALF_INGOT = ITEMS.register("two_half_ingot",
-            ()-> new Item(new Item.Properties())
-    );
+            () -> new KunCourseItem.TwoHalfIngotItem(new Item.Properties()
+            ));
+    //黑粉
+    public static final RegistryObject<Item> POWDER_ANTI = ITEMS.register("powder_anti",
+            () -> new Item(new Item.Properties()
+            ));
+    //黑粉 4x
+    public static final RegistryObject<Item> POWDER_ANTI_4 = ITEMS.register("powder_anti_4",
+            () -> new Item(new Item.Properties()
+            ));
+    //一小堆黑粉
+    public static final RegistryObject<Item> POWDER_ANTI_9 = ITEMS.register("powder_anti_9",
+            () -> new Item(new Item.Properties()
+            ));
+
     //聚酯纤维（PET）
     public static final RegistryObject<Item> POLYESTER = ITEMS.register("polyester",
             ()-> new Item(new Item.Properties())
@@ -378,23 +400,39 @@ public class ModItems {
                     .rarity(Rarity.RARE)
             ));
 
-    //黑粉
-    public static final RegistryObject<Item> POWDER_ANTI = ITEMS.register("powder_anti",
-            () -> new Item(new Item.Properties()
+    //只因蛋
+    public static final RegistryObject<Item> KUN_EGG = ITEMS.register("kun_egg",
+            () -> new EggCourseItem.KunEggItem(new Item.Properties()
+                    .stacksTo(16)
             ));
 
     //黑蛋
     public static final RegistryObject<Item> BLACK_EGG = ITEMS.register("black_egg",
-            () -> new BlackEggItem(new Item.Properties()
-            ));
-
-    //反相篮球
-    public static final RegistryObject<Item> BASKETBALL_ANTI = ITEMS.register("basketball_anti",
-            () -> new BasketballAntiItem(new Item.Properties()
+            () -> new EggCourseItem.BlackEggItem(new Item.Properties()
                     .stacksTo(16)
-                    .rarity(Rarity.UNCOMMON)
-
             ));
+
+    //鸡碱
+    public static final RegistryObject<Item> CHE_JIOH = ITEMS.register("che_jioh",
+            () -> new ChemistryItem.JiOH(new Item.Properties()
+            ));
+
+    //黑酸
+    public static final RegistryObject<Item> CHE_HBP = ITEMS.register("che_hbp",
+            () -> new ChemistryItem.HBp(new Item.Properties()
+            ));
+
+    //黑鸡
+    public static final RegistryObject<Item> CHE_JIBP = ITEMS.register("che_jibp",
+            () -> new ChemistryItem.JiBp(new Item.Properties()
+                    .rarity(Rarity.UNCOMMON)
+            ));
+
+    //一氧化二鸡
+    public static final RegistryObject<Item> CHE_JI2O = ITEMS.register("che_ji2o",
+            () -> new ChemistryItem.Ji2O(new Item.Properties()
+            ));
+
 
     //练习鸡刷怪蛋
     public static final RegistryObject<Item> KUN_TRAINEES_SPAWN_EGG = ITEMS.register("kun_trainees_spawn_egg",

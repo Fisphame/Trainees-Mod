@@ -1,9 +1,9 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.item.LongItem;
-import com.pha.trainees.item.RealPickaxeItem;
-import com.sun.jna.platform.win32.Winnetwk;
+import com.pha.trainees.block.PowderAnti99Block;
+import com.pha.trainees.item.LongCourseItem;
+import com.pha.trainees.item.ScytheCourseItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
@@ -33,6 +33,14 @@ public class Something {
                         .lightLevel(state -> 15)
                         .emissiveRendering((state,world,pos) -> true)
                         .jumpFactor(5.0f)
+        ));
+
+        public static final RegistryObject<Block> POWDER_ANTI_99_BLOCK = BLOCKS.register("powder_anti_99",() ->
+                new PowderAnti99Block(
+                        -16777216,
+                BlockBehaviour.Properties.of()
+                        .strength(0.5f, 0f)
+                        .sound(SoundType.SAND)
         ));
 
 
@@ -103,7 +111,7 @@ public class Something {
         //顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 -> 刷怪蛋
         //“钻石镐” 24*24
         public static final RegistryObject<Item> REAL_DIAMOND_PICKAXE = ITEMS.register("real_diamond_pickaxe",
-                () -> new RealPickaxeItem(
+                () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         1,
                         -2.8F,
@@ -114,7 +122,7 @@ public class Something {
 
         //“钻 石 镐” 32*32
         public static final RegistryObject<Item> LONG_REAL_DIAMOND_PICKAXE = ITEMS.register("long_real_diamond_pickaxe",
-                () -> new RealPickaxeItem(
+                () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         2,
                         -2.9F,
@@ -125,7 +133,7 @@ public class Something {
 
         //“钻  石  镐” 40*40
         public static final RegistryObject<Item> LONGER_REAL_DIAMOND_PICKAXE = ITEMS.register("longer_real_diamond_pickaxe",
-                () -> new RealPickaxeItem(
+                () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         2,
                         -2.9F,
@@ -136,7 +144,7 @@ public class Something {
 
         //“钻   石   镐” 48*48
         public static final RegistryObject<Item> LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("longest_real_diamond_pickaxe",
-                () -> new RealPickaxeItem(
+                () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         3,
                         -3.0F,
@@ -147,7 +155,7 @@ public class Something {
 
         //“钻    石    镐” 56*56
         public static final RegistryObject<Item> THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_longest_real_diamond_pickaxe",
-                () -> new RealPickaxeItem(
+                () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         3,
                         -3.0F,
@@ -158,7 +166,7 @@ public class Something {
 
         //“钻     石     镐” 64*64
         public static final RegistryObject<Item> THE_THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_the_longest_real_diamond_pickaxe",
-                () -> new RealPickaxeItem(
+                () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         4,
                         -3.0F,
@@ -178,17 +186,28 @@ public class Something {
                                 .rarity(Rarity.EPIC)
                 ));
 
+        //黑粉镰刀
+        public static final RegistryObject<Item> POWDER_ANTI_99_SCYTHE = ITEMS.register("powder_anti_99_scythe",
+                () -> new ScytheCourseItem.BlackPowderScytheItem(
+                        Tiers.GOLD,
+                        499,
+                        -2.4F,
+                        new Item.Properties()
+                                .durability((int) Main.MATH99)
+                                .rarity(Rarity.RARE)
+                ));
+
         //长木棍
         public static final RegistryObject<Item> LONG_STICK = ITEMS.register("long_stick",
-                ()-> new LongItem(new Item.Properties())
+                ()-> new LongCourseItem.LongItem(new Item.Properties())
         );
         //长长木棍
         public static final RegistryObject<Item> LONGER_STICK = ITEMS.register("longer_stick",
-                ()-> new LongItem(new Item.Properties())
+                ()-> new LongCourseItem.LongItem(new Item.Properties())
         );
         //长长长木棍
         public static final RegistryObject<Item> LONGEST_STICK = ITEMS.register("longest_stick",
-                ()-> new LongItem(new Item.Properties())
+                ()-> new LongCourseItem.LongItem(new Item.Properties())
         );
         //左半镐
         public static final RegistryObject<Item> LEFT_HALF_DIAMOND_PICKAXE = ITEMS.register("left_half_diamond_pickaxe",
@@ -219,6 +238,36 @@ public class Something {
                         new Item.Properties()
                 )
         );
+
+        //一小堆黑粉 powder_anti_9
+        //一堆黑粉
+        public static final RegistryObject<Item> POWDER_ANTI_92 = ITEMS.register("powder_anti_92",
+                () -> new Item(new Item.Properties()));
+        //一大堆黑粉
+        public static final RegistryObject<Item> POWDER_ANTI_93 = ITEMS.register("powder_anti_93",
+                () -> new Item(new Item.Properties()));
+        //一小坨黑粉
+        public static final RegistryObject<Item> POWDER_ANTI_94 = ITEMS.register("powder_anti_94",
+                () -> new Item(new Item.Properties()));
+        //一坨黑粉
+        public static final RegistryObject<Item> POWDER_ANTI_95 = ITEMS.register("powder_anti_95",
+                () -> new Item(new Item.Properties()));
+        //一大坨黑粉
+        public static final RegistryObject<Item> POWDER_ANTI_96 = ITEMS.register("powder_anti_96",
+                () -> new Item(new Item.Properties()));
+        //一小块黑粉
+        public static final RegistryObject<Item> POWDER_ANTI_97 = ITEMS.register("powder_anti_97",
+                () -> new Item(new Item.Properties()));
+        //一块黑粉
+        public static final RegistryObject<Item> POWDER_ANTI_98 = ITEMS.register("powder_anti_98",
+                () -> new Item(new Item.Properties()));
+        //黑粉块
+        public static final RegistryObject<Item> POWDER_ANTI_99_BLOCK_ITEM = ITEMS.register("powder_anti_99",
+                () -> new BlockItem(SomethingBlocks.POWDER_ANTI_99_BLOCK.get(),
+                        new Item.Properties()));
+        //黑洞
+        public static final RegistryObject<Item> BLACK_HOLE = ITEMS.register("black_hole",
+                () -> new Item(new Item.Properties()));
 
         //渲染超格物品
         public static void registerModels(ModelEvent.RegisterAdditional event) {

@@ -24,7 +24,7 @@ import net.minecraft.world.damagesource.DamageSource;
 
 public class KunAntiEntity extends Chicken {
     // 定义新的食物列表
-    private static final Ingredient FOOD_ITEMS = Ingredient.of(ModItems.POWDER_ANTI.get());
+    private static final Ingredient FOOD_ITEMS = Ingredient.of(ModItems.POWDER_ANTI.get(),ModItems.POWDER_ANTI_4.get(),ModItems.POWDER_ANTI_9.get());
 
     public KunAntiEntity(EntityType<? extends Chicken> type, Level level) {
         super(type, level);
@@ -32,7 +32,7 @@ public class KunAntiEntity extends Chicken {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Chicken.createAttributes()
-                .add(Attributes.MAX_HEALTH, 18.0)
+                .add(Attributes.MAX_HEALTH, 16.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.25);
     }
 
