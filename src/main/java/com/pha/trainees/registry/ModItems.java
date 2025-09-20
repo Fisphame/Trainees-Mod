@@ -6,7 +6,6 @@ import com.pha.trainees.materials.TRAIN;
 import com.pha.trainees.util.ModTiers;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -412,8 +411,24 @@ public class ModItems {
                     .stacksTo(16)
             ));
 
-    //鸡碱
+    //化学书
+    public static final RegistryObject<Item> CHEMISTRY_BOOK = ITEMS.register("chemistry_book",
+            () -> new ChemistryBookItem(
+                    new Item.Properties()
+                            .stacksTo(1)
+                            .rarity(Rarity.UNCOMMON),
+                    "化学·练习生选择性必修一",
+                    "真的要看吗……"
+            )
+    );
+
+    //鸡碱锭
     public static final RegistryObject<Item> CHE_JIOH = ITEMS.register("che_jioh",
+            () -> new ChemistryItem.JiOH(new Item.Properties()
+            ));
+
+    //鸡碱粒
+    public static final RegistryObject<Item> CHE_JIOH_NUGGET = ITEMS.register("che_jioh_nugget",
             () -> new ChemistryItem.JiOH(new Item.Properties()
             ));
 
@@ -430,6 +445,11 @@ public class ModItems {
 
     //一氧化二鸡
     public static final RegistryObject<Item> CHE_JI2O = ITEMS.register("che_ji2o",
+            () -> new ChemistryItem.Ji2O(new Item.Properties()
+            ));
+
+    //一氧化二鸡粒
+    public static final RegistryObject<Item> CHE_JI2O_NUGGET = ITEMS.register("che_ji2o_nugget",
             () -> new ChemistryItem.Ji2O(new Item.Properties()
             ));
 
@@ -454,6 +474,8 @@ public class ModItems {
                             .stacksTo(64) // 物品属性
             )
     );
+
+
 
 
 }

@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" },
+        { "item": "trainees:kun_nugget" }
+    ],
+    "result": {
+        "item": "thetwice:jin5",
+        "count": 1
+    },
+    "unlockedBy": {
+        "trigger": {
+            "trigger": "minecraft:tick",
+            "conditions": {
+                "items": [
+                    {
+                        "items": ["trainees:kun_nugget"]
+                    }
+                ]
+            }
+        }
+    }
+}

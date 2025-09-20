@@ -5,7 +5,7 @@ import com.mojang.serialization.Codec;
 import com.pha.trainees.entity.KunAntiEntity;
 import com.pha.trainees.entity.KunTraineesEntity;
 import com.pha.trainees.event.*;
-import com.pha.trainees.loot.DuihuanquanLootModifier;
+//import com.pha.trainees.loot.DuihuanquanLootModifier;
 import com.pha.trainees.registry.*;
 //import com.pha.trainees.structure.Chicken_2;
 import net.minecraft.core.registries.Registries;
@@ -48,9 +48,9 @@ public class Main {
 //            STRUCTURES.register("chicken_2", () -> explicitStructureTypeTyping(Chicken_2.CODEC));
 
     // 辅助方法
-    private static <S extends Structure> StructureType<S> explicitStructureTypeTyping(Codec<S> codec) {
-        return () -> codec;
-    }
+//    private static <S extends Structure> StructureType<S> explicitStructureTypeTyping(Codec<S> codec) {
+//        return () -> codec;
+//    }
 
 
     public Main() {
@@ -108,9 +108,9 @@ public class Main {
         }
     }
 
-    public static final DeferredRegister<GlobalLootModifierSerializer<?>> GLM =
-            DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, MODID);
-
-    public static final RegistryObject<DuihuanquanLootModifier.Serializer> DUIHUANQUAN_LOOT =
-            GLM.register("duihuanquan_loot", DuihuanquanLootModifier.Serializer::new);
+//    public static final DeferredRegister<GlobalLootModifierSerializer<?>> GLM =
+//            DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, MODID);
+//
+//    public static final RegistryObject<DuihuanquanLootModifier.Serializer> DUIHUANQUAN_LOOT =
+//            GLM.register("duihuanquan_loot", DuihuanquanLootModifier.Serializer::new);
 }
