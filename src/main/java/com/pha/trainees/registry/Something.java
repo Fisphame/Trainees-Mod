@@ -59,23 +59,23 @@ public class Something {
                                 .rarity(Rarity.UNCOMMON)
                 ));
 
-        //豪哥
-        public static final RegistryObject<Item> HAO_GE = ITEMS.register("hao_ge",
-                () -> new AxeItem(
-                        Tiers.NETHERITE,
-                        8,
-                        -2.0F,
-                        new Item.Properties()
-                                .food(new FoodProperties.Builder()
-                                        .nutrition(10)
-                                        .saturationMod(0.3f)
-                                        .alwaysEat()
-                                        .build()
-                                )
-                                .durability(250)
-                                .rarity(Rarity.UNCOMMON)
-                )
-        );
+//        //豪哥
+//        public static final RegistryObject<Item> HAO_GE = ITEMS.register("hao_ge",
+//                () -> new AxeItem(
+//                        Tiers.NETHERITE,
+//                        8,
+//                        -2.0F,
+//                        new Item.Properties()
+//                                .food(new FoodProperties.Builder()
+//                                        .nutrition(10)
+//                                        .saturationMod(0.3f)
+//                                        .alwaysEat()
+//                                        .build()
+//                                )
+//                                .durability(250)
+//                                .rarity(Rarity.UNCOMMON)
+//                )
+//        );
 
         //配方球
         public static final RegistryObject<Item> PEI_FANG_BALL = ITEMS.register("pei_fang_ball",
@@ -227,15 +227,6 @@ public class Something {
                         -3.0F,
                         new Item.Properties()
                                 .durability(2)
-                )
-        );
-        //杂鱼
-        public static final RegistryObject<Item> FAST_KUN_DAGGER = ITEMS.register("fast_kun_dagger",
-                ()-> new SwordItem(
-                        Tiers.NETHERITE,
-                        0,
-                        995,
-                        new Item.Properties()
                 )
         );
 

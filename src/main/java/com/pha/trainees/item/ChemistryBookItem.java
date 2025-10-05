@@ -19,11 +19,9 @@ public class ChemistryBookItem extends BookItem{
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                List<Component> tooltipComponents, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltipComponents, flag);
 
-        // 添加本地化的工具提示
         tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.title"));
         tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.pre"));
         tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.content"));

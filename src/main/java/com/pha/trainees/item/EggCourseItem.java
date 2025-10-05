@@ -38,8 +38,7 @@ public class EggCourseItem {
                 // 创建自定义的投掷坤蛋实体
                 ThrownKunEgg thrownKunEgg = new ThrownKunEgg(level, player);
                 thrownKunEgg.setItem(itemstack);
-                thrownKunEgg.shootFromRotation(player, player.getXRot(), player.getYRot(),
-                        0.0F, 1.5F, 1.0F);
+                thrownKunEgg.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
                 level.addFreshEntity(thrownKunEgg);
             }
 
@@ -66,8 +65,7 @@ public class EggCourseItem {
                     KunTraineesEntity kunTrainees = ModEntities.KUN_TRAINEES.get().create(this.level());
                     if (kunTrainees != null) {
                         kunTrainees.setAge(-24000); // 设置为幼年
-                        kunTrainees.moveTo(this.getX(), this.getY(), this.getZ(),
-                                this.getYRot(), 0.0F);
+                        kunTrainees.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0F);
                         this.level().addFreshEntity(kunTrainees);
                     }
 
@@ -78,11 +76,9 @@ public class EggCourseItem {
         }
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.kun_egg_item"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.kun_egg_item.2"));
         }
@@ -90,9 +86,7 @@ public class EggCourseItem {
 
     public static class BlackEggItem extends EggItem {
 
-        public BlackEggItem(Properties properties) {
-            super(properties);
-        }
+        public BlackEggItem(Properties properties) {super(properties);}
 
         @Override
         public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -105,8 +99,7 @@ public class EggCourseItem {
                 // 创建自定义的投掷黑蛋实体
                 ThrownBlackEgg thrownBlackEgg = new ThrownBlackEgg(level, player);
                 thrownBlackEgg.setItem(itemstack);
-                thrownBlackEgg.shootFromRotation(player, player.getXRot(), player.getYRot(),
-                        0.0F, 1.5F, 1.0F);
+                thrownBlackEgg.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
                 level.addFreshEntity(thrownBlackEgg);
             }
 
@@ -145,11 +138,9 @@ public class EggCourseItem {
         }
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item.2"));
         }

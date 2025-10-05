@@ -21,12 +21,9 @@ public class PurificationStationBlock extends Block implements EntityBlock {
         super(properties);
     }
 
-    // 右键打开GUI的核心逻辑
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos,
-                                 Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide() &&
-                level.getBlockEntity(pos) instanceof PurificationStationBlockEntity blockEntity) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PurificationStationBlockEntity blockEntity) {
             NetworkHooks.openScreen((ServerPlayer) player, blockEntity, pos);
             return InteractionResult.CONSUME;
         }

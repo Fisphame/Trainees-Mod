@@ -31,6 +31,10 @@ import java.util.Optional;
 
 public class PurificationStationBlockEntity extends BlockEntity implements MenuProvider {
 
+    public PurificationStationBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.PURIFICATION_STATION.get(), pos, state);
+    }
+
     private final ItemStackHandler itemHandler = new ItemStackHandler(3) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -40,9 +44,6 @@ public class PurificationStationBlockEntity extends BlockEntity implements MenuP
 
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
-    public PurificationStationBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.PURIFICATION_STATION.get(), pos, state);
-    }
 
     @Override
     public Component getDisplayName() {

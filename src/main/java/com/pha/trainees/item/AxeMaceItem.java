@@ -15,11 +15,9 @@ public class AxeMaceItem extends AxeItem {
         super(p_40521_, p_40522_, p_40523_, p_40524_);
     }
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                List<Component> tooltipComponents, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltipComponents, flag);
 
-        // 添加本地化的工具提示
         tooltipComponents.add(Component.translatable("tooltip.trainees.axemace_item"));
         tooltipComponents.add(Component.translatable("tooltip.trainees.axemace_item.2"));
     }

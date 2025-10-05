@@ -38,16 +38,12 @@ public class ChemistryItem {
     */
     //鸡碱
     public static class JiOH extends Item {
-        public JiOH(Properties p_41383_) {
-            super(p_41383_);
-        }
+        public JiOH(Properties p_41383_) {super(p_41383_);}
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.jioh"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.jioh.2"));
         }
@@ -55,16 +51,12 @@ public class ChemistryItem {
 
     //黑酸
     public static class HBp extends Item {
-        public HBp(Properties p_41383_) {
-            super(p_41383_);
-        }
+        public HBp(Properties p_41383_) {super(p_41383_);}
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.hpb"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.hpb.2"));
         }
@@ -72,16 +64,12 @@ public class ChemistryItem {
 
     //黑鸡
     public static class JiBp extends Item {
-        public JiBp(Properties p_41383_) {
-            super(p_41383_);
-        }
+        public JiBp(Properties p_41383_) {super(p_41383_);}
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.jibp"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.jibp.2"));
         }
@@ -89,16 +77,12 @@ public class ChemistryItem {
 
     //一氧化二鸡
     public static class Ji2O extends Item {
-        public Ji2O(Properties p_41383_) {
-            super(p_41383_);
-        }
+        public Ji2O(Properties p_41383_) {super(p_41383_);}
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o.2"));
         }

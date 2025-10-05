@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class KunTraineesRenderer extends MobRenderer<KunTraineesEntity, ChickenModel<KunTraineesEntity>> {
-    // 使用原版鸡的模型
     public KunTraineesRenderer(EntityRendererProvider.Context context) {
         super(context, new ChickenModel<>(context.bakeLayer(ModelLayers.CHICKEN)), 0.3F);
     }

@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class AbilityHandler {
 
-        private static final int COOLDOWN_TICKS = 0 * 20; // 冷却
+        private static final int COOLDOWN_TICKS = 1 * 20; // 冷却
 
         @SubscribeEvent
         public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {

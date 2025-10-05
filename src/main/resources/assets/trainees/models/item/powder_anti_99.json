@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "trainees:item/powder_anti_99"
-  }
+  "parent": "trainees:block/powder_anti_99"
 }

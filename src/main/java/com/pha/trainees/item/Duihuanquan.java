@@ -42,11 +42,9 @@ public class Duihuanquan extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                List<Component> tooltipComponents, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltipComponents, flag);
 
-        // 添加本地化的工具提示
         tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan"));
         tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan.2"));
     }

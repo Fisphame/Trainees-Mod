@@ -25,7 +25,6 @@ public class ScytheCourseItem {
 
         @Override
         public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-            // 仅在主线程处理，避免客户端逻辑干扰
             if (!attacker.level().isClientSide && attacker instanceof Player player) {
                 // 检测是否满足横扫条件（原版逻辑）
                 float attackStrength = player.getAttackStrengthScale(0.5F);
@@ -33,8 +32,7 @@ public class ScytheCourseItem {
                     // 获取范围内的所有生物
                     AABB area = target.getBoundingBox().inflate(SWEEP_RADIUS, 0.25, SWEEP_RADIUS);
                     List<LivingEntity> entities = player.level().getEntitiesOfClass(
-                            LivingEntity.class,
-                            area,
+                            LivingEntity.class, area,
                             e -> e != player && e != target && !e.isAlliedTo(player)
                     );
 
@@ -50,11 +48,9 @@ public class ScytheCourseItem {
         }
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item.2"));
         }
@@ -77,8 +73,7 @@ public class ScytheCourseItem {
                     // 获取范围内的所有生物
                     AABB area = target.getBoundingBox().inflate(SWEEP_RADIUS, 0.25, SWEEP_RADIUS);
                     List<LivingEntity> entities = player.level().getEntitiesOfClass(
-                            LivingEntity.class,
-                            area,
+                            LivingEntity.class, area,
                             e -> e != player && e != target && !e.isAlliedTo(player)
                     );
 
@@ -94,11 +89,9 @@ public class ScytheCourseItem {
         }
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item.2"));
         }
@@ -121,8 +114,7 @@ public class ScytheCourseItem {
                     // 获取范围内的所有生物
                     AABB area = target.getBoundingBox().inflate(SWEEP_RADIUS, 0.25, SWEEP_RADIUS);
                     List<LivingEntity> entities = player.level().getEntitiesOfClass(
-                            LivingEntity.class,
-                            area,
+                            LivingEntity.class, area,
                             e -> e != player && e != target && !e.isAlliedTo(player)
                     );
 
@@ -138,11 +130,9 @@ public class ScytheCourseItem {
         }
 
         @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level,
-                                    List<Component> tooltipComponents, TooltipFlag flag) {
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            // 添加本地化的工具提示
             tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item"));
             tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item.2"));
         }
