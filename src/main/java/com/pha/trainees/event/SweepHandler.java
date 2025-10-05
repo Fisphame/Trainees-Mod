@@ -17,8 +17,7 @@ public class SweepHandler {
         Player player = event.getEntity();
         ItemStack stack = player.getMainHandItem();
         int p;
-        int[] SweepNum = {0, 30, 60, 200};
-        int[] SweepArea = {0, 2, 4, 6};
+        int[] SweepNum = {0, 30, 60, 200}, SweepArea = {0, 2, 4, 6};
         Item item = stack.getItem(),
                 S1 = ModItems.KUN_SCYTHE.get() ,
                 S2 = ModItems.KUN_COMPOUND_SCYTHE.get() ,
