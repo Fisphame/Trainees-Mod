@@ -16,7 +16,6 @@ public class SweepHandler {
     public static void onSweepAttack(AttackEntityEvent event) {
         Player player = event.getEntity();
         ItemStack stack = player.getMainHandItem();
-        int p;
         int[] SweepNum = {0, 30, 60, 200}, SweepArea = {0, 2, 4, 6};
         Item item = stack.getItem(),
                 S1 = ModItems.KUN_SCYTHE.get() ,
@@ -26,7 +25,7 @@ public class SweepHandler {
         if(item == S1 || item == S2 || item == S3){
             if (player.level() instanceof ServerLevel serverLevel) {
                 Vec3 pos = event.getTarget().position();
-                p = item == S1 ? 1 : (item == S2 ? 2 : 3);
+                int p = item == S1 ? 1 : (item == S2 ? 2 : 3);
                 serverLevel.sendParticles(
                         ParticleTypes.SWEEP_ATTACK, pos.x, pos.y + 1.0, pos.z,
                         SweepNum[p], SweepArea[p], SweepArea[p], SweepArea[p],

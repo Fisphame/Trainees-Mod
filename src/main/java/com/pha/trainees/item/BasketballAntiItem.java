@@ -66,7 +66,6 @@ public class BasketballAntiItem extends SplashPotionItem {
             PotionUtils.setPotion(itemstack, Potions.HARMING);
         }
 
-        // 检查玩家是否在潜行（按下Shift键）
         if (player.isShiftKeyDown()) {
             // 获取玩家视线指向的方块位置
             BlockHitResult blockhitresult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);

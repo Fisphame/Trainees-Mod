@@ -21,7 +21,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Map;
 
-
 public class AbilityHandler {
 
         private static final int COOLDOWN_TICKS = 1 * 20; // 冷却

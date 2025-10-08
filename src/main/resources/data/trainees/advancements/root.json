@@ -9,7 +9,7 @@
     "description": {
       "translate": "advancements.trainees.root.description"
     },
-    "background": "trainees:textures/block/myblock.png",
+    "background": "trainees:textures/block/two_half_ingot_block.png",
     "frame": "task",
     "show_toast": false,
     "announce_to_chat": false,

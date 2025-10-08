@@ -360,15 +360,15 @@ public class ModItems {
             ));
     //黑粉
     public static final RegistryObject<Item> POWDER_ANTI = ITEMS.register("powder_anti",
-            () -> new Item(new Item.Properties()
+            () -> new PowderAntiCourseItem.PowderAntiItem(new Item.Properties()
             ));
     //黑粉 4x
     public static final RegistryObject<Item> POWDER_ANTI_4 = ITEMS.register("powder_anti_4",
-            () -> new Item(new Item.Properties()
+            () -> new PowderAntiCourseItem.PowderAnti4Item(new Item.Properties()
             ));
     //一小堆黑粉
     public static final RegistryObject<Item> POWDER_ANTI_9 = ITEMS.register("powder_anti_9",
-            () -> new Item(new Item.Properties()
+            () -> new PowderAntiCourseItem.PowderAnti9Item(new Item.Properties()
             ));
 
     //聚酯纤维（PET）
@@ -459,19 +459,19 @@ public class ModItems {
             () -> new ForgeSpawnEggItem(
                     ModEntities.KUN_TRAINEES,
                     0xFFFFFF,// 主颜色（蛋底色）
-                    0x000000,// 副颜色（斑点色）
+                    0xff7f27,// 副颜色（斑点色）
                     new Item.Properties()
-                            .stacksTo(64) // 物品属性
+                            .stacksTo(64)
             )
     );
     //黑粉刷怪蛋
     public static final RegistryObject<Item> KUN_ANTI_SPAWN_EGG = ITEMS.register("kun_anti_spawn_egg",
             () -> new ForgeSpawnEggItem(
                     ModEntities.KUN_ANTI,
-                    0xFFFFFF,// 主颜色（蛋底色）
-                    0x000000,// 副颜色（斑点色）
+                    0x9f9f9f,// 主颜色（蛋底色）
+                    0x272727,// 副颜色（斑点色）
                     new Item.Properties()
-                            .stacksTo(64) // 物品属性
+                            .stacksTo(64)
             )
     );
 

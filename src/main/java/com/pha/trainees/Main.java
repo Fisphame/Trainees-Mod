@@ -42,36 +42,39 @@ public class Main {
         Something.PrankItems.ITEMS.register(bus);
         Something.Paintings.PAINTING_VARIANTS.register(bus);
         Something.OttoMother.ITEMS.register(bus);
+        HiddenItem.BLOCKS.register(bus);
+        HiddenItem.ITEMS.register(bus);
         ModCreativeModeTabs.CREATIVE_MODE_TABS.register(bus);
         ModBlockEntities.BLOCK_ENTITIES.register(bus);
         ModMenuTypes.MENUS.register(bus);
         ModRecipeTypes.RECIPE_SERIALIZERS.register(bus);
         ModRecipeTypes.RECIPE_TYPES.register(bus);
 
+        bus.register(new RegisterAttributes());
 
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
         ebus.register(RealPickaxeEvents.class);
         ebus.register(SweepHandler.class);
+//        ebus.register(RegisterModels.class);
+//        ebus.register(RegisterAttributes.class);
 
 
     }
 
+//    public static class RegisterModels {
+//        @SubscribeEvent
+//        public static void registerModels(ModelEvent.RegisterAdditional event) {
+//            Something.PrankItems.registerModels(event);
+//        }
+//    }
 
-    public class ClientModEvents {
-        @SubscribeEvent
-        public static void registerModels(ModelEvent.RegisterAdditional event) {
-            Something.PrankItems.registerModels(event);
-        }
-    }
-
-    @Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public class CommonModEvents {
-        @SubscribeEvent
-        public static void registerAttributes(EntityAttributeCreationEvent event) {
-            // 确保注册你的实体属性
-            event.put(ModEntities.KUN_TRAINEES.get(), KunTraineesEntity.createAttributes().build());
-            event.put(ModEntities.KUN_ANTI.get(), KunAntiEntity.createAttributes().build());
-        }
-    }
+//    public static class RegisterAttributes {
+//        @SubscribeEvent
+//        public static void registerAttributes(EntityAttributeCreationEvent event) {
+//            // 确保注册你的实体属性
+//            event.put(ModEntities.KUN_TRAINEES.get(), KunTraineesEntity.createAttributes().build());
+//            event.put(ModEntities.KUN_ANTI.get(), KunAntiEntity.createAttributes().build());
+//        }
+//    }
 }

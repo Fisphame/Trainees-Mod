@@ -2,8 +2,11 @@ package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.block.PowderAnti99Block;
+import com.pha.trainees.item.BombItem;
+import com.pha.trainees.item.FuckItem;
 import com.pha.trainees.item.LongCourseItem;
 import com.pha.trainees.item.ScytheCourseItem;
+import com.pha.trainees.materials.TRAIN;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
@@ -39,7 +42,7 @@ public class Something {
                 new PowderAnti99Block(
                         -16777216,
                 BlockBehaviour.Properties.of()
-                        .strength(0.5f, 0f)
+                        .strength(0.5f, 250f)
                         .sound(SoundType.SAND)
         ));
 
@@ -258,7 +261,14 @@ public class Something {
                         new Item.Properties()));
         //黑洞
         public static final RegistryObject<Item> BLACK_HOLE = ITEMS.register("black_hole",
-                () -> new Item(new Item.Properties()));
+                () -> new Item(new Item.Properties()
+                        .stacksTo(1)
+                ));
+        //
+//        public static final RegistryObject<Item> BOMB_FUCK = ITEMS.register("bomb_sheep",
+//                () -> new BombItem(new Item.Properties()
+//                        .stacksTo(1)
+//                ));
 
         //渲染超格物品
         public static void registerModels(ModelEvent.RegisterAdditional event) {
