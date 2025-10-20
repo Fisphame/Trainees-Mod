@@ -1,6 +1,7 @@
 package com.pha.trainees.item;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.way.DoTnt;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -49,17 +50,8 @@ public class KunCourseItem {
         if (!entity.level().isClientSide && entity.isInWater()) {
             Level level = entity.level();
             double X = entity.getX(), Y = entity.getY(), Z = entity.getZ();
-
-            level.playSound(null, X, Y, Z,
-                    SoundEvents.TNT_PRIMED,
-                    SoundSource.BLOCKS,
-                    1.0F, 1.0F
-            );
-
-            //+3 创建TNT实体 立即爆炸 添加TNT实体到世界
-            PrimedTnt tnt = new PrimedTnt(level, X, Y, Z, null);
-            tnt.setFuse(0);
-            level.addFreshEntity(tnt);
+            DoTnt doTnt = new DoTnt(true, level, X, Y, Z, 4.0f, 0);
+            DoTnt.Do();
 
             //创建物品 获取原物品堆叠个数 创建物品堆叠 创建掉落物实体 设置无敌 设置默认拾取延迟 生成实体
             var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, number==1 ? "che_jioh_nugget" : "che_jioh"));
@@ -81,12 +73,8 @@ public class KunCourseItem {
 
     public static void Do2(Level level, Entity entity){
         double X = entity.getX(), Y = entity.getY(), Z = entity.getZ();
-        // 创建TNT实体
-        PrimedTnt tnt = new PrimedTnt(level, X, Y, Z, null);
-        tnt.setFuse(0); // 立即爆炸
-        // 添加TNT实体到世界
-        level.addFreshEntity(tnt);
-        level.playSound(null, X, Y, Z, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
+        DoTnt doTnt = new DoTnt(true, level, X, Y, Z, 4.0f, 0);
+        DoTnt.Do();
         // 发送游戏事件
         level.gameEvent(entity, GameEvent.PRIME_FUSE, entity.blockPosition());
     }

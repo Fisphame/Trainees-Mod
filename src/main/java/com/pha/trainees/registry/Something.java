@@ -1,6 +1,7 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.block.BlackHoleBlock;
 import com.pha.trainees.block.PowderAnti99Block;
 import com.pha.trainees.item.BombItem;
 import com.pha.trainees.item.FuckItem;
@@ -46,8 +47,13 @@ public class Something {
                         .sound(SoundType.SAND)
         ));
 
-
-
+        public static final RegistryObject<Block> BLACK_HOLE = BLOCKS.register("black_hole",
+                () -> new BlackHoleBlock(
+                        BlockBehaviour.Properties.of()
+                                .strength(20f, 2000f)
+                                .sound(SoundType.NETHER_BRICKS)
+                                .requiresCorrectToolForDrops()
+                ));
 
     }
     public static class SomethingItems {
@@ -261,8 +267,9 @@ public class Something {
                         new Item.Properties()));
         //黑洞
         public static final RegistryObject<Item> BLACK_HOLE = ITEMS.register("black_hole",
-                () -> new Item(new Item.Properties()
-                        .stacksTo(1)
+                () -> new BlockItem(SomethingBlocks.BLACK_HOLE.get(),
+                        new Item.Properties()
+                                .stacksTo(1)
                 ));
         //
 //        public static final RegistryObject<Item> BOMB_FUCK = ITEMS.register("bomb_sheep",

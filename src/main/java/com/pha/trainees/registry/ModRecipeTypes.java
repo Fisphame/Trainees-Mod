@@ -24,16 +24,27 @@ public class ModRecipeTypes {
 //                            return PurificationRecipe.RECIPE_ID;
 //                        }
 //                    });
-
-    // 注册配方类型
-    public static final RegistryObject<RecipeType<PurificationRecipe>> PURIFICATION_RECIPE =
-            RECIPE_TYPES.register(PurificationRecipe.RECIPE_ID,
-                    () -> RecipeType.simple(new ResourceLocation(Main.MODID, PurificationRecipe.RECIPE_ID)));
-
-
-
-    // 注册配方序列化器
-    public static final RegistryObject<RecipeSerializer<?>> PURIFICATION_SERIALIZER =
-            RECIPE_SERIALIZERS.register(PurificationRecipe.RECIPE_ID,
-                    () -> PurificationRecipe.Serializer.INSTANCE);
+//
+//    // 注册配方类型
+//    public static final RegistryObject<RecipeType<PurificationRecipe>> PURIFICATION_RECIPE =
+//            RECIPE_TYPES.register(PurificationRecipe.RECIPE_ID,
+//                    () -> RecipeType.simple(new ResourceLocation(Main.MODID, PurificationRecipe.RECIPE_ID)));
+//
+//
+//
+//    // 注册配方序列化器
+//    public static final RegistryObject<RecipeSerializer<?>> PURIFICATION_SERIALIZER =
+//            RECIPE_SERIALIZERS.register(PurificationRecipe.RECIPE_ID,
+//                    () -> PurificationRecipe.Serializer.INSTANCE);
+//
+//
+//    public static final RegistryObject<RecipeType<PurificationRecipe>> REACTING_FURNACE_RECIPE =
+//            RECIPE_TYPES.register("reacting_furnace",
+//                    () -> RecipeType.simple(new ResourceLocation(Main.MODID, PurificationRecipe.RECIPE_ID)));
+//
+//    public static final RegistryObject<RecipeSerializer<?>> REACTING_FURNACE_SERIALIZER =
+//            RECIPE_SERIALIZERS.register("reacting_furnace",
+//                    () -> ReactingFurnaceRecipe.Serializer.INSTANCE);
+//
+//
 }

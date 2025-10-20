@@ -38,9 +38,21 @@ public class ModItems {
             new Item.Properties()
                     .rarity(Rarity.RARE)
     ));
+    //反相素方块
+    public static final RegistryObject<Item> CHE_JIBP_BLOCK_ITEM = ITEMS.register("che_jibp_block",
+            () -> new BlockItem(ModBlocks.CHE_JIBP_BLOCK.get(),
+                    new Item.Properties()
+                            .rarity(Rarity.UNCOMMON)
+            ));
     //提纯台
     public static final RegistryObject<Item> PURIFICATION_STATION_ITEM = ITEMS.register("purification_station",
             () -> new BlockItem(ModBlocks.PURIFICATION_STATION.get(),
+                    new Item.Properties()
+            )
+    );
+    //反应炉
+    public static final RegistryObject<Item> REACTING_FURNACE_BLOCK_ITEM = ITEMS.register("reacting_furnace",
+            () -> new BlockItem(ModBlocks.REACTING_FURNACE.get(),
                     new Item.Properties()
             )
     );
@@ -49,9 +61,8 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.BASKETBALL_ANTI_BLOCK.get(),
                     new Item.Properties()
             )
-
-
     );
+
 
     //只因锹
     public static final RegistryObject<Item> KUN_SHOVEL= ITEMS.register("kun_shovel" ,
@@ -111,19 +122,21 @@ public class ModItems {
 
     //篮球
     public static final RegistryObject<Item> KUN_BASKETBALL = ITEMS.register("kun_basketball",
-            () -> new Item(new Item.Properties()
-                    .stacksTo(1)    // 堆叠数量为1
-                    .durability(250) // 耐久度
-                    .rarity(Rarity.UNCOMMON)
+            () -> new Item(
+                    new Item.Properties()
+                            .stacksTo(1)
+                            .durability(250)
+                            .rarity(Rarity.UNCOMMON)
             )
     );
 
     //反相篮球
     public static final RegistryObject<Item> BASKETBALL_ANTI = ITEMS.register("basketball_anti",
-            () -> new BasketballAntiItem(new Item.Properties()
-                    .stacksTo(16)
-                    .rarity(Rarity.UNCOMMON)
-
+            () -> new BasketballAntiItem(
+                    new Item.Properties()
+                            .stacksTo(1)
+                            .durability(250)
+                            .rarity(Rarity.UNCOMMON)
             ));
 
 

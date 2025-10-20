@@ -1,6 +1,7 @@
 package com.pha.trainees.item;
 
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.way.DoTnt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -62,7 +63,7 @@ public class PowderAntiCourseItem {
         BlockPos belowPos = clickedPos.below();
         BlockState belowState = level.getBlockState(belowPos);
         ResourceLocation belowBlockId = ForgeRegistries.BLOCKS.getKey(belowState.getBlock());
-        int x = clickedPos.getX(), y = clickedPos.getY(), z = clickedPos.getZ();
+        double x = clickedPos.getX(), y = clickedPos.getY(), z = clickedPos.getZ();
         boolean isRight = clickedBlockId != null && clickedBlockId.toString().equals("trainees:two_half_ingot_block")
                 && belowBlockId != null && belowBlockId.toString().equals("minecraft:campfire");
 
@@ -94,60 +95,8 @@ public class PowderAntiCourseItem {
         return InteractionResult.PASS;
     }
 
-    public static void DoTnt(Level level, int x, int y, int z, float power, int surface, int distance){
-        int O = 0;
-        level.playSound(null, x, y, z, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
-
-        PrimedTnt[] tnts = new PrimedTnt[]{
-                new PrimedTnt(level, x, y+distance, z, null) {
-                    @Override
-                    protected void explode() {
-                        level.explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
-                                power, Level.ExplosionInteraction.TNT);
-                    }
-                },
-                new PrimedTnt(level, x, y-distance, z, null) {
-                    @Override
-                    protected void explode() {
-                        level.explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
-                                power, Level.ExplosionInteraction.TNT);
-                    }
-                },
-                new PrimedTnt(level, x+distance, y, z, null) {
-                    @Override
-                    protected void explode() {
-                        level.explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
-                                power, Level.ExplosionInteraction.TNT);
-                    }
-                },
-                new PrimedTnt(level, x-distance, y, z, null) {
-                    @Override
-                    protected void explode() {
-                        level.explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
-                                power, Level.ExplosionInteraction.TNT);
-                    }
-                },
-                new PrimedTnt(level, x, y, z+distance, null) {
-                    @Override
-                    protected void explode() {
-                        level.explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
-                                power, Level.ExplosionInteraction.TNT);
-                    }
-                },
-                new PrimedTnt(level, x, y, z-distance, null) {
-                    @Override
-                    protected void explode() {
-                        level.explode(this, this.getX(), this.getY(0.0625D), this.getZ(),
-                                power, Level.ExplosionInteraction.TNT);
-                    }
-                },
-        };
-
-
-        //欸嘿^v^
-        for (int i = O; !(i >= surface) ; i -= -1) {
-            tnts[i].setFuse(O);
-            level.addFreshEntity(tnts[i]);
-        }
+    public static void DoTnt(Level level, double x, double y, double z, float power, int surfaces, int diffusion){
+        DoTnt doTnt = new DoTnt(level, x, y, z, power, 0, surfaces, diffusion);
+        DoTnt.Do();
     }
 }

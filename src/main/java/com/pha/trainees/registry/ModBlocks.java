@@ -1,16 +1,18 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.block.BasketballAntiBlock;
-import com.pha.trainees.block.PurificationStationBlock;
+import com.pha.trainees.block.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.apache.commons.lang3.ObjectUtils;
 
+import java.util.function.Supplier;
 
 
 public class ModBlocks {
@@ -36,6 +38,15 @@ public class ModBlocks {
                     .noCollission()
     ));
 
+    //反相素方块
+    public static final RegistryObject<Block> CHE_JIBP_BLOCK = BLOCKS.register("che_jibp_block",
+            () -> new CheJibpBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(0.5f,3f)
+                            .sound(SoundType.WET_GRASS)
+            )
+    );
+
     public static final RegistryObject<Block> POLYESTER_ORE = BLOCKS.register("polyester_ore",
             () -> new Block(
             BlockBehaviour.Properties.of()
@@ -47,6 +58,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> DEEPSLATE_POLYESTER_ORE = BLOCKS.register("deepslate_polyester_ore",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_IRON_ORE))
     );
+
 
     public static final RegistryObject<Block> myblock = BLOCKS.register("myblock",
             () -> new Block(
@@ -87,6 +99,21 @@ public class ModBlocks {
             )
     );
 
+//    public static final RegistryObject<Block> KUN_CHEST = BLOCKS.register("kun_chest",
+//            () -> new KunChestBlock(
+//                    BlockBehaviour.Properties.of()
+//                            .strength(1.0f, 2.0f)
+//                            .sound(SoundType.METAL)
+//                            .requiresCorrectToolForDrops()
+//            ));
+
+    public static final RegistryObject<Block> REACTING_FURNACE = BLOCKS .register("reacting_furnace",
+            () -> new ReactingFurnaceBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(1.0f, 2.0f)
+                            .sound(SoundType.STONE)
+                            .requiresCorrectToolForDrops()
+            ));
 
 }
 
