@@ -1,9 +1,4 @@
 {
-  "display": {
-    "frame": "task",
-    "show_toast": true,
-    "announce_to_chat": false
-  },
   "criteria": {
     "obtain_powder_anti_4": {
       "trigger": "minecraft:inventory_changed",

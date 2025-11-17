@@ -3,8 +3,8 @@ package com.pha.trainees.way.Twilightwood;
 //真的在翻我的源码吗……那给你点惊喜好了
 
 
-public class TW {
-    public boolean getLove(){
+class TW {
+    protected boolean getLove(){
         return true;
     }
 

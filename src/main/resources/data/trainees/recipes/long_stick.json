@@ -14,11 +14,11 @@
   },
   "unlockedBy": {
     "trigger": {
-      "trigger": "minecraft:tick",
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": ["minecraft:stick"]
+            "items": ["trainees:two_half_ingot"]
           }
         ]
       }

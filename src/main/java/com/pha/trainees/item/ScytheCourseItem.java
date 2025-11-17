@@ -1,6 +1,7 @@
 package com.pha.trainees.item;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.way.ModMath;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -101,8 +102,8 @@ public class ScytheCourseItem {
         public BlackPowderScytheItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
             super(tier, attackDamage, attackSpeed, properties);
         }
-        private static final float SWEEP_RADIUS = Main.MATH99; // 横扫范围（原版为1.0）
-        private static final float SWEEP_DAMAGE_MULTIPLIER = Main.MATH99; // 伤害倍率（原版为1.0）
+        private static final float SWEEP_RADIUS = ModMath.MATH99; // 横扫范围（原版为1.0）
+        private static final float SWEEP_DAMAGE_MULTIPLIER = ModMath.MATH99; // 伤害倍率（原版为1.0）
 
         @Override
         public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {

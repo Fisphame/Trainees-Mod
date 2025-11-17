@@ -1,22 +1,15 @@
 package com.pha.trainees;
 
 import com.mojang.logging.LogUtils;
-import com.pha.trainees.entity.KunAntiEntity;
-import com.pha.trainees.entity.KunTraineesEntity;
+import com.pha.trainees.config.TraineesConfigScreen;
 import com.pha.trainees.event.*;
 import com.pha.trainees.registry.*;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 
 @Mod(Main.MODID)
@@ -25,12 +18,13 @@ public class Main {
     public static final String MODID = "trainees";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    //实际上应该是387420489F，电脑算力还是有限的（，但其实也受加载距离影响。
-    public static final float MATH99 = 38742F;
+
 
     public Main() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         var ebus = MinecraftForge.EVENT_BUS;
+
+
 
         ModBlocks.BLOCKS.register(bus);
         ModSounds.SOUNDS.register(bus);
@@ -49,6 +43,11 @@ public class Main {
         ModMenuTypes.MENUS.register(bus);
         ModRecipeTypes.RECIPE_SERIALIZERS.register(bus);
         ModRecipeTypes.RECIPE_TYPES.register(bus);
+        ModFluid.FLUID_TYPES.register(bus);
+        ModFluid.FLUIDS.register(bus);
+
+//        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TraineesConfig.SPEC);
+
 
         bus.register(new RegisterAttributes());
 
@@ -59,22 +58,18 @@ public class Main {
 //        ebus.register(RegisterModels.class);
 //        ebus.register(RegisterAttributes.class);
 
+        // 注册配置屏幕
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
 
     }
 
-//    public static class RegisterModels {
-//        @SubscribeEvent
-//        public static void registerModels(ModelEvent.RegisterAdditional event) {
-//            Something.PrankItems.registerModels(event);
-//        }
-//    }
-
-//    public static class RegisterAttributes {
-//        @SubscribeEvent
-//        public static void registerAttributes(EntityAttributeCreationEvent event) {
-//            // 确保注册你的实体属性
-//            event.put(ModEntities.KUN_TRAINEES.get(), KunTraineesEntity.createAttributes().build());
-//            event.put(ModEntities.KUN_ANTI.get(), KunAntiEntity.createAttributes().build());
-//        }
-//    }
+    private void onClientSetup(final FMLClientSetupEvent event) {
+        // 注册配置屏幕工厂
+        ModLoadingContext.get().registerExtensionPoint(
+                ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(
+                        (minecraft, screen) -> new TraineesConfigScreen(screen)
+                )
+        );
+    }
 }

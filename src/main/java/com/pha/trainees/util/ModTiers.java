@@ -6,13 +6,12 @@ import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
 public enum ModTiers implements Tier {
-    SCYTHE(3, 913, 8.0F, 3.0F, 15, () -> {
-        return Ingredient.of(ModItems.TWO_HALF_INGOT.get());
-    });
+    SCYTHE(3, 913, 8.0F, 3.0F, 15, () -> Ingredient.of(ModItems.TWO_HALF_INGOT.get()));
 
     private final int level;          // 工具等级（钻石为3）
     private final int uses;           // 耐久
@@ -46,7 +45,7 @@ public enum ModTiers implements Tier {
     public int getEnchantmentValue() { return enchantmentValue; }
 
     @Override
-    public Ingredient getRepairIngredient() {
+    public @NotNull Ingredient getRepairIngredient() {
         return this.repairIngredient.get();
     }
 

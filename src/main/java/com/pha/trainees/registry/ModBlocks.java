@@ -4,9 +4,12 @@ import com.pha.trainees.Main;
 import com.pha.trainees.block.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -38,6 +41,15 @@ public class ModBlocks {
                     .noCollission()
     ));
 
+    //氢氧化鸡方块
+    public static final RegistryObject<Block> CHE_JIOH_BLOCK = BLOCKS.register("che_jioh_block",
+            () -> new ChemistryBlock.JiOHBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(2f,6f)
+                            .sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops()
+            ));
+
     //反相素方块
     public static final RegistryObject<Block> CHE_JIBP_BLOCK = BLOCKS.register("che_jibp_block",
             () -> new CheJibpBlock(
@@ -60,7 +72,7 @@ public class ModBlocks {
     );
 
 
-    public static final RegistryObject<Block> myblock = BLOCKS.register("myblock",
+    public static final RegistryObject<Block> MYBLOCK = BLOCKS.register("myblock",
             () -> new Block(
             BlockBehaviour.Properties.of()
                     .strength(15.0f,1200f)
@@ -114,6 +126,17 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .requiresCorrectToolForDrops()
             ));
+
+
+    public static final RegistryObject<LiquidBlock> CHE_HBP_BLOCK = BLOCKS.register("che_hbp_block",
+            () -> new LiquidBlock(ModFluid.SOURCE_CHE_HBP,
+                    BlockBehaviour.Properties.of()
+                            .mapColor(MapColor.WATER)
+                            .replaceable()
+                            .noCollission()
+                            .strength(100.0F)
+                            .pushReaction(PushReaction.DESTROY)
+                            .noLootTable()));
 
 }
 

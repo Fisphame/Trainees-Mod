@@ -46,6 +46,14 @@
 
 
   "itemGroup.trainees.kun_tab": "练习生",
+  
+  "block.trainees.myblock": "只因方块",
+  "block.trainees.two_half_ingot_block": "两锭半块",
+  "block.trainees.polyester_ore": "聚酯纤维矿",
+  "block.trainees.feather_block": "羽毛方块",
+  "block.trainees.purification_station": "提纯台",
+  "block.trainees.basketball_anti_block": "[方块]反相篮球",
+  "block.trainees.basketball_anti_block_rgt": "反相篮球",
 
   "item.trainees.kun_axe": "只因斧",
   "item.trainees.kun_hoe": "只因锄",
@@ -93,11 +101,12 @@
   "item.trainees.basketball_anti.effect.empty": "反相篮球",
   "item.trainees.basketball_anti.effect.harming": "[瞬伤]反相篮球",
   "item.trainees.kun_egg": "只因蛋",
-  "item.trainees.che_jioh": "鸡碱锭",
-  "item.trainees.che_jioh_nugget": "鸡碱粒",
-  "item.trainees.che_hbp": "黑酸",
+  "item.trainees.che_jioh": "氢氧化鸡锭",
+  "item.trainees.che_jioh_nugget": "氢氧化鸡粒",
+  "item.trainees.che_hbp": "黑化氢粉末",
   "item.trainees.che_jibp": "反相素",
   "item.trainees.che_ji2o": "氧化鸡锭",
+  "item.trainees.che_hbpo": "次黑酸粉末",
   "item.trainees.che_ji2o_nugget": "氧化鸡粒",
   "item.trainees.chemistry_book": "化学书",
   
@@ -123,26 +132,21 @@
   "tooltip.trainees.black_powder_scythe_item.2": "横扫伤害为主手的38742倍，范围提升至38742倍。（主手伤害不变）\n注：实际伤害范围取决于模拟距离(范围半径≈模拟距离×16)，所以不用担心电脑爆炸啦qwq\n",
   "tooltip.trainees.jioh": "§l鸡碱",
   "tooltip.trainees.jioh.2": "JiOH 鸡碱/氢氧化鸡",
-  "tooltip.trainees.hpb": "§l黑酸",
-  "tooltip.trainees.hpb.2":"HBp 黑酸",
-  "tooltip.trainees.jibp": "§l反相素",
-  "tooltip.trainees.jibp.2": "JiBp 反相素/黑化鸡",
+  "tooltip.trainees.hbp": "§l黑化氢",
+  "tooltip.trainees.hbp.2":"HBp 黑化氢",
+  "tooltip.trainees.hbpo": "§l次黑酸",
+  "tooltip.trainees.hbpo.2":"HBpO 次黑酸",
+  "tooltip.trainees.jibp": "§黑化鸡",
+  "tooltip.trainees.jibp.2": "JiBp 黑化鸡",
   "tooltip.trainees.ji2o": "§l氧化鸡",
   "tooltip.trainees.ji2o.2": "Ji2O 氧化鸡",
   "tooltip.trainees.che_book.title": "§l化学 · 练习生-选择性必修一",
-  "tooltip.trainees.che_book.pre": "  //你真的要看吗？",
+  "tooltip.trainees.che_book.pre": " 法莫斯·费希佩姆 著",
   "tooltip.trainees.che_book.content": "§l§e119 Ji 钅鸡(称“鸡”)§r§7，固态银色带有淡金光泽的金属，密度8.0g/cm³，熔点20°C，沸点550°C；元素类别-碱金属，价电子构型[Og] 8s¹，常见氧化态+1，电负性0.7，第一电离能350kJ/mol，电子亲和能40kJ/mol，高放射性，α或β衰变，半衰期很短；游戏内表现为只因粒单质及其合成物。\n§l§e117 Bp 石黑（称黑）§r§7，固态黑色或深灰黑色的粉末非金属，密度9.5/cm³，熔点350°C，沸点500°C；元素类别-卤素，价电子构型[Lv] 7s²7p⁵，常见氧化态-1、+1、+3、+5、+7，电负性2.6 ，第一电离能800kJ/mol，电子亲和能200kJ/mol，高放射性，α衰变，半衰期很短；游戏内表现为黑粉单质及其合成物。\n§l§e离子化合物JiBp 反相素§r§7，白色固体（类似盐），游戏中为可投掷物品，遇水或撞击时解离为Ji⁺和Bk⁻离子。由于Bk⁻离子具有生物毒性（类似氰化物），会产生瞬间伤害（药水）效果。\n   §7两者均为超重元素，具有放射性，密度远超其同族较轻的元素；Ji极易失1个电子，是极强的还原剂。Bk极易得1个电子，具有很高的电子亲和能，是极强的氧化剂。Ji只有+1价。Bk类似砹(At)，有多种正价态，但与Ji反应时表现为-1价。\n§r§f  化合物：JiOH 鸡碱/氢氧化鸡；HBp 黑酸；JiBp 反相素/黑化鸡,可合成反相篮球；Ji2O 氧化鸡。\n  §l2Ji + 2H2O == 2JiOH + H2↑§r 放出热量、爆炸、发光，危险！\n  §l4Bp + 2H2O == 4HBp + O2↑§r 放出热量，反应较慢。\n  §lJi + Bp == JiBp§r 剧烈放热，剧烈爆炸，发光，极度危险！！\n  §lJiOH + HBp == JiBp + H2O§r 放出大量热，反应剧烈，谨慎。\n  §l2Ji + O2 =点燃= Ji2O 放出热量，谨慎。§r\n§7注：1.对于化学反应的游戏内表现，所有放热及发光均忽略，所有爆炸以tnt爆炸代替。爆炸会损坏方块和造成伤害，谨慎。2.两物质均为放射性物质，但在游戏中忽略其放射性质和在现实中可能带来的风险。所有数据均为大约数据。3.所有有关化学的所有部分仅供娱乐，可以进行完善（更多的）反应，讨论严谨性等任何学术行为，但请不要上纲上线。§0§r",
   "tooltip.trainees.fuck": "手持该物品右键，“可能”会导致游戏卡顿、程序未响应、服务器崩溃、cpu热损伤、cpu满负载、内存控制器过热、内存过载、DRAM芯片损耗、总线负载、SSD写入放大、NAND闪存磨损、SSD控制器过热、电压波动、电容老化、VRM压力、MOSFET损耗、电感饱和、风扇高转、硅脂干涸、算数异常、栈溢出、堆内存溢出、类型转换异常、并发修改异常、空指针异常、数组越界……嘻嘻嘻，我想谋杀你的（服主的）电脑（尤其是cpu）哦……",
   "tooltip.trainees.fuck.2": "注：如果你的或服主的电脑（尤其是cpu）一般，切勿轻易尝试！！！（纯递归计算斐波那契第n项，n为30~50内的随机整数，时间复杂度2^n，一般水平纯净最长耗时约42s）",
   
-  
-  "block.trainees.myblock": "只因方块",
-  "block.trainees.two_half_ingot_block": "两锭半块",
-  "block.trainees.polyester_ore": "聚酯纤维矿",
-  "block.trainees.feather_block": "羽毛方块",
-  "block.trainees.purification_station": "提纯台",
-  "block.trainees.basketball_anti_block": "[方块]反相篮球",
-  "block.trainees.basketball_anti_block_rgt": "de_反相篮球",
+
 
 
   "enchantment.trainees.ten_thousand_sword": "万剑归宗",
@@ -159,13 +163,13 @@
   "item.trainees.pei_fang_ball": "配方是个球",
 
   "painting.trainees.spf1.title": "月牙天冲",
-  "painting.trainees.spf1.author": "Phamoce - 塑料瓶匿迹于残影，也乱他脸于不可见…………",
+  "painting.trainees.spf1.author": "法莫斯·泰肯福图斯 - 塑料瓶匿迹于残影，也乱他脸于不可见…………",
   "painting.trainees.spf2.title": "旋耳炫光",
-  "painting.trainees.spf2.author": "Phamoce - 俯仰绕耳，光冲脸过，独留他耳旋…………",
+  "painting.trainees.spf2.author": "法莫斯·泰肯福图斯 - 俯仰绕耳，光冲脸过，独留他耳旋…………",
   "painting.trainees.spf3.title": "光抚视慈",
-  "painting.trainees.spf3.author": "Phamoce - 白光抚摸着他视线慈和的脸，勾出笑来…………",
+  "painting.trainees.spf3.author": "法莫斯·泰肯福图斯 - 白光抚摸着他视线慈和的脸，勾出笑来…………",
   "painting.trainees.spf4.title": "平观光洒",
-  "painting.trainees.spf4.author": "Phamoce - 他捧着惨白与狂烈，任光洒在前胸与脸颊…………",
+  "painting.trainees.spf4.author": "法莫斯·泰肯福图斯 - 他捧着惨白与狂烈，任光洒在前胸与脸颊…………",
   "painting.trainees.p1.title": "好臭啊（悲）",
   "painting.trainees.p1.author": "Homo",
 
@@ -208,5 +212,16 @@
   "container.trainees.purification_station": "提纯台",
   "container.trainees.purification_station.input_slot": "材料",
   "container.trainees.purification_station.fuel_slot": "升级/提纯物……",
-  "button.trainees.purify": "提升"
+  "button.trainees.purify": "提升",
+  
+  "config.trainees.title": "Trainees 模组配置",
+  "config.trainees.movement_max": "生成物随机运动上限",
+  "config.trainees.movement_max.tooltip": "这个值会影响物品实体等随机移动的范围 (0-10000)",
+  "config.trainees.save": "保存",
+  "config.trainees.cancel": "取消",
+  "config.trainees.reset": "重置",
+  "config.trainees.saved": "配置已保存！新值: %s",
+  "config.trainees.invalid_range": "数值必须在 0-10000 范围内",
+  "config.trainees.invalid_number": "请输入有效的数字",
+  "config.trainees.reset_default": "已重置为默认值 10"
 }

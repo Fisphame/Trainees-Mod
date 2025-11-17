@@ -14,7 +14,7 @@
   },
   "unlockedBy": {
     "trigger": {
-      "trigger": "minecraft:tick",
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {

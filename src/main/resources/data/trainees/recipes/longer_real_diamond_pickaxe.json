@@ -19,7 +19,7 @@
     "conditions": {
       "items": [
         {
-          "items": ["trainees:long_real_diamond_pickaxe"]
+          "items": ["trainees:real_diamond_pickaxe"]
         }
       ]
     }

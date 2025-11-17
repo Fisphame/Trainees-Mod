@@ -7,10 +7,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -25,15 +25,18 @@ public class Duihuanquan extends Item {
     public Duihuanquan(Properties p_41383_){
         super(p_41383_);
     }
+
     public InteractionResult useOn(UseOnContext context){
         Level level = context.getLevel();
         BlockPos blockpos = context.getClickedPos();
         BlockState blockstate = level.getBlockState(blockpos);
         Block block = blockstate.getBlock();
-        if (block == ModBlocks.myblock.get()){
+        if (block == ModBlocks.MYBLOCK.get()) {
             Player player = context.getPlayer();
-            player.addItem(new ItemStack(ModItems.UPGRADE_THEME.get()));
-            var itemstack = context.getItemInHand();
+            ItemStack itemstack = new ItemStack(ModItems.UPGRADE_THEME.get(), 1);
+            ItemEntity itemEntity = new ItemEntity(level, blockpos.getX(), blockpos.getY() + 1, blockpos.getZ(), itemstack);
+            itemEntity.level().addFreshEntity(itemEntity);
+
             itemstack.shrink(1);
             level.playSound(player, blockpos, SoundEvents.CHICKEN_DEATH, SoundSource.BLOCKS, 1.0F, 1.0F);
             return InteractionResult.sidedSuccess(level.isClientSide);

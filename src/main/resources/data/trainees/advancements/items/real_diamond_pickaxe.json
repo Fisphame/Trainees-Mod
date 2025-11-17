@@ -30,9 +30,13 @@
   "rewards": {
     "experience": 5,
     "recipes": [
-      "long_real_diamond_pickaxe",
-      "left_half_diamond_pickaxe",
-      "right_half_diamond_pickaxe"
+      "trainees:left_half_diamond_pickaxe",
+      "trainees:right_half_diamond_pickaxe",
+      "trainees:long_real_diamond_pickaxe",
+      "trainees:longer_real_diamond_pickaxe",
+      "trainees:longest_real_diamond_pickaxe",
+      "trainees:the_longest_real_diamond_pickaxe",
+      "trainees:the_the_longest_real_diamond_pickaxe"
     ]
   }
 }

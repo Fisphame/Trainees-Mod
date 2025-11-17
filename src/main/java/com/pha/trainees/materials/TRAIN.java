@@ -8,6 +8,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
@@ -59,15 +60,15 @@ public class TRAIN{
         @Override
         public int getEnchantmentValue() {return ENCHANTMENT_VALUE[level];}
         @Override
-        public SoundEvent getEquipSound() {
+        public @NotNull SoundEvent getEquipSound() {
             return SOUND_EVENTS[level];
         }
         @Override
-        public Ingredient getRepairIngredient() {
+        public @NotNull Ingredient getRepairIngredient() {
             return REPAIR_MATERIAL.get();
         }
         @Override
-        public String getName() {return NAME[level];}
+        public @NotNull String getName() {return NAME[level];}
         @Override
         public float getToughness() {return TOUGHNESS_VALUE[level];}
         @Override
@@ -84,15 +85,15 @@ public class TRAIN{
         @Override
         public int getEnchantmentValue() {return ENCHANTMENT_VALUE[level];}
         @Override
-        public SoundEvent getEquipSound() {
+        public @NotNull SoundEvent getEquipSound() {
             return SOUND_EVENTS[level];
         }
         @Override
-        public Ingredient getRepairIngredient() {
+        public @NotNull Ingredient getRepairIngredient() {
             return REPAIR_MATERIAL.get();
         }
         @Override
-        public String getName() {return NAME[level];}
+        public @NotNull String getName() {return NAME[level];}
         @Override
         public float getToughness() {return TOUGHNESS_VALUE[level];}
         @Override
@@ -109,15 +110,15 @@ public class TRAIN{
         @Override
         public int getEnchantmentValue() {return ENCHANTMENT_VALUE[level];}
         @Override
-        public SoundEvent getEquipSound() {
+        public @NotNull SoundEvent getEquipSound() {
             return SOUND_EVENTS[level];
         }
         @Override
-        public Ingredient getRepairIngredient() {
+        public @NotNull Ingredient getRepairIngredient() {
             return REPAIR_MATERIAL.get();
         }
         @Override
-        public String getName() {return NAME[level];}
+        public @NotNull String getName() {return NAME[level];}
         @Override
         public float getToughness() {return TOUGHNESS_VALUE[level];}
         @Override

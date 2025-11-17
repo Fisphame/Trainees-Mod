@@ -28,6 +28,9 @@
     }
   },
   "rewards": {
-    "experience": 4782969
+    "experience": 4782969,
+    "recipes": [
+      "trainees:powder_anti_99_scythe"
+    ]
   }
 }

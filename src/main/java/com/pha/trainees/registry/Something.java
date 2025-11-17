@@ -3,11 +3,9 @@ package com.pha.trainees.registry;
 import com.pha.trainees.Main;
 import com.pha.trainees.block.BlackHoleBlock;
 import com.pha.trainees.block.PowderAnti99Block;
-import com.pha.trainees.item.BombItem;
-import com.pha.trainees.item.FuckItem;
-import com.pha.trainees.item.LongCourseItem;
-import com.pha.trainees.item.ScytheCourseItem;
+import com.pha.trainees.item.*;
 import com.pha.trainees.materials.TRAIN;
+import com.pha.trainees.way.ModMath;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
@@ -202,7 +200,7 @@ public class Something {
                         499,
                         -2.4F,
                         new Item.Properties()
-                                .durability((int) Main.MATH99)
+                                .durability((int) ModMath.MATH99)
                                 .rarity(Rarity.RARE)
                 ));
 
@@ -242,25 +240,25 @@ public class Something {
         //一小堆黑粉 powder_anti_9
         //一堆黑粉
         public static final RegistryObject<Item> POWDER_ANTI_92 = ITEMS.register("powder_anti_92",
-                () -> new Item(new Item.Properties()));
+                () -> new PowderAntiCourseItem.PowderAnti92Item(new Item.Properties()));
         //一大堆黑粉
         public static final RegistryObject<Item> POWDER_ANTI_93 = ITEMS.register("powder_anti_93",
-                () -> new Item(new Item.Properties()));
+                () -> new PowderAntiCourseItem.PowderAnti93Item(new Item.Properties()));
         //一小坨黑粉
         public static final RegistryObject<Item> POWDER_ANTI_94 = ITEMS.register("powder_anti_94",
-                () -> new Item(new Item.Properties()));
+                () -> new PowderAntiCourseItem.PowderAnti94Item(new Item.Properties()));
         //一坨黑粉
         public static final RegistryObject<Item> POWDER_ANTI_95 = ITEMS.register("powder_anti_95",
-                () -> new Item(new Item.Properties()));
+                () -> new PowderAntiCourseItem.PowderAnti95Item(new Item.Properties()));
         //一大坨黑粉
         public static final RegistryObject<Item> POWDER_ANTI_96 = ITEMS.register("powder_anti_96",
-                () -> new Item(new Item.Properties()));
+                () -> new PowderAntiCourseItem.PowderAnti96Item(new Item.Properties()));
         //一小块黑粉
         public static final RegistryObject<Item> POWDER_ANTI_97 = ITEMS.register("powder_anti_97",
-                () -> new Item(new Item.Properties()));
+                () -> new PowderAntiCourseItem.PowderAnti97Item(new Item.Properties()));
         //一块黑粉
         public static final RegistryObject<Item> POWDER_ANTI_98 = ITEMS.register("powder_anti_98",
-                () -> new Item(new Item.Properties()));
+                () -> new PowderAntiCourseItem.PowderAnti98Item(new Item.Properties()));
         //黑粉块
         public static final RegistryObject<Item> POWDER_ANTI_99_BLOCK_ITEM = ITEMS.register("powder_anti_99",
                 () -> new BlockItem(SomethingBlocks.POWDER_ANTI_99_BLOCK.get(),

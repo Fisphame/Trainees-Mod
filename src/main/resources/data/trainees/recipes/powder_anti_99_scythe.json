@@ -2,14 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "PPP",
-    "PPP",
-    "PPP"
+    "  S",
+    "  S"
   ],
   "key": {
-    "P": { "item": "trainees:powder_anti_95" }
+    "P": { "item": "trainees:powder_anti_99" },
+    "S": { "item": "trainees:stone_stick" }
   },
   "result": {
-    "item": "trainees:powder_anti_96",
+    "item": "trainees:powder_anti_99_scythe",
     "count": 1
   },
   "unlockedBy": {
@@ -18,7 +19,7 @@
       "conditions": {
         "items": [
           {
-            "items": ["trainees:powder_anti"]
+            "items": ["trainees:powder_anti_99"]
           }
         ]
       }

@@ -40,9 +40,11 @@
       "trainees:kun_scythe2",
       "trainees:kun_shovel",
       "trainees:kun_sword",
-      "trainees:kun_two_half_ingot_block",
+      "trainees:two_half_ingot_block",
       "trainees:ahkun_apple",
-      "trainees:big_ahkun_apple"
+      "trainees:big_ahkun_apple",
+      "trainees:real_apple",
+      "trainees:real_diamond_pickaxe"
     ]
   }
 }

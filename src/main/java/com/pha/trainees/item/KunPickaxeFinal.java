@@ -24,7 +24,7 @@ public class KunPickaxeFinal extends PickaxeItem {
 
     @Override
     public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
-        if (state.is(ModBlocks.myblock.get())) {
+        if (state.is(ModBlocks.MYBLOCK.get())) {
             return true;
         }
 

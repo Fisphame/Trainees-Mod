@@ -19,7 +19,7 @@ public class ModItems {
 
     //两锭半块
     public static final RegistryObject<Item> TWO_HALF_INGOT_BLOCK_ITEM = ITEMS.register("two_half_ingot_block",
-            () -> new BlockItem(ModBlocks.TWO_HALF_INGOT_BLOCK.get(),
+            () -> new KunCourseItem.TwoHalfIngotBlockItem(ModBlocks.TWO_HALF_INGOT_BLOCK.get(),
             new Item.Properties()
     ));
     //羽毛方块
@@ -34,10 +34,15 @@ public class ModItems {
     ));
     //只因方块
     public static final RegistryObject<Item> myblockitem = ITEMS.register("myblock",
-            () -> new BlockItem(ModBlocks.myblock.get(),
+            () -> new BlockItem(ModBlocks.MYBLOCK.get(),
             new Item.Properties()
                     .rarity(Rarity.RARE)
     ));
+    //氢氧化鸡方块
+    public static final RegistryObject<Item> CHE_JIOH_BLOCK_ITEM = ITEMS.register("che_jioh_block",
+            () -> new BlockItem(ModBlocks.CHE_JIOH_BLOCK.get(),
+                    new Item.Properties()
+            ));
     //反相素方块
     public static final RegistryObject<Item> CHE_JIBP_BLOCK_ITEM = ITEMS.register("che_jibp_block",
             () -> new BlockItem(ModBlocks.CHE_JIBP_BLOCK.get(),
@@ -383,7 +388,6 @@ public class ModItems {
     public static final RegistryObject<Item> POWDER_ANTI_9 = ITEMS.register("powder_anti_9",
             () -> new PowderAntiCourseItem.PowderAnti9Item(new Item.Properties()
             ));
-
     //聚酯纤维（PET）
     public static final RegistryObject<Item> POLYESTER = ITEMS.register("polyester",
             ()-> new Item(new Item.Properties())
@@ -411,61 +415,61 @@ public class ModItems {
             ()-> new Item(new Item.Properties()
                     .rarity(Rarity.RARE)
             ));
-
     //只因蛋
     public static final RegistryObject<Item> KUN_EGG = ITEMS.register("kun_egg",
             () -> new EggCourseItem.KunEggItem(new Item.Properties()
                     .stacksTo(16)
             ));
-
     //黑蛋
     public static final RegistryObject<Item> BLACK_EGG = ITEMS.register("black_egg",
             () -> new EggCourseItem.BlackEggItem(new Item.Properties()
                     .stacksTo(16)
             ));
-
     //化学书
     public static final RegistryObject<Item> CHEMISTRY_BOOK = ITEMS.register("chemistry_book",
-            () -> new ChemistryBookItem(
+            () -> new ChemistryItem.ChemistryBookItem(
                     new Item.Properties()
                             .stacksTo(1)
-                            .rarity(Rarity.UNCOMMON),
-                    "化学·练习生选择性必修一",
-                    "真的要看吗……"
+                            .rarity(Rarity.UNCOMMON)
             )
     );
-
+    //相酸桶
+    public static final RegistryObject<Item> CHE_HBP_BUCKET = ITEMS.register("che_hbp_bucket",
+            () -> new BucketItem(
+                    ModFluid.SOURCE_CHE_HBP,
+                    new Item.Properties()
+                            .craftRemainder(Items.BUCKET)
+                            .stacksTo(1)
+            ));
     //鸡碱锭
     public static final RegistryObject<Item> CHE_JIOH = ITEMS.register("che_jioh",
             () -> new ChemistryItem.JiOH(new Item.Properties()
             ));
-
     //鸡碱粒
     public static final RegistryObject<Item> CHE_JIOH_NUGGET = ITEMS.register("che_jioh_nugget",
             () -> new ChemistryItem.JiOH(new Item.Properties()
             ));
-
-    //黑酸
+    //黑化氢
     public static final RegistryObject<Item> CHE_HBP = ITEMS.register("che_hbp",
             () -> new ChemistryItem.HBp(new Item.Properties()
             ));
-
-    //黑鸡
+    //次黑酸
+    public static final RegistryObject<Item> CHE_HBPO = ITEMS.register("che_hbpo",
+            () -> new ChemistryItem.HBpO(new Item.Properties()
+            ));
+    //反相素
     public static final RegistryObject<Item> CHE_JIBP = ITEMS.register("che_jibp",
             () -> new ChemistryItem.JiBp(new Item.Properties()
                     .rarity(Rarity.UNCOMMON)
             ));
-
-    //一氧化二鸡
+    //氧化鸡
     public static final RegistryObject<Item> CHE_JI2O = ITEMS.register("che_ji2o",
             () -> new ChemistryItem.Ji2O(new Item.Properties()
             ));
-
-    //一氧化二鸡粒
+    //氧化鸡粒
     public static final RegistryObject<Item> CHE_JI2O_NUGGET = ITEMS.register("che_ji2o_nugget",
             () -> new ChemistryItem.Ji2O(new Item.Properties()
             ));
-
 
     //练习鸡刷怪蛋
     public static final RegistryObject<Item> KUN_TRAINEES_SPAWN_EGG = ITEMS.register("kun_trainees_spawn_egg",
