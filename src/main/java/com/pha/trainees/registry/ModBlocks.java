@@ -41,23 +41,6 @@ public class ModBlocks {
                     .noCollission()
     ));
 
-    //氢氧化鸡方块
-    public static final RegistryObject<Block> CHE_JIOH_BLOCK = BLOCKS.register("che_jioh_block",
-            () -> new ChemistryBlock.JiOHBlock(
-                    BlockBehaviour.Properties.of()
-                            .strength(2f,6f)
-                            .sound(SoundType.METAL)
-                            .requiresCorrectToolForDrops()
-            ));
-
-    //反相素方块
-    public static final RegistryObject<Block> CHE_JIBP_BLOCK = BLOCKS.register("che_jibp_block",
-            () -> new CheJibpBlock(
-                    BlockBehaviour.Properties.of()
-                            .strength(0.5f,3f)
-                            .sound(SoundType.WET_GRASS)
-            )
-    );
 
     public static final RegistryObject<Block> POLYESTER_ORE = BLOCKS.register("polyester_ore",
             () -> new Block(
@@ -128,15 +111,7 @@ public class ModBlocks {
             ));
 
 
-    public static final RegistryObject<LiquidBlock> CHE_HBP_BLOCK = BLOCKS.register("che_hbp_block",
-            () -> new LiquidBlock(ModFluid.SOURCE_CHE_HBP,
-                    BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.WATER)
-                            .replaceable()
-                            .noCollission()
-                            .strength(100.0F)
-                            .pushReaction(PushReaction.DESTROY)
-                            .noLootTable()));
+
 
 }
 

@@ -68,7 +68,7 @@ public class CodeMuseumAndShit {
     public class RealDoTnt {
 
 
-        /// 用法如下： 仅中心  快捷多面  自定义爆炸
+            /// 用法如下： 仅中心  快捷多面  自定义爆炸
 /*
     // 1. 仅中心爆炸
     new DoTnt.Builder(level, x, y, z)

@@ -71,7 +71,8 @@ public class AbilityHandler {
 
             // 计算伤害
             float baseDamage = 0.0f;
-            Multimap<net.minecraft.world.entity.ai.attributes.Attribute, AttributeModifier> modifiers = sword.getAttributeModifiers(EquipmentSlot.MAINHAND);
+            Multimap<net.minecraft.world.entity.ai.attributes.Attribute, AttributeModifier> modifiers =
+                    sword.getAttributeModifiers(EquipmentSlot.MAINHAND);
             for (Map.Entry<Attribute, AttributeModifier> entry : modifiers.entries()) {
                 if (entry.getKey() == Attributes.ATTACK_DAMAGE) {
                     baseDamage = (float) entry.getValue().getAmount();

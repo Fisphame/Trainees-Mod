@@ -1,7 +1,6 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.registry.ModItems;
-import com.pha.trainees.way.ChemicalReaction;
+import com.pha.trainees.way.chemistry.ReactionSystem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BookItem;
@@ -9,12 +8,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
 
 import javax.annotation.Nullable;
 import java.util.List;
-
-import static com.pha.trainees.way.ModMath.POW;
 
 public class ChemistryItem {
 
@@ -36,8 +32,8 @@ public class ChemistryItem {
     }
 
     /*
-        Ji   钅鸡（以下称鸡）  原子序数119   金属元素    +1               易失1电子 成Ji+
-        Bp   石黑（以下称黑）  原子序数117   非金属元素   +1 -1 -3 -5 -7   易得1电子 成Bp-
+        Ji   钅鸡（以下称鸡）  原子序数119   金属元素    +1
+        Bp   石黑（以下称黑）  原子序数117   非金属元素   +1 -1 -3 -5 -7
         JiBp   黑化鸡
         JiOH   氢氧化鸡
         HBp    黑化氢   相酸：黑化氢的水溶液
@@ -48,9 +44,19 @@ public class ChemistryItem {
         BpNH4  铵黑
 
         反应：
+            Bp2 + H2O == HBpO + HBp
+            Bp2 + 2O2 =点燃= 2BpO2
+            2HBpO =光照= 2HBp + O2↑
+            2BpO2 + 2H2O == 2HBpO3 + H2↑
+            2BpO2 + O2 =催化剂= 2BpO3
+            2BpO3 + 2H2O == 2HBpO4 + H2↑
+
+
+
         1.  Ji + Bp == JiBp
         2.  2Ji + 2H2O == 2JiOH + H2↑
-        3.  4Bp + 2H2O == 4HBp + O2↑
+
+        4.
         4.  JiOH + HBp == JiBp + H2O
         5.  2Ji + O2 =点燃= Ji2O
         6.  Ji2SO4 + 2Na == Na2SO4 + Ji2
@@ -87,9 +93,16 @@ public class ChemistryItem {
     public static class HBpO extends Item {
         public HBpO(Properties p_41383_) {super(p_41383_);}
 
+        public static boolean on(ItemStack stack, ItemEntity entity) {
+            if (!entity.level().isClientSide) {
+                return ReactionSystem.ReactionRegistry.triggerReactions(stack, entity);
+            }
+            return false;
+        }
+
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.HBpODecompose(stack, entity);
+            return on(stack, entity);
         }
 
         @Override

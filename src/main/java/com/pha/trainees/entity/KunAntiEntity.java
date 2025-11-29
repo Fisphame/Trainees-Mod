@@ -3,6 +3,8 @@ package com.pha.trainees.entity;
 import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModEntities;
 import com.pha.trainees.registry.ModItems;
+import com.pha.trainees.registry.ModTags;
+import com.pha.trainees.way.game.Tools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -23,8 +25,6 @@ import net.minecraft.world.damagesource.DamageSource;
 
 
 public class KunAntiEntity extends Chicken {
-    // 定义新的食物列表
-    private static final Ingredient FOOD_ITEMS = Ingredient.of(ModItems.POWDER_ANTI.get(),ModItems.POWDER_ANTI_4.get(),ModItems.POWDER_ANTI_9.get());
 
     public KunAntiEntity(EntityType<? extends Chicken> type, Level level) {
         super(type, level);
@@ -33,7 +33,10 @@ public class KunAntiEntity extends Chicken {
     public static AttributeSupplier.Builder createAttributes() {
         return Chicken.createAttributes()
                 .add(Attributes.MAX_HEALTH, 16.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.25);
+                .add(Attributes.MOVEMENT_SPEED, 0.25)
+                .add(Attributes.ATTACK_DAMAGE, 5.0F)
+                .add(Attributes.ATTACK_SPEED, 1.0F)
+                ;
     }
 
     @Override
@@ -59,7 +62,8 @@ public class KunAntiEntity extends Chicken {
     // 重写食物检测方法
     @Override
     public boolean isFood(ItemStack stack) {
-        return FOOD_ITEMS.test(stack);
+        var item = stack.getItem();
+        return Tools.isInTag(item, ModTags.POWDER_ANTI_2);
     }
 
     // 重写环境音效方法（需要替换为自定义音效）

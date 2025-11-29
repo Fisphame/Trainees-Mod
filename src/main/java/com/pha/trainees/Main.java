@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.pha.trainees.config.TraineesConfigScreen;
 import com.pha.trainees.event.*;
 import com.pha.trainees.registry.*;
+import com.pha.trainees.way.chemistry.ChemicalReaction;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -25,11 +26,13 @@ public class Main {
         var ebus = MinecraftForge.EVENT_BUS;
 
 
-
         ModBlocks.BLOCKS.register(bus);
+        ModChemistry.ModChemistryBlocks.BLOCKS.register(bus);
         ModSounds.SOUNDS.register(bus);
         ModEnchantments.ENCHANTMENTS.register(bus);
         ModItems.ITEMS.register(bus);
+        ModChemistry.ModChemistryBlockItems.ITEMS.register(bus);
+        ModChemistry.ModChemistryItems.ITEMS.register(bus);
         ModEntities.ENTITIES.register(bus);
         Something.SomethingBlocks.BLOCKS.register(bus);
         Something.SomethingItems.ITEMS.register(bus);
@@ -51,6 +54,8 @@ public class Main {
 
         bus.register(new RegisterAttributes());
 
+        ChemicalReaction.registerAllReactions();
+
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
         ebus.register(RealPickaxeEvents.class);
@@ -61,6 +66,19 @@ public class Main {
         // 注册配置屏幕
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
 
+        setupMixinCompatibility();
+
+    }
+
+    private void setupMixinCompatibility() {
+        // 检查是否有冲突的 Mixin
+        try {
+            // 确保使用正确的映射表
+            System.setProperty("mixin.env.compatLevel", "JAVA_17");
+            System.setProperty("mixin.checks", "true");
+        } catch (Exception e) {
+            LOGGER.warn("Mixin compatibility setup failed, but continuing...");
+        }
     }
 
     private void onClientSetup(final FMLClientSetupEvent event) {

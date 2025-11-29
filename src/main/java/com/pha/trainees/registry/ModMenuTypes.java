@@ -13,7 +13,8 @@ public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(ForgeRegistries.MENU_TYPES, Main.MODID);
 
-    public static final RegistryObject<MenuType<PurificationStationMenu>> PURIFICATION_STATION_MENU = MENUS.register("purification_station_menu",
+    public static final RegistryObject<MenuType<PurificationStationMenu>> PURIFICATION_STATION_MENU = MENUS.register(
+            "purification_station_menu",
             () -> IForgeMenuType.create((windowId, inv, data) ->
                     new PurificationStationMenu(windowId, inv, data.readBlockPos())
             )

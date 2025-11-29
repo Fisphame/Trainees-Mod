@@ -38,17 +38,7 @@ public class ModItems {
             new Item.Properties()
                     .rarity(Rarity.RARE)
     ));
-    //氢氧化鸡方块
-    public static final RegistryObject<Item> CHE_JIOH_BLOCK_ITEM = ITEMS.register("che_jioh_block",
-            () -> new BlockItem(ModBlocks.CHE_JIOH_BLOCK.get(),
-                    new Item.Properties()
-            ));
-    //反相素方块
-    public static final RegistryObject<Item> CHE_JIBP_BLOCK_ITEM = ITEMS.register("che_jibp_block",
-            () -> new BlockItem(ModBlocks.CHE_JIBP_BLOCK.get(),
-                    new Item.Properties()
-                            .rarity(Rarity.UNCOMMON)
-            ));
+
     //提纯台
     public static final RegistryObject<Item> PURIFICATION_STATION_ITEM = ITEMS.register("purification_station",
             () -> new BlockItem(ModBlocks.PURIFICATION_STATION.get(),
@@ -425,51 +415,7 @@ public class ModItems {
             () -> new EggCourseItem.BlackEggItem(new Item.Properties()
                     .stacksTo(16)
             ));
-    //化学书
-    public static final RegistryObject<Item> CHEMISTRY_BOOK = ITEMS.register("chemistry_book",
-            () -> new ChemistryItem.ChemistryBookItem(
-                    new Item.Properties()
-                            .stacksTo(1)
-                            .rarity(Rarity.UNCOMMON)
-            )
-    );
-    //相酸桶
-    public static final RegistryObject<Item> CHE_HBP_BUCKET = ITEMS.register("che_hbp_bucket",
-            () -> new BucketItem(
-                    ModFluid.SOURCE_CHE_HBP,
-                    new Item.Properties()
-                            .craftRemainder(Items.BUCKET)
-                            .stacksTo(1)
-            ));
-    //鸡碱锭
-    public static final RegistryObject<Item> CHE_JIOH = ITEMS.register("che_jioh",
-            () -> new ChemistryItem.JiOH(new Item.Properties()
-            ));
-    //鸡碱粒
-    public static final RegistryObject<Item> CHE_JIOH_NUGGET = ITEMS.register("che_jioh_nugget",
-            () -> new ChemistryItem.JiOH(new Item.Properties()
-            ));
-    //黑化氢
-    public static final RegistryObject<Item> CHE_HBP = ITEMS.register("che_hbp",
-            () -> new ChemistryItem.HBp(new Item.Properties()
-            ));
-    //次黑酸
-    public static final RegistryObject<Item> CHE_HBPO = ITEMS.register("che_hbpo",
-            () -> new ChemistryItem.HBpO(new Item.Properties()
-            ));
-    //反相素
-    public static final RegistryObject<Item> CHE_JIBP = ITEMS.register("che_jibp",
-            () -> new ChemistryItem.JiBp(new Item.Properties()
-                    .rarity(Rarity.UNCOMMON)
-            ));
-    //氧化鸡
-    public static final RegistryObject<Item> CHE_JI2O = ITEMS.register("che_ji2o",
-            () -> new ChemistryItem.Ji2O(new Item.Properties()
-            ));
-    //氧化鸡粒
-    public static final RegistryObject<Item> CHE_JI2O_NUGGET = ITEMS.register("che_ji2o_nugget",
-            () -> new ChemistryItem.Ji2O(new Item.Properties()
-            ));
+
 
     //练习鸡刷怪蛋
     public static final RegistryObject<Item> KUN_TRAINEES_SPAWN_EGG = ITEMS.register("kun_trainees_spawn_egg",
@@ -491,8 +437,4 @@ public class ModItems {
                             .stacksTo(64)
             )
     );
-
-
-
-
 }

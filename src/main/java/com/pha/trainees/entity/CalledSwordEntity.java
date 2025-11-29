@@ -41,13 +41,6 @@ public class CalledSwordEntity extends Entity {
         );
     }
 
-
-
-
-
-
-
-
     private float damage;
     private Direction direction;
     private int lifespan = 20 * 4;

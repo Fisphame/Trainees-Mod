@@ -1,17 +1,28 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.way.ChemicalReaction;
+import com.pha.trainees.way.chemistry.ChemicalReaction;
+import com.pha.trainees.way.chemistry.ReactionSystem;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 
-import static com.pha.trainees.way.ModMath.POW;
 public class PowderAntiCourseItem {
 
+    public static InteractionResult JiBpCombination_1(UseOnContext context, int number){
+        if (ChemicalReaction.JiBpCombination_1(context, number)){
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.FAIL;
+    }
 
-
+    public static boolean on(ItemStack stack, ItemEntity entity) {
+        if (!entity.level().isClientSide) {
+            return ReactionSystem.ReactionRegistry.triggerReactions(stack, entity);
+        }
+        return false;
+    }
 
     public static class PowderAntiItem extends Item{
         public PowderAntiItem(Properties p_41383_) {
@@ -20,12 +31,12 @@ public class PowderAntiCourseItem {
 
         @Override
         public InteractionResult useOn(UseOnContext context){
-            return ChemicalReaction.JiBpCombination_1(context, 9);
+            return JiBpCombination_1(context, 9);
         }
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[0], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -36,7 +47,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(4, stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -47,12 +58,12 @@ public class PowderAntiCourseItem {
 
         @Override
         public InteractionResult useOn(UseOnContext context){
-            return ChemicalReaction.JiBpCombination_1(context, 1);
+            return JiBpCombination_1(context, 1);
         }
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[1], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -63,7 +74,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[2], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -74,7 +85,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[3], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -85,7 +96,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[4], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -96,7 +107,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[5], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -107,7 +118,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[6], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -118,7 +129,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[7], stack, entity);
+            return on(stack, entity);
         }
     }
 
@@ -129,14 +140,8 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return ChemicalReaction.Bp2AndH2O(POW[8], stack, entity);
+            return on(stack, entity);
         }
     }
-
-
-
-
-
-
 
 }

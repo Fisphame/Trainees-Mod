@@ -4,8 +4,7 @@ import com.pha.trainees.Main;
 import com.pha.trainees.block.BlackHoleBlock;
 import com.pha.trainees.block.PowderAnti99Block;
 import com.pha.trainees.item.*;
-import com.pha.trainees.materials.TRAIN;
-import com.pha.trainees.way.ModMath;
+import com.pha.trainees.way.math.Math;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
@@ -22,7 +21,8 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class Something {
     public static class SomethingBlocks {
-        public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Main.MODID);
+        public static final DeferredRegister<Block> BLOCKS =
+                DeferredRegister.create(ForgeRegistries.BLOCKS, Main.MODID);
         //神人（真的是人）方块
 
         //顺序：建筑方块 -> 染色方块 -> 自然方块 -> 功能方块 -> 红石方块
@@ -161,7 +161,8 @@ public class Something {
                 ));
 
         //“钻    石    镐” 56*56
-        public static final RegistryObject<Item> THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_longest_real_diamond_pickaxe",
+        public static final RegistryObject<Item> THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register(
+                "the_longest_real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         3,
@@ -172,7 +173,8 @@ public class Something {
                 ));
 
         //“钻     石     镐” 64*64
-        public static final RegistryObject<Item> THE_THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("the_the_longest_real_diamond_pickaxe",
+        public static final RegistryObject<Item> THE_THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register(
+                "the_the_longest_real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
                         4,
@@ -200,7 +202,7 @@ public class Something {
                         499,
                         -2.4F,
                         new Item.Properties()
-                                .durability((int) ModMath.MATH99)
+                                .durability((int) Math.MATH99)
                                 .rarity(Rarity.RARE)
                 ));
 
@@ -289,7 +291,8 @@ public class Something {
         }
     }
     public static class Paintings {
-        public static final DeferredRegister<PaintingVariant> PAINTING_VARIANTS = DeferredRegister.create(ForgeRegistries.PAINTING_VARIANTS, Main.MODID);
+        public static final DeferredRegister<PaintingVariant> PAINTING_VARIANTS =
+                DeferredRegister.create(ForgeRegistries.PAINTING_VARIANTS, Main.MODID);
         private static RegistryObject<PaintingVariant> rpv(String name,int width,int height) {
             return PAINTING_VARIANTS.register(name,
                     () -> new PaintingVariant(width, height)

@@ -101,14 +101,7 @@
   "item.trainees.basketball_anti.effect.empty": "反相篮球",
   "item.trainees.basketball_anti.effect.harming": "[瞬伤]反相篮球",
   "item.trainees.kun_egg": "只因蛋",
-  "item.trainees.che_jioh": "氢氧化鸡锭",
-  "item.trainees.che_jioh_nugget": "氢氧化鸡粒",
-  "item.trainees.che_hbp": "黑化氢粉末",
-  "item.trainees.che_jibp": "反相素",
-  "item.trainees.che_ji2o": "氧化鸡锭",
-  "item.trainees.che_hbpo": "次黑酸粉末",
-  "item.trainees.che_ji2o_nugget": "氧化鸡粒",
-  "item.trainees.chemistry_book": "化学书",
+
   
   "tooltip.trainees.axemace_item": "§l斧锤",
   "tooltip.trainees.axemace_item.2": "仍可作为斧头使用。",
@@ -130,6 +123,25 @@
   "tooltip.trainees.scythe_item.2": "横扫伤害为主手伤害的2倍，范围提升至2倍。（主手伤害不变）",
   "tooltip.trainees.black_powder_scythe_item": "§l§8镰刀?",
   "tooltip.trainees.black_powder_scythe_item.2": "横扫伤害为主手的38742倍，范围提升至38742倍。（主手伤害不变）\n注：实际伤害范围取决于模拟距离(范围半径≈模拟距离×16)，所以不用担心电脑爆炸啦qwq\n",
+  
+  "enchantment.trainees.ten_thousand_sword": "万剑归宗",
+  
+  "entity.trainees.kun_trainees": "练习鸡",
+  "entity.trainees.kun_anti": "黑粉",
+  
+  
+  
+  "itemGroup.trainees.chemistry_tab": "化学讲堂",
+  
+  "item.trainees.che_jioh": "氢氧化鸡锭",
+  "item.trainees.che_jioh_nugget": "氢氧化鸡粒",
+  "item.trainees.che_hbp": "黑化氢粉末",
+  "item.trainees.che_jibp": "反相素",
+  "item.trainees.che_ji2o": "氧化鸡锭",
+  "item.trainees.che_hbpo": "次黑酸粉末",
+  "item.trainees.che_ji2o_nugget": "氧化鸡粒",
+  "item.trainees.chemistry_book": "化学书",
+  
   "tooltip.trainees.jioh": "§l鸡碱",
   "tooltip.trainees.jioh.2": "JiOH 鸡碱/氢氧化鸡",
   "tooltip.trainees.hbp": "§l黑化氢",
@@ -146,15 +158,9 @@
   "tooltip.trainees.fuck": "手持该物品右键，“可能”会导致游戏卡顿、程序未响应、服务器崩溃、cpu热损伤、cpu满负载、内存控制器过热、内存过载、DRAM芯片损耗、总线负载、SSD写入放大、NAND闪存磨损、SSD控制器过热、电压波动、电容老化、VRM压力、MOSFET损耗、电感饱和、风扇高转、硅脂干涸、算数异常、栈溢出、堆内存溢出、类型转换异常、并发修改异常、空指针异常、数组越界……嘻嘻嘻，我想谋杀你的（服主的）电脑（尤其是cpu）哦……",
   "tooltip.trainees.fuck.2": "注：如果你的或服主的电脑（尤其是cpu）一般，切勿轻易尝试！！！（纯递归计算斐波那契第n项，n为30~50内的随机整数，时间复杂度2^n，一般水平纯净最长耗时约42s）",
   
-
-
-
-  "enchantment.trainees.ten_thousand_sword": "万剑归宗",
   
-  "entity.trainees.kun_trainees": "练习鸡",
-  "entity.trainees.kun_anti": "黑粉",
-
-
+  
+  
   "itemGroup.trainees.hao_tab": "一些东西",
 
   "block.trainees.pei_fang_block": "配方块",

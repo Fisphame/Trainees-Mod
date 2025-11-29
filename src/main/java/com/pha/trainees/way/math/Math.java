@@ -1,6 +1,8 @@
-package com.pha.trainees.way;
+package com.pha.trainees.way.math;
 
-public class ModMath {
+public class Math {
+    // 有关数学的拓展方法
+
     //实际上应该是387420489F，电脑算力还是有限的（，但其实也受加载距离影响。
     public static final float MATH99 = 38742F;
 
@@ -16,4 +18,12 @@ public class ModMath {
             43046721, // 9^8
             387420489 // 9^9
     };
+
+    public static final int MaxCountMove = POW[3];
+
+
+    public static double log(double value, double base) {
+        return java.lang.Math.log(value) / java.lang.Math.log(base);
+    }
+    //    double result = MathUtils.log(8, 2); // log2(8) = 3
 }
