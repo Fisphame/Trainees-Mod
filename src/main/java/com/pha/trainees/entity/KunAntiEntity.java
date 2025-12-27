@@ -63,7 +63,7 @@ public class KunAntiEntity extends Chicken {
     @Override
     public boolean isFood(ItemStack stack) {
         var item = stack.getItem();
-        return Tools.isInTag(item, ModTags.POWDER_ANTI_2);
+        return Tools.isInstanceof.tag(item, ModTags.POWDER_ANTI_2);
     }
 
     // 重写环境音效方法（需要替换为自定义音效）

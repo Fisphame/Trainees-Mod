@@ -1,10 +1,10 @@
 package com.pha.trainees.way.chemistry;
 
-import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.registry.ModTags;
+import com.pha.trainees.way.game.NumedItemEntities;
 import com.pha.trainees.way.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -20,8 +20,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import static com.pha.trainees.way.game.Tools.AddEntity;
-import static com.pha.trainees.way.game.Tools.getPowderMultiplier;
+import static com.pha.trainees.way.game.Tools.*;
 
 public class ChemicalReaction {
 
@@ -57,23 +56,20 @@ public class ChemicalReaction {
         if (!isLit) return false;
 
 
-
+        Tools.DoTnt_6(level, x, y, z, 6.0F, 6, 1);
         //实现逻辑
-        Block targetBlock = ForgeRegistries.BLOCKS.getValue(ModBlocks.BASKETBALL_ANTI_BLOCK_RGT.getId());
+//        Block targetBlock = ForgeRegistries.BLOCKS.getValue(ModBlocks.BASKETBALL_ANTI_BLOCK_RGT.getId());
+        BlockState blockState = ModChemistry.ModChemistryBlocks.CHE_JIBP_BLOCK_RGT.get().defaultBlockState();
 
-        if (targetBlock != null) {
-            // 替换方块
-            context.getLevel().setBlock(clickedPos, targetBlock.defaultBlockState(), 3);
-            if (player != null && !player.isCreative()) {
-                context.getItemInHand().shrink(num);
-            }
-            context.getLevel().playSound(null, clickedPos, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
-            Tools.DoTnt_6(level, x, y, z, 6.0F, 6, 1);
-
-            return true;
+        // 替换方块
+        context.getLevel().setBlock(clickedPos, blockState, 3);
+        if (player != null && !player.isCreative()) {
+            context.getItemInHand().shrink(num);
         }
+        context.getLevel().playSound(null, clickedPos, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
 
-        return false;
+        return true;
+
     }
 
 
@@ -187,7 +183,7 @@ public class ChemicalReaction {
                             double punishTime = Tools.punishmentTimeToSunlight(entity);
                             if (punishTime >= 9999) return false; // 不在有效光照时间
 
-                            double randomTime = entity.level().random.nextInt(20) / 20.0; // 0-1秒随机时间
+                            double randomTime = randomInRange(entity.level(), 0.0, 0.5);
                             double totalTime = randomTime + punishTime;
 
                             return ReactionSystem.TimeManager.shouldReact(entity, "hbp_decompose", totalTime);
@@ -197,7 +193,7 @@ public class ChemicalReaction {
                         public void onTimerStart(ItemStack stack, ItemEntity entity) {
                             double punishTime = Tools.punishmentTimeToSunlight(entity);
                             if (punishTime < 9999) {
-                                double randomTime = entity.level().random.nextInt(20) / 20.0;
+                                double randomTime = randomInRange(entity.level(), 0.0, 1.0);
                                 double totalTime = randomTime + punishTime;
                                 ReactionSystem.TimeManager.startTimer(entity, "hbp_decompose", totalTime);
                             }
@@ -216,7 +212,11 @@ public class ChemicalReaction {
                         int count = stack.getCount() / 2;
                         if (count > 0) {
                             entity.discard();
-                            AddEntity(level, entity, ModChemistry.ModChemistryItems.CHE_HBP.get(), count * 2, true);
+
+                            NumedItemEntities itemEntities = AddEntity(level, entity,
+                                    new ItemStack(ModChemistry.ModChemistryItems.CHE_HBP.get(), count * 2) , true);
+                            AddNIEs(entity, itemEntities, false);
+
                         }
                     },
                     10 // 高优先级
@@ -230,13 +230,14 @@ public class ChemicalReaction {
                         @Override
                         public boolean shouldStartTimer(ItemStack stack, ItemEntity entity) {
                             return isAntiPowder2(stack.getItem()) &&
-                                    entity.isInWater() &&
+                                    (entity.isInWater() || entity.level().isRaining() || entity.level().isThundering()) &&
                                     !ReactionSystem.TimeManager.isTimerActive(entity, "bp2_water_reaction");
                         }
 
                         @Override
                         public boolean shouldReact(ItemStack stack, ItemEntity entity) {
-                            if (!isAntiPowder2(stack.getItem()) || !entity.isInWater()) {
+                            if (!isAntiPowder2(stack.getItem()) ||
+                                    !(entity.isInWater() || entity.level().isRaining() || entity.level().isThundering())) {
                                 return false;
                             }
 
@@ -262,7 +263,7 @@ public class ChemicalReaction {
                         }
 
                         private boolean isAntiPowder2(Item item) {
-                            return Tools.isInTag(item, ModTags.POWDER_ANTI_2);
+                            return Tools.isInstanceof.tag(item, ModTags.POWDER_ANTI_2);
                         }
                     },
                     // 结果：生成HBp和HBpO
@@ -273,8 +274,13 @@ public class ChemicalReaction {
 
                         if (count > 0) {
                             entity.discard();
-                            AddEntity(level, entity, ModChemistry.ModChemistryItems.CHE_HBP.get(), count, true);
-                            AddEntity(level, entity, ModChemistry.ModChemistryItems.CHE_HBPO.get(), count, true);
+
+                            NumedItemEntities itemEntities_1 = AddEntity(level, entity,
+                                    new ItemStack(ModChemistry.ModChemistryItems.CHE_HBP.get(), count) , true);
+                            NumedItemEntities itemEntities_2 = AddEntity(level, entity,
+                                    new ItemStack(ModChemistry.ModChemistryItems.CHE_HBPO.get(), count) , true);
+                            AddNIEs(entity, itemEntities_1, false);
+                            AddNIEs(entity, itemEntities_2, false);
                         }
                     },
                     5
@@ -295,17 +301,15 @@ public class ChemicalReaction {
                         Tools.DoTnt_center(level, x, y, z);
 
                         entity.discard();
-                        var item = ForgeRegistries.ITEMS.getValue(new ResourceLocation
-                                (Main.MODID, stack.getItem() == ModItems.KUN_NUGGET.get() ? "che_jioh_nugget" : ( stack.getItem() == ModItems.TWO_HALF_INGOT.get() ? "che_jioh" : "che_jioh_block")));
+                        Item item = stack.getItem() == ModItems.KUN_NUGGET.get() ?
+                                ModChemistry.ModChemistryItems.CHE_JIOH_NUGGET.get() :
+                                ( stack.getItem() == ModItems.TWO_HALF_INGOT.get() ?
+                                        ModChemistry.ModChemistryItems.CHE_JIOH.get() :
+                                        ModChemistry.ModChemistryBlockItems.CHE_JIOH_BLOCK_ITEM.get());
+                        int count = stack.getCount();
 
-                        if (item != null) {
-                            int count = stack.getCount();
-                            ItemStack resultStack = new ItemStack(item, count);
-                            ItemEntity itemEntity = new ItemEntity(level, x, y, z, resultStack);
-                            itemEntity.setInvulnerable(true);
-                            itemEntity.setDefaultPickUpDelay();
-                            level.addFreshEntity(itemEntity);
-                        }
+                        NumedItemEntities itemEntities = AddEntity(level, entity, new ItemStack(item, count) , true);
+                        AddNIEs(entity, itemEntities, true);
                     },
                     5
             );

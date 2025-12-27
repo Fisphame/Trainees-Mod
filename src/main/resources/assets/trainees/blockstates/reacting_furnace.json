@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "trainees:block/reacting_furnace"
+      },
+      {
+        "model": "trainees:block/reacting_furnace",
+        "y": 90
+      },
+      {
+        "model": "trainees:block/reacting_furnace",
+        "y": 180
+      },
+      {
+        "model": "trainees:block/reacting_furnace",
+        "y": 270
+      }
+    ]
+  }
+}

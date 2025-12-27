@@ -3,7 +3,7 @@
   "biomes": "#minecraft:is_overworld",
   "spawners": {
     "type": "trainees:kun_anti",
-    "weight": 10,
+    "weight": 5,
     "minCount": 2,
     "maxCount": 3
   }

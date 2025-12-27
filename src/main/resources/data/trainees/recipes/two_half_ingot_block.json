@@ -1,13 +1,34 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    "TTT",
-    "TTT",
-    "TTT"
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    },
+    {
+      "item": "trainees:two_half_ingot"
+    }
   ],
-  "key": {
-    "T": { "item": "trainees:two_half_ingot" }
-  },
   "result": {
     "item": "trainees:two_half_ingot_block",
     "count": 1
@@ -17,7 +38,9 @@
     "conditions": {
       "items": [
         {
-          "items": ["trainees:two_half_ingot"]
+          "items": [
+            "trainees:two_half_ingot"
+          ]
         }
       ]
     }

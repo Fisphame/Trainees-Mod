@@ -15,13 +15,23 @@ public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
 
-    ///顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 （化学最后）-> 刷怪蛋
+    ///顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 -> 刷怪蛋
 
     //两锭半块
     public static final RegistryObject<Item> TWO_HALF_INGOT_BLOCK_ITEM = ITEMS.register("two_half_ingot_block",
             () -> new KunCourseItem.TwoHalfIngotBlockItem(ModBlocks.TWO_HALF_INGOT_BLOCK.get(),
-            new Item.Properties()
-    ));
+                    new Item.Properties()
+            ));
+    // 涂蜡的两锭半块
+    public static final RegistryObject<Item> WAXED_TWO_HALF_INGOT_BLOCK_ITEM = ITEMS.register("waxed_two_half_ingot_block",
+            () -> new BlockItem(ModBlocks.WAXED_TWO_HALF_INGOT_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    // 金矽块
+    public static final RegistryObject<Item> AURIVERSITE_BLOCK_ITEM = ITEMS.register("auriversite_block",
+            () -> new BlockItem(ModBlocks.AURIVERSITE_BLOCK.get(),
+                    new Item.Properties()
+            ));
     //羽毛方块
     public static final RegistryObject<Item> FEATHER_BLOCK_ITEM = ITEMS.register("feather_block",
             () -> new BlockItem(ModBlocks.FEATHER_BLOCK.get(),
@@ -81,7 +91,7 @@ public class ModItems {
     );
     //终极只因镐
     public static final RegistryObject<Item> KUN_PICKAXE_FINAL= ITEMS.register("kun_pickaxe_final" ,
-            ()-> new KunPickaxeFinal(
+            ()-> new KunCourseItem.KunPickaxeFinal(
                     Tiers.DIAMOND,
                     3,
                     -2.8F,
@@ -140,7 +150,7 @@ public class ModItems {
 
     //只因剑
     public static final RegistryObject<Item> KUN_SWORD = ITEMS.register("kun_sword" ,
-            ()-> new SwordItem(
+            ()-> new KunCourseItem.KunSwordItem(
                     Tiers.IRON,
                     3,
                     -2.4F,
@@ -151,7 +161,7 @@ public class ModItems {
 
     //只因短匕
     public static final RegistryObject<Item> KUN_DAGGER = ITEMS.register("kun_dagger" ,
-            ()-> new SwordItem(
+            ()-> new KunCourseItem.KunDaggerItem(
                     Tiers.IRON,
                     0,
                     0F,
@@ -209,6 +219,17 @@ public class ModItems {
             )
     );
     //15*4=60 提升4倍
+
+    // 金矽刺剑
+    public static final RegistryObject<Item> AURIVERSITE_RAPIER = ITEMS.register("auriversite_rapier",
+            () -> new AuriversiteRapierItem(
+                    ModTiers.STAB,
+                    1,
+                    -1.4F,
+                    new Item.Properties().durability(913)
+            )
+    );
+
 
     //盔甲lv1
     public static final RegistryObject<Item> TRAIN_I_HELMET = ITEMS.register("train_i_helmet",
@@ -378,6 +399,14 @@ public class ModItems {
     public static final RegistryObject<Item> POWDER_ANTI_9 = ITEMS.register("powder_anti_9",
             () -> new PowderAntiCourseItem.PowderAnti9Item(new Item.Properties()
             ));
+    // 金矽锭
+    public static final RegistryObject<Item> AURIVERSITE_INGOT = ITEMS.register("auriversite_ingot",
+            () -> new Item(new Item.Properties())
+    );
+    // 金矽粒
+    public static final RegistryObject<Item> AURIVERSITE_NUGGET = ITEMS.register("auriversite_nugget",
+            () -> new Item(new Item.Properties())
+    );
     //聚酯纤维（PET）
     public static final RegistryObject<Item> POLYESTER = ITEMS.register("polyester",
             ()-> new Item(new Item.Properties())

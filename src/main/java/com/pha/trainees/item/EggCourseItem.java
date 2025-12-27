@@ -3,6 +3,7 @@ package com.pha.trainees.item;
 import com.pha.trainees.entity.KunAntiEntity;
 import com.pha.trainees.entity.KunTraineesEntity;
 import com.pha.trainees.registry.ModEntities;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -79,8 +80,13 @@ public class EggCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.kun_egg_item"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.kun_egg_item.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.kun_egg_item"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.kun_egg_item.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
@@ -141,8 +147,13 @@ public class EggCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 }

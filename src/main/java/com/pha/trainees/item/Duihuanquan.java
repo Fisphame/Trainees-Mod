@@ -2,6 +2,7 @@ package com.pha.trainees.item;
 
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -26,18 +28,18 @@ public class Duihuanquan extends Item {
         super(p_41383_);
     }
 
-    public InteractionResult useOn(UseOnContext context){
+    public @NotNull InteractionResult useOn(UseOnContext context){
         Level level = context.getLevel();
+        Player player = context.getPlayer();
+        ItemStack itemStack = context.getItemInHand();
         BlockPos blockpos = context.getClickedPos();
         BlockState blockstate = level.getBlockState(blockpos);
         Block block = blockstate.getBlock();
-        if (block == ModBlocks.MYBLOCK.get()) {
-            Player player = context.getPlayer();
-            ItemStack itemstack = new ItemStack(ModItems.UPGRADE_THEME.get(), 1);
-            ItemEntity itemEntity = new ItemEntity(level, blockpos.getX(), blockpos.getY() + 1, blockpos.getZ(), itemstack);
+        if (block == ModBlocks.MYBLOCK.get() || player != null || true) {
+            itemStack.shrink(1);
+            ItemStack spawnStack = new ItemStack(ModItems.UPGRADE_THEME.get(), 1);
+            ItemEntity itemEntity = new ItemEntity(level, blockpos.getX(), blockpos.getY() + 1, blockpos.getZ(), spawnStack);
             itemEntity.level().addFreshEntity(itemEntity);
-
-            itemstack.shrink(1);
             level.playSound(player, blockpos, SoundEvents.CHICKEN_DEATH, SoundSource.BLOCKS, 1.0F, 1.0F);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
@@ -48,8 +50,13 @@ public class Duihuanquan extends Item {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltipComponents, flag);
 
-        tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan"));
-        tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan.2"));
+        boolean isShiftPressed = Screen.hasShiftDown();
+        if (isShiftPressed) {
+            tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan"));
+            tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan.2"));
+        } else {
+            tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+        }
     }
 }
 

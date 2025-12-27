@@ -1,6 +1,7 @@
 package com.pha.trainees.item;
 
 import com.pha.trainees.way.chemistry.ReactionSystem;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BookItem;
@@ -25,9 +26,14 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.title"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.pre"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.content"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.title"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.pre"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.content"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
@@ -63,18 +69,83 @@ public class ChemistryItem {
 
 
     */
-    // 氢氧化鸡
-    public static class JiOH extends Item {
-        public JiOH(Properties p_41383_) {super(p_41383_);}
+    /// 氧化物
+    // 氧化鸡
+    public static class Ji2O extends Item {
+        public Ji2O(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.jioh"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.jioh.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
+
+    // 过氧化鸡
+    public static class Ji2O2 extends Item {
+        public Ji2O2(Properties p_41383_) {super(p_41383_);}
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o2"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o2.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+    // 二氧化黑
+    public static class BpO2 extends Item {
+        public BpO2(Properties p_41383_) {super(p_41383_);}
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo2"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo2.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+    // 三氧化黑
+    public static class BpO3 extends Item {
+        public BpO3(Properties p_41383_) {super(p_41383_);}
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo3"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo3.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+
+
+
+///     酸
 
     // 黑化氢
     public static class HBp extends Item {
@@ -84,8 +155,13 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.hbp"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.hbp.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbp"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbp.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
@@ -109,11 +185,74 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
+    // 黑酸
+    public static class HBpO3 extends Item {
+        public HBpO3(Properties p_41383_) {super(p_41383_);}
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo3"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo3.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+    // 高黑酸
+    public static class HBpO4 extends Item {
+        public HBpO4(Properties p_41383_) {super(p_41383_);}
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo4"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo4.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+    /// 碱
+
+    // 氢氧化鸡
+    public static class JiOH extends Item {
+        public JiOH(Properties p_41383_) {super(p_41383_);}
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jioh"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jioh.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+
+    /// 盐
     // 黑化鸡
     public static class JiBp extends Item {
         public JiBp(Properties p_41383_) {super(p_41383_);}
@@ -122,25 +261,69 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.jibp"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.jibp.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibp"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibp.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
-    // 氧化鸡
-    public static class Ji2O extends Item {
-        public Ji2O(Properties p_41383_) {super(p_41383_);}
+    // 次黑酸鸡
+    public static class JiBpO extends Item {
+        public JiBpO(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
+    // 黑酸鸡
+    public static class JiBpO3 extends Item {
+        public JiBpO3(Properties p_41383_) {super(p_41383_);}
 
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo3"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo3.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+    // 高黑酸鸡
+    public static class JiBpO4 extends Item {
+        public JiBpO4(Properties p_41383_) {super(p_41383_);}
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo4"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo4.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
 
 
 

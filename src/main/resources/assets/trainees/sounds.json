@@ -40,5 +40,35 @@
       "trainees:mining_sound_6"
     ],
     "subtitle": "subtitles.trainees.mining_sound_6"
+  },
+  "final_mining_sound_1": {
+    "sounds": [
+      "trainees:final_mining_sound_1"
+    ],
+    "subtitle": "subtitles.trainees.final_mining_sound_1"
+  },
+  "final_mining_sound_2": {
+    "sounds": [
+      "trainees:final_mining_sound_2"
+    ],
+    "subtitle": "subtitles.trainees.final_mining_sound_2"
+  },
+  "final_mining_sound_3": {
+    "sounds": [
+      "trainees:final_mining_sound_3"
+    ],
+    "subtitle": "subtitles.trainees.final_mining_sound_3"
+  },
+  "final_mining_sound_4": {
+    "sounds": [
+      "trainees:final_mining_sound_4"
+    ],
+    "subtitle": "subtitles.trainees.final_mining_sound_4"
+  },
+  "final_mining_sound_5": {
+    "sounds": [
+      "trainees:final_mining_sound_5"
+    ],
+    "subtitle": "subtitles.trainees.final_mining_sound_5"
   }
 }

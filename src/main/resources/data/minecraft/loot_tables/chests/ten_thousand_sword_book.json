@@ -6,7 +6,7 @@
       "name": "minecraft:enchanted_book",
       "functions": [{
         "function": "minecraft:set_nbt",
-        "tag": "{StoredEnchantments:[{id:\"trainees:ten_thousand_sword\",lvl:1}]}"
+        "tag": "{StoredEnchantments:[{id:\"trainees:ten_thousand_sword\",lvl:5}]}"
       }]
     }]
   }]

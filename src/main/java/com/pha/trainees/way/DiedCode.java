@@ -1,5 +1,8 @@
 package com.pha.trainees.way;
 
+import com.pha.trainees.entity.CalledSwordEntity;
+import com.pha.trainees.registry.ModEntities;
+
 public class DiedCode {
 //    private static final String startTime = "start_time";
 //    private static final String requiredTime = "required_time";
@@ -140,4 +143,164 @@ public class DiedCode {
 
      */
 
+    /*
+public class AbilityHandler {
+
+        private static final int COOLDOWN_TICKS = 10 * 20;
+        private static final int HURT_BREAK = 5;
+
+        @SubscribeEvent
+        public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+            Level level = event.getLevel();
+            Player player = event.getEntity();
+            ItemStack stack = player.getMainHandItem();
+
+            // 检查是否持有剑且附魔存在
+            if (stack.getItem() instanceof SwordItem &&
+                    stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get()) > 0) {
+                Item item = stack.getItem();
+                float basicDamage = ((SwordItem) stack.getItem()).getDamage();
+                float enchantDamage = EnchantmentHelper.getDamageBonus(stack, MobType.UNDEFINED);
+                if (Tools.isInstanceofScythe(item)){
+                    basicDamage *= 2;
+                }
+
+                float damage = basicDamage + enchantDamage;
+                if (player.getCooldowns().isOnCooldown(item)){
+                    player.displayClientMessage(Component.translatable("msg.trainees.isOnCooldown"), true);
+                    return;
+                }
+                level.playSound(null, new BlockPos(player.getBlockX(), player.getBlockY(), player.getBlockZ()),
+                        SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 0.5F, 1.0F);
+                // 触发技能
+                int degree = stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get());
+                activateAbility(player, damage, degree);
+
+                if (!player.isCreative()) {
+                    player.getCooldowns().addCooldown(item, COOLDOWN_TICKS);
+                    stack.hurtAndBreak(HURT_BREAK, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+                }
+            }
+        }
+
+        private static void activateAbility(Player player, float damage, int degree) {
+            spawnSwords(player, degree, damage);
+        }
+
+
+        private static void spawnSwords(Player player, int degree, float damage) {
+            Direction direction = player.getDirection(); // 玩家朝向
+            int totalSwords = degree * 4; // N=附魔等级×n
+            double baseX = player.getX();
+            double baseY = player.getY() + 1;
+            double baseZ = player.getZ();
+
+
+
+            // 计算伤害
+//            float baseDamage = 0.0f;
+//            Multimap<net.minecraft.world.entity.ai.attributes.Attribute, AttributeModifier> modifiers =
+//                    stack.getAttributeModifiers(EquipmentSlot.MAINHAND);
+//            for (Map.Entry<Attribute, AttributeModifier> entry : modifiers.entries()) {
+//                if (entry.getKey() == Attributes.ATTACK_DAMAGE) {
+//                    baseDamage = (float) entry.getValue().getAmount();
+//                    break;
+//                }
+//            }
+            float re_damage = damage * 2.0f;
+
+            //计算方向
+            Direction direction1=player.getDirection();
+//            float pitch = player.getXRot();
+//            if( -30.0F < pitch && pitch < 30.0F){
+//
+//            }
+
+            //计算坐标
+            for (int i = 0; i < totalSwords; i++) {
+                // 计算每对剑的偏移量
+                int pairIndex = i / 2;
+                //double offset = ( (pairIndex % 8) + 1 ) * 0.5; // 每对距离递增0.5，超过4.0后重置
+                //double yOffset = (pairIndex / 8) * 1; // 每8对Y轴增加1
+
+                double offset = pairIndex * 0.5; // 每对距离递增n，无上限
+                double yOffset = 0; // Y轴不增加
+                ///注：弧形其实是两条等边
+
+/*
+                offset:x z的共同偏移
+                要使最终效果如下：
+                   ·      ·
+                  ·        ·
+                 ·          ·
+                ·            ·
+                    player
+
+                东 +x  西-x
+                南 +z  北-z
+ */
+/*
+    // 根据朝向计算初始位置
+    // 左右分布
+    double sideOffset = (i % 2 == 0) ? -offset : offset; //弧形
+    sideOffset = sideOffset * 1.25;
+    //当剑[i]为奇数数，向正方向；偶数，向负方向
+    //double sideOffset = (i % 2 == 0) ? -1 : 1;//直线
+    double x, y, z;
+    float constIndex = 1; //额定偏移
+
+                switch (direction) {
+        case NORTH -> { // 朝北（-Z方向）
+            x = baseX + sideOffset;
+            z = baseZ - constIndex + offset / 2;
+        }
+        case SOUTH -> { // 朝南（+Z方向）
+            x = baseX + sideOffset;
+            //x = baseX * sideOffset;
+            z = baseZ + constIndex - offset / 2;
+        }
+        case EAST -> { // 朝东（+X方向）
+            x = baseX + constIndex - offset / 2;
+            z = baseZ + sideOffset;
+            //z = baseX * sideOffset;
+        }
+        case WEST -> { // 朝西（-X方向）
+            x = baseX - constIndex + offset / 2;
+            z = baseZ + sideOffset;
+            //z = baseX * sideOffset;
+        }
+        default -> { // 默认朝南
+            x = baseX;
+            z = baseZ;
+        }
+    }
+
+    y = baseY + yOffset;
+
+
+
+    // 生成剑实体
+    CalledSwordEntity swordEntity = new CalledSwordEntity(
+            ModEntities.CALLED_SWORD.get(),
+            player.level()
+
+    );
+
+    //传参
+                swordEntity.setDamage(re_damage);
+                swordEntity.setDirection(direction1);
+                swordEntity.setPos(x, y, z);
+                swordEntity.setOffPlayer(player);
+                player.level().addFreshEntity(swordEntity);
+}
+        }
+                }
+
+
+
+
+
+
+
+ */
 }

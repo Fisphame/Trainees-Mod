@@ -1,27 +1,10 @@
 package com.pha.trainees.way.math;
 
-public class QuadraticFuncVertexT {
-    private final double a, h, k;
-
-    public QuadraticFuncVertexT(double a, double h, double k) {
+public record QuadraticFuncVertexT(double a, double h, double k) {
+    public QuadraticFuncVertexT {
         if (a == 0) {
             throw new IllegalArgumentException(" 'a' can't be 0 ");
         }
-        this.a = a;
-        this.h = h;
-        this.k = k;
-    }
-
-    public double getA() {
-        return a;
-    }
-
-    public double getH() {
-        return h;
-    }
-
-    public double getK() {
-        return k;
     }
 
     public Pair getX(double y) {
@@ -31,7 +14,7 @@ public class QuadraticFuncVertexT {
             return null;
         }
 
-        double sqrtRightSide = java.lang.Math.sqrt(rightSide);
+        double sqrtRightSide = Math.sqrt(rightSide);
         return new Pair(h + sqrtRightSide, h - sqrtRightSide);
     }
 

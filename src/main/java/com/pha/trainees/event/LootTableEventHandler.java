@@ -20,7 +20,9 @@ import java.util.List;
 public class LootTableEventHandler {
 
     // 定义要修改的战利品表列表
-    private static final List<ResourceLocation> CHEST_LOOT_TABLES = Arrays.asList(
+    // 所有村庄
+
+    private static final List<ResourceLocation> CHEST_LOOT_TABLES_VILLAGE = Arrays.asList(
             new ResourceLocation("minecraft:chests/village/village_desert_house"),
             new ResourceLocation("minecraft:chests/village/village_plains_house"),
             new ResourceLocation("minecraft:chests/village/village_savanna_house"),
@@ -30,6 +32,7 @@ public class LootTableEventHandler {
             new ResourceLocation("minecraft:chests/village/village_temple"),
             new ResourceLocation("minecraft:chests/village/village_toolsmith"),
             new ResourceLocation("minecraft:chests/village/village_weaponsmith"),
+
             new ResourceLocation("minecraft:chests/simple_dungeon"),
             new ResourceLocation("minecraft:chests/abandoned_mineshaft"),
             new ResourceLocation("minecraft:chests/stronghold_corridor"),
@@ -45,7 +48,7 @@ public class LootTableEventHandler {
     @SubscribeEvent
     public static void onLootTableLoad(LootTableLoadEvent event) {
         // 检查是否是我们要修改的战利品表
-        if (CHEST_LOOT_TABLES.contains(event.getName())) {
+        if (CHEST_LOOT_TABLES_VILLAGE.contains(event.getName())) {
             // 创建一个新的奖励池，设置随机几率为15%
             LootPool pool = LootPool.lootPool()
                     .name("trainees_duihuanquan_pool")

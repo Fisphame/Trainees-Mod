@@ -1,173 +1,217 @@
 package com.pha.trainees.event;
 
-import com.google.common.collect.Multimap;
 import com.pha.trainees.entity.CalledSwordEntity;
 import com.pha.trainees.registry.ModEnchantments;
 import com.pha.trainees.registry.ModEntities;
-import com.pha.trainees.util.CooldownTracker;
-import net.minecraft.core.Direction;
+import com.pha.trainees.way.game.Tools;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.MobType;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.Map;
-
 public class AbilityHandler {
 
-        private static final int COOLDOWN_TICKS = 1 * 20; // 冷却
+    private static final int COOLDOWN_TICKS = 10 * 20;
+    private static final int CREATIVE_COOLDOWN_TICKS = 10;
+    private static final int HURT_BREAK = 5;
 
-        @SubscribeEvent
-        public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-            Player player = event.getEntity();
-            ItemStack stack = player.getMainHandItem();
+    // 阵列参数
+    private static double BASE_DISTANCE = 3.0; // 阵列中心剑距离玩家的基础距离
+    private static double ARRAY_RADIUS = 2.5;  // 阵列半径
+    private static double VERTICAL_SPREAD = 1.5; // 垂直散布
 
-            // 检查是否持有剑且附魔存在
-            if (stack.getItem() instanceof SwordItem &&
-                    stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get()) > 0) {
+    @SubscribeEvent
+    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        Level level = event.getLevel();
+        Player player = event.getEntity();
+        ItemStack stack = player.getMainHandItem();
 
-                // 检查冷却状态
-                if (CooldownTracker.isOnCooldown(player)) {
-                    player.displayClientMessage(Component.literal("技能冷却中！"), true);
-                    return;
-                }
-
-                // 触发技能
-                int level = stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get());
-                activateAbility(player, stack, level);
-
-                // 设置冷却
-                CooldownTracker.setCooldown(player, COOLDOWN_TICKS);
-                // 消耗耐久
-                stack.hurtAndBreak(20, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+        // 检查是否持有剑且附魔存在
+        if (stack.getItem() instanceof SwordItem &&
+                stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get()) > 0) {
+            Item item = stack.getItem();
+            int degree = stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get());
+            float basicDamage = ((SwordItem) stack.getItem()).getDamage();
+            float enchantDamage = EnchantmentHelper.getDamageBonus(stack, MobType.UNDEFINED);
+            if (Tools.isInstanceof.scythe(item)){
+                basicDamage *= 2;
+                degree += 1;
+                BASE_DISTANCE = 2.0;
+                ARRAY_RADIUS = 3.5;
+                VERTICAL_SPREAD = 0.5;
             }
-        }
-
-        private static void activateAbility(Player player, ItemStack sword, int level) {
-            // 召唤剑实体逻辑
-                spawnSwords(player, level, sword);
-        }
-
-
-        private static void spawnSwords(Player player, int level, ItemStack sword) {
-            Direction direction = player.getDirection(); // 玩家朝向
-            int totalSwords = level * 4; // N=附魔等级×n
-            double baseX = player.getX();
-            double baseY = player.getY() + 1;
-            double baseZ = player.getZ();
-
-
-
-
-
-
-            // 计算伤害
-            float baseDamage = 0.0f;
-            Multimap<net.minecraft.world.entity.ai.attributes.Attribute, AttributeModifier> modifiers =
-                    sword.getAttributeModifiers(EquipmentSlot.MAINHAND);
-            for (Map.Entry<Attribute, AttributeModifier> entry : modifiers.entries()) {
-                if (entry.getKey() == Attributes.ATTACK_DAMAGE) {
-                    baseDamage = (float) entry.getValue().getAmount();
-                    break;
-                }
+            else if (Tools.isInstanceof.repair(item)){
+                basicDamage /= 2;
+                degree -= 1;
+                BASE_DISTANCE = 0.5;
+                ARRAY_RADIUS = 1.5;
+                VERTICAL_SPREAD = 1.5;
             }
-            float enchantDamage = EnchantmentHelper.getDamageBonus(sword, MobType.UNDEFINED);
-            float damage = (baseDamage+enchantDamage) * 1.5f;
+            else if (Tools.isInstanceof.kunSword(item)){
+                degree += 1;
+                BASE_DISTANCE = 3.0;
+                ARRAY_RADIUS = 2.5;
+                VERTICAL_SPREAD = 2.0;
+            }
+            else {
+                BASE_DISTANCE = 3.0;
+                ARRAY_RADIUS = 2.5;
+                VERTICAL_SPREAD = 1.5;
+            }
+            float damage = basicDamage + enchantDamage * 2;
+            if (player.getCooldowns().isOnCooldown(item)){
+                player.displayClientMessage(Component.translatable("msg.trainees.isOnCooldown"), true);
+                return;
+            }
+            level.playSound(null, new BlockPos(player.getBlockX(), player.getBlockY(), player.getBlockZ()),
+                    SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 0.5F, 1.0F);
 
-            //计算方向
-            Direction direction1=player.getDirection();
-//            float pitch = player.getXRot();
-//            if( -30.0F < pitch && pitch < 30.0F){
-//
-//            }
+            // 触发技能
+            activateAbility(player, damage, degree, level);
 
-            //计算坐标
-            for (int i = 0; i < totalSwords; i++) {
-                // 计算每对剑的偏移量
-                int pairIndex = i / 2;
-                //double offset = ( (pairIndex % 8) + 1 ) * 0.5; // 每对距离递增0.5，超过4.0后重置
-                //double yOffset = (pairIndex / 8) * 1; // 每8对Y轴增加1
-
-                double offset = pairIndex * 0.5; // 每对距离递增n，无上限
-                double yOffset = 0; // Y轴不增加
-                ///注：弧形其实是两条等边
-
-/*
-                offset:x z的共同偏移
-                要使最终效果如下：
-                   ·      ·
-                  ·        ·
-                 ·          ·
-                ·            ·
-                    player
-
-                东 +x  西-x
-                南 +z  北-z
- */
-
-                // 根据朝向计算初始位置
-                // 左右分布
-                double sideOffset = (i % 2 == 0) ? -offset : offset; //弧形
-                sideOffset = sideOffset * 1.25;
-                //当剑[i]为奇数数，向正方向；偶数，向负方向
-                //double sideOffset = (i % 2 == 0) ? -1 : 1;//直线
-                double x, y, z;
-                float constIndex = 1; //额定偏移
-
-                switch (direction) {
-                    case NORTH -> { // 朝北（-Z方向）
-                        x = baseX + sideOffset;
-                        z = baseZ - constIndex + offset / 2;
-                    }
-                    case SOUTH -> { // 朝南（+Z方向）
-                        x = baseX + sideOffset;
-                        //x = baseX * sideOffset;
-                        z = baseZ + constIndex - offset / 2;
-                    }
-                    case EAST -> { // 朝东（+X方向）
-                        x = baseX + constIndex - offset / 2;
-                        z = baseZ + sideOffset;
-                        //z = baseX * sideOffset;
-                    }
-                    case WEST -> { // 朝西（-X方向）
-                        x = baseX - constIndex + offset / 2;
-                        z = baseZ + sideOffset;
-                        //z = baseX * sideOffset;
-                    }
-                    default -> { // 默认朝南
-                        x = baseX;
-                        z = baseZ;
-                    }
+            if (!player.isCreative()) {
+                if (!Tools.isInstanceof.repair(item)){
+                    player.getCooldowns().addCooldown(item, COOLDOWN_TICKS);
                 }
-
-                y = baseY + yOffset;
-
-
-
-                // 生成剑实体
-                CalledSwordEntity swordEntity = new CalledSwordEntity(
-                        ModEntities.CALLED_SWORD.get(),
-                        player.level()
-
-                );
-
-                //传参
-                swordEntity.setDamage(damage);
-                swordEntity.setDirection(direction1);
-                swordEntity.setPos(x, y, z);
-                player.level().addFreshEntity(swordEntity);
+                stack.hurtAndBreak(HURT_BREAK, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+            }
+            else if (player.isCreative()){
+                if (!Tools.isInstanceof.repair(item)){
+                    player.getCooldowns().addCooldown(item, CREATIVE_COOLDOWN_TICKS);
+                }
             }
         }
     }
 
+    private static void activateAbility(Player player, float damage, int degree, Level level) {
+        spawnSwords(player, degree, damage, level);
+    }
 
+    private static void spawnSwords(Player player, int degree, float damage, Level level) {
+        // 获取玩家视线方向（水平方向）
+        Vec3 lookVec = player.getLookAngle();
+        Vec3 forward = new Vec3(lookVec.x, 0, lookVec.z).normalize();
 
+        // 如果视线完全垂直（比如看天或地），使用玩家的朝向
+        if (forward.lengthSqr() < 0.001) {
+            forward = Vec3.atLowerCornerOf(player.getDirection().getNormal());
+        }
 
+        // 计算右向量和上向量
+        Vec3 up = new Vec3(0, 1, 0);
+        Vec3 right = forward.cross(up).normalize();
+
+        // 计算基础位置（玩家位置向前推BASE_DISTANCE距离）
+        Vec3 playerPos = player.position().add(0, player.getEyeHeight() * 0.7, 0);
+        Vec3 basePos = playerPos.add(forward.scale(BASE_DISTANCE));
+
+        // 计算伤害
+        float re_damage = damage * 2.0f;
+
+        // 计算要生成的剑数量
+        int totalSwords = degree * 4;
+
+        // 生成阵列
+        for (int i = 0; i < totalSwords; i++) {
+            // 计算剑在阵列中的位置
+            Vec3 swordPos;
+            if (player.isShiftKeyDown()){
+                swordPos = calculateSwordPosition(basePos, forward, right, up, i, totalSwords);
+            }
+            else {
+                swordPos = calculateSwordPositionAlternative(basePos, forward, right, up, i, totalSwords);
+            }
+
+            // 生成剑实体
+            CalledSwordEntity swordEntity = new CalledSwordEntity(
+                    ModEntities.CALLED_SWORD.get(),
+                    player.level()
+            );
+
+            // 设置参数
+            swordEntity.setDamage(re_damage);
+            swordEntity.setMoveDirection(forward); // 所有剑都沿视线方向移动
+            swordEntity.setPos(swordPos.x, swordPos.y, swordPos.z);
+            swordEntity.setOffPlayer(player);
+            swordEntity.setEnchantBreakBlock(Tools.Command.getEnchantBreakBlock(level));
+            swordEntity.setEnchantBrokenBlockDrop(Tools.Command.getEnchantBrokenBlockDrop(level));
+            player.level().addFreshEntity(swordEntity);
+        }
+    }
+
+    /**
+     * 计算单个剑在阵列中的位置
+     *
+     * @param basePos   阵列基础位置
+     * @param forward   前进方向
+     * @param right     右方向
+     * @param up        上方向
+     * @param index     剑的索引
+     * @param total     总剑数
+     * @return          剑的位置
+     */
+    private static Vec3 calculateSwordPosition(Vec3 basePos, Vec3 forward, Vec3 right, Vec3 up,
+                                               int index, int total) {
+        // 计算阵列布局（弧形/圆形阵列）
+
+        // 1. 计算角度（0到2π）
+        double angle = (2.0 * Math.PI * index) / total;
+
+        // 2. 计算在阵列平面上的偏移
+        double radius = ARRAY_RADIUS;
+        double xOffset = Math.cos(angle) * radius;
+        double zOffset = Math.sin(angle) * radius;
+
+        // 3. 计算垂直偏移（形成立体阵列）
+        double yOffset = Math.sin(angle * 2) * VERTICAL_SPREAD;
+
+        // 4. 将偏移应用到局部坐标系
+        //    注意：这里我们需要将(xOffset, zOffset)映射到(right, forward)平面上
+        //    但通常阵列应该垂直于视线方向，所以我们要旋转一下
+        //    简单起见，我们直接使用极坐标的x和z作为两个方向的偏移
+
+        // 创建一个旋转矩阵，使阵列始终面向玩家视线方向
+        // 这里简化处理：阵列围绕视线方向旋转
+        Vec3 position = basePos
+                .add(right.scale(xOffset))      // 左右偏移
+                .add(up.scale(yOffset))         // 上下偏移
+                .add(forward.scale(zOffset * 0.3)); // 前后少量偏移，形成层次感
+
+        return position;
+    }
+
+    /**
+     * 替代方案：保持原阵列形状但沿视线方向移动
+     */
+    private static Vec3 calculateSwordPositionAlternative(Vec3 basePos, Vec3 forward, Vec3 right,
+                                                          Vec3 up, int index, int total) {
+        // 这是原阵列的简化版本，保持类似形状但沿视线方向展开
+
+        int pairIndex = index / 2;
+        double offset = pairIndex * 0.5;
+        double yOffset = 0;
+
+        // 计算左右偏移（原阵列的sideOffset）
+        double sideOffset = (index % 2 == 0) ? -offset : offset;
+        sideOffset *= (ARRAY_RADIUS / 2);
+
+        // 在垂直于forward的平面上布置阵列
+        Vec3 position = basePos
+                .add(right.scale(sideOffset))                // 左右展开
+                .add(up.scale(yOffset))                     // 垂直方向
+                .add(forward.scale(-offset * 0.5));         // 前后错开
+
+        return position;
+    }
+}

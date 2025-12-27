@@ -4,7 +4,7 @@ import com.pha.trainees.Main;
 import com.pha.trainees.block.BlackHoleBlock;
 import com.pha.trainees.block.PowderAnti99Block;
 import com.pha.trainees.item.*;
-import com.pha.trainees.way.math.Math;
+import com.pha.trainees.way.math.MAth;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
@@ -202,7 +202,7 @@ public class Something {
                         499,
                         -2.4F,
                         new Item.Properties()
-                                .durability((int) Math.MATH99)
+                                .durability((int) MAth.MATH99)
                                 .rarity(Rarity.RARE)
                 ));
 

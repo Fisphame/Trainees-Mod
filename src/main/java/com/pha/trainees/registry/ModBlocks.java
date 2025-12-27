@@ -2,6 +2,7 @@ package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.block.*;
+import com.pha.trainees.thetwice.Object;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -25,12 +26,29 @@ public class ModBlocks {
     //顺序：建筑方块 -> 染色方块 -> 自然方块 -> 功能方块 -> 红石方块
 
     public static final RegistryObject<Block> TWO_HALF_INGOT_BLOCK = BLOCKS.register("two_half_ingot_block",
-            () -> new Block(
+            () -> new TwoHalfIngotCourseBlock.TwoHalfIngotBlock(
             BlockBehaviour.Properties.of()
                     .strength(2f,6f)
                     .sound(SoundType.METAL)
                     .requiresCorrectToolForDrops()
     ));
+
+    public static final RegistryObject<Block> WAXED_TWO_HALF_INGOT_BLOCK = BLOCKS.register("waxed_two_half_ingot_block",
+            () -> new TwoHalfIngotCourseBlock.WaxedTwoHalfIngotBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(2f,6f)
+                            .sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops()
+            ));
+// Pullium Inversine   Pullium inverside
+    // 金矽块   /ɔːrɪvərsaɪt/
+    public static final RegistryObject<Block> AURIVERSITE_BLOCK = BLOCKS.register("auriversite_block",
+            () -> new Block(
+               BlockBehaviour.Properties.of()
+                       .strength(3f, 8f)
+                       .sound(SoundType.METAL)
+                       .requiresCorrectToolForDrops()
+            ));
 
     public static final RegistryObject<Block> FEATHER_BLOCK = BLOCKS.register("feather_block",
             () -> new Block(

@@ -1,6 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.way.math.Math;
+import com.pha.trainees.way.math.MAth;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -51,8 +52,13 @@ public class ScytheCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
@@ -92,8 +98,13 @@ public class ScytheCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 
@@ -101,8 +112,8 @@ public class ScytheCourseItem {
         public BlackPowderScytheItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
             super(tier, attackDamage, attackSpeed, properties);
         }
-        private static final float SWEEP_RADIUS = Math.MATH99; // 横扫范围（原版为1.0）
-        private static final float SWEEP_DAMAGE_MULTIPLIER = Math.MATH99; // 伤害倍率（原版为1.0）
+        private static final float SWEEP_RADIUS = MAth.MATH99; // 横扫范围（原版为1.0）
+        private static final float SWEEP_DAMAGE_MULTIPLIER = MAth.MATH99; // 伤害倍率（原版为1.0）
 
         @Override
         public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
@@ -133,8 +144,13 @@ public class ScytheCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 }

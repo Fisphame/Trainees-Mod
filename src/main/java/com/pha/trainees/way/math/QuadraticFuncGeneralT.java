@@ -1,25 +1,10 @@
 package com.pha.trainees.way.math;
 
-public class QuadraticFuncGeneralT {
-    private final double a, b, c;
-
-    public QuadraticFuncGeneralT(double a, double b, double c){
+public record QuadraticFuncGeneralT(double a, double b, double c) {
+    public QuadraticFuncGeneralT {
         if (a == 0) {
             throw new IllegalArgumentException(" 'a' can't be 0 ");
         }
-        this.a = a; this.b = b; this.c = c;
-    }
-
-    public double getA() {
-        return a;
-    }
-
-    public double getB() {
-        return b;
-    }
-
-    public double getC() {
-        return c;
     }
 
     public double getDiscriminant() {
@@ -27,14 +12,14 @@ public class QuadraticFuncGeneralT {
     }
 
 
-    public Pair getX(double y){
+    public Pair getX(double y) {
         final double discriminant = b * b - 4 * a * (c - y);
 
-        if ( discriminant < 0){
+        if (discriminant < 0) {
             return null;
         }
 
-        double sqrtDiscriminant = java.lang.Math.sqrt(discriminant);
+        double sqrtDiscriminant = Math.sqrt(discriminant);
         double denominator = 2 * a;
 
         return new Pair(

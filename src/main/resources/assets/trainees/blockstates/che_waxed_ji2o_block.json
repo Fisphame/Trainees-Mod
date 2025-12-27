@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "trainees:block/che_waxed_ji2o_block"
+      },
+      {
+        "model": "trainees:block/che_waxed_ji2o_block",
+        "y": 90
+      },
+      {
+        "model": "trainees:block/che_waxed_ji2o_block",
+        "y": 180
+      },
+      {
+        "model": "trainees:block/che_waxed_ji2o_block",
+        "y": 270
+      }
+    ]
+  }
+}

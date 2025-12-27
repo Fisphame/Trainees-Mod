@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "trainees:block/che_jibp_block_rgt"
+      },
+      {
+        "model": "trainees:block/che_jibp_block_rgt",
+        "y": 90
+      },
+      {
+        "model": "trainees:block/che_jibp_block_rgt",
+        "y": 180
+      },
+      {
+        "model": "trainees:block/che_jibp_block_rgt",
+        "y": 270
+      }
+    ]
+  }
+}

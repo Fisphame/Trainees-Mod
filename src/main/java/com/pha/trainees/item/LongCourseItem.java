@@ -1,5 +1,6 @@
 package com.pha.trainees.item;
 
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
@@ -23,8 +24,13 @@ public class LongCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            tooltipComponents.add(Component.translatable("tooltip.trainees.real_pickaxe_item"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.real_pickaxe_item.2"));
+            boolean isShiftPressed = Screen.hasShiftDown();
+            if (isShiftPressed) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.real_pickaxe_item"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.real_pickaxe_item.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
         }
     }
 }
