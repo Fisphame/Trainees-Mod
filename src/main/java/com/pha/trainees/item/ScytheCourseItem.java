@@ -52,8 +52,7 @@ public class ScytheCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item.2"));
             } else {
@@ -98,8 +97,7 @@ public class ScytheCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item.2"));
             } else {
@@ -144,8 +142,7 @@ public class ScytheCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item.2"));
             } else {

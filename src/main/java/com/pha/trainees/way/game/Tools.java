@@ -3,20 +3,13 @@ package com.pha.trainees.way.game;
 import com.pha.trainees.item.AuriversiteRapierItem;
 import com.pha.trainees.item.KunCourseItem;
 import com.pha.trainees.item.ScytheCourseItem;
-import com.pha.trainees.registry.ModBlocks;
-import com.pha.trainees.registry.ModCommand;
-import com.pha.trainees.registry.ModItems;
-import com.pha.trainees.registry.Something;
+import com.pha.trainees.registry.*;
 import com.pha.trainees.way.math.LogarithmicFunc;
 import com.pha.trainees.way.math.MAth;
 import com.pha.trainees.way.math.Pair;
 import com.pha.trainees.way.math.QuadraticFuncVertexT;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.*;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,8 +29,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.scores.Team;
-import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -53,6 +44,8 @@ import static java.lang.Math.min;
 
 // 方法类
 public class Tools {
+
+
 
     public static Pair AFireflyGleamAgainstTheMoon(double a, double b){
         if (a >= b) return new Pair(b, a);
@@ -210,6 +203,32 @@ public class Tools {
         if (item == Something.PrankItems.POWDER_ANTI_98.get()) return MAth.POW[8];
 
         return 1;
+    }
+
+    public static Boolean isJi(Item item) {
+        return item == ModItems.KUN_NUGGET.get() ||
+                item == ModItems.TWO_HALF_INGOT.get() ||
+                item == ModItems.TWO_HALF_INGOT_BLOCK_ITEM.get();
+    }
+
+    public static Boolean isJi(ItemStack stack) {
+        return isJi(stack.getItem());
+    }
+
+    public static Item getWhichJiOH(Item item) {
+        return item == ModItems.KUN_NUGGET.get() ?
+                ModChemistry.ModChemistryItems.CHE_JIOH_NUGGET.get() :
+                ( item == ModItems.TWO_HALF_INGOT.get() ?
+                        ModChemistry.ModChemistryItems.CHE_JIOH.get() :
+                        (item == ModItems.TWO_HALF_INGOT_BLOCK_ITEM.get() ?
+                                ModChemistry.ModChemistryBlockItems.CHE_JIOH_BLOCK_ITEM.get() :
+                                ModChemistry.ModChemistryItems.IMPERFECTION.get()
+                        )
+                );
+    }
+
+    public static Item getWhichJiOH(ItemStack stack) {
+        return getWhichJiOH(stack.getItem());
     }
 
     public static void DoTnt_center(Level level, double x, double y, double z){

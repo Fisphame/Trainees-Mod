@@ -1,7 +1,6 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.entity.BasketballEntity;
 import com.pha.trainees.entity.CalledSwordEntity;
 //import com.pha.trainees.entity.KunTraineesEntity;
 import com.pha.trainees.entity.KunAntiEntity;
@@ -41,16 +40,16 @@ public class ModEntities {
                             .build(new ResourceLocation(Main.MODID, "kun_trainees").toString())
             );
 
-    public static final RegistryObject<EntityType<BasketballEntity>> BASKETBALL =
-            ENTITIES.register("kun_basketball",
-                    () -> EntityType.Builder.<BasketballEntity>of(
-                                    BasketballEntity::new,
-                                    MobCategory.MISC
-                            )
-                            .sized(0.5F, 0.5F)
-                            .clientTrackingRange(4)
-                            .build("kun_basketball")
-            );
+//    public static final RegistryObject<EntityType<BasketballEntity>> BASKETBALL =
+//            ENTITIES.register("kun_basketball",
+//                    () -> EntityType.Builder.<BasketballEntity>of(
+//                                    BasketballEntity::new,
+//                                    MobCategory.MISC
+//                            )
+//                            .sized(0.5F, 0.5F)
+//                            .clientTrackingRange(4)
+//                            .build("kun_basketball")
+//            );
 
     public static final RegistryObject<EntityType<KunAntiEntity>> KUN_ANTI =
             ENTITIES.register("kun_anti",

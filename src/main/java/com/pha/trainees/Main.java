@@ -8,6 +8,7 @@ import com.pha.trainees.way.chemistry.ChemicalReaction;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
@@ -54,7 +55,6 @@ public class Main {
 
         bus.register(new RegisterAttributes());
 
-        ChemicalReaction.registerAllReactions();
 
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
@@ -68,6 +68,11 @@ public class Main {
 
 //        setupMixinCompatibility();
 
+    }
+
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        // 延迟执行，确保注册表已就绪
+        event.enqueueWork(ChemicalReaction::registerAllReactions);
     }
 
 //    private void setupMixinCompatibility() {

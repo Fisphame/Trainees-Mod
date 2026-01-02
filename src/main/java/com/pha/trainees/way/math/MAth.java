@@ -26,4 +26,28 @@ public class MAth {
         return Math.log(value) / Math.log(base);
     }
     //    double result = MathUtils.log(8, 2); // log2(8) = 3
+
+    // 计算最大公约数
+    public static int gcd(int a, int b) {
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    // 计算最小公倍数
+    public static int lcm(int a, int b) {
+        return Math.abs(a * b) / gcd(a, b);
+    }
+
+    // 计算数组的最小公倍数
+    public static int lcmArray(int[] numbers) {
+        int result = numbers[0];
+        for (int i = 1; i < numbers.length; i++) {
+            result = lcm(result, numbers[i]);
+        }
+        return result;
+    }
 }

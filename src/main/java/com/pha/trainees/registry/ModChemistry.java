@@ -4,12 +4,13 @@ import com.pha.trainees.Main;
 import com.pha.trainees.block.CheJibpBlock;
 import com.pha.trainees.block.ChemistryBlock;
 import com.pha.trainees.item.ChemistryItem;
+import com.pha.trainees.way.chemistry.ChemicalEquation;
+import com.pha.trainees.way.chemistry.ReactionConditions;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraftforge.registries.DeferredRegister;
@@ -152,14 +153,23 @@ public class ModChemistry {
                 )
         );
 
-        //相酸桶
-        public static final RegistryObject<Item> CHE_HBP_BUCKET = ITEMS.register("che_hbp_bucket",
-                () -> new BucketItem(
-                        ModFluid.SOURCE_CHE_HBP,
+        // 杂质
+        public static final RegistryObject<Item> IMPERFECTION = ITEMS.register("imperfection",
+                () -> new Item(
                         new Item.Properties()
-                                .craftRemainder(BUCKET)
-                                .stacksTo(1)
+                                .fireResistant()
+                                .rarity(Rarity.UNCOMMON)
+                                .setNoRepair()
                 ));
+
+        //相酸桶
+//        public static final RegistryObject<Item> CHE_HBP_BUCKET = ITEMS.register("che_hbp_bucket",
+//                () -> new BucketItem(
+//                        ModFluid.SOURCE_CHE_HBP,
+//                        new Item.Properties()
+//                                .craftRemainder(BUCKET)
+//                                .stacksTo(1)
+//                ));
         //鸡桶
 //        public static final RegistryObject<Item> JI_BUCKET = ITEMS.register("ji_bucket",
 //                () -> new BucketItem(
@@ -239,4 +249,37 @@ public class ModChemistry {
                 ));
     }
 
+    public static class ModChemistryEquations {
+        // HBpO分解反应: 2HBpO =光照= 2HBp + O2↑
+        public static final ChemicalEquation HBPO_DECOMPOSITION =
+                new ChemicalEquation.Builder("hbpo_decomposition")
+                        .withName("HBpO光分解")
+                        .withDescription("次黑酸在光照下分解为纽黑粉末和氧气")
+                        .addReactant(ModChemistry.ModChemistryItems.CHE_HBPO.get(), 2, "次黑酸")
+                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBP.get(), 2, "纽黑粉末")
+                        // .addProduct(ModChemistry.ModChemistryItems.CHE_O2.get(), 1, "氧气")
+                        .withTimedConditions(
+                                ReactionConditions.hbpoDecomposeCondition.get(),
+                                ReactionConditions.hbpoDurationProvider.get()
+                        )
+                        .addTag("decomposition")
+                        .addTag("photochemical")
+                        .addTag("redox")
+                        .build();
+
+        // Bp2与水反应: Bp2 + H2O == HBp + HBpO
+        public static final ChemicalEquation BP2_WATER_REACTION =
+                new ChemicalEquation.Builder("bp2_water_reaction")
+                        .withName("黑单质水解")
+                        .addReactant(ModItems.POWDER_ANTI.get(), 1, "黑单质")
+                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBP.get(), 1, "纽黑粉末")
+                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBPO.get(), 1, "次黑酸")
+                        .withTimedConditions(
+                                ReactionConditions.bp2AndWaterCondition.get(),
+                                ReactionConditions.random5to10
+                        )
+                        .addTag("hydrolysis")
+                        .addTag("redox")
+                        .build();
+    }
 }

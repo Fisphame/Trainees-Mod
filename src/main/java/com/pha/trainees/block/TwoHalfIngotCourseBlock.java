@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 
 public class TwoHalfIngotCourseBlock {
     public static class TwoHalfIngotBlock extends Block {
@@ -67,7 +68,7 @@ public class TwoHalfIngotCourseBlock {
         }
 
         @Override
-        public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        public void tick(@NotNull BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, @NotNull RandomSource random) {
             super.tick(state, level, pos, random);
 
             // 确保当前方块还是 TwoHalfIngotBlock

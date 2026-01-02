@@ -3,7 +3,6 @@ package com.pha.trainees.item;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.way.chemistry.ReactionSystem;
 import com.pha.trainees.way.game.Tools;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -89,13 +88,13 @@ public class KunCourseItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.kun_pickaxe_final_item"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.kun_pickaxe_final_item.2"));
             } else {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
             }
+
         }
     }
 
@@ -119,9 +118,6 @@ public class KunCourseItem {
                 if (nearestEntity instanceof LivingEntity living) {
                     if (Tools.EntityWay.getYawDiffer(living, player) <= 30.0f){
                         living.hurt(player.damageSources().playerAttack(player), 20.0f);
-                    }
-                    else {
-
                     }
                 }
             }

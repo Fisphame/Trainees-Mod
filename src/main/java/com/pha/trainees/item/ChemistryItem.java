@@ -26,8 +26,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.title"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.pre"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.content"));
@@ -78,8 +77,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o.2"));
             } else {
@@ -96,8 +94,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o2"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o2.2"));
             } else {
@@ -114,8 +111,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.bpo2"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.bpo2.2"));
             } else {
@@ -132,8 +128,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.bpo3"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.bpo3.2"));
             } else {
@@ -155,8 +150,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbp"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbp.2"));
             } else {
@@ -185,8 +179,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo.2"));
             } else {
@@ -203,8 +196,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo3"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo3.2"));
             } else {
@@ -221,8 +213,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo4"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo4.2"));
             } else {
@@ -241,8 +232,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jioh"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jioh.2"));
             } else {
@@ -261,8 +251,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibp"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibp.2"));
             } else {
@@ -279,8 +268,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo.2"));
             } else {
@@ -297,8 +285,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo3"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo3.2"));
             } else {
@@ -315,8 +302,7 @@ public class ChemistryItem {
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
-            boolean isShiftPressed = Screen.hasShiftDown();
-            if (isShiftPressed) {
+            if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo4"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo4.2"));
             } else {

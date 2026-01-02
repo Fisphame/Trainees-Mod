@@ -5,15 +5,12 @@ import com.pha.trainees.block.BlackHoleBlock;
 import com.pha.trainees.block.PowderAnti99Block;
 import com.pha.trainees.item.*;
 import com.pha.trainees.way.math.MAth;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -40,10 +37,10 @@ public class Something {
         public static final RegistryObject<Block> POWDER_ANTI_99_BLOCK = BLOCKS.register("powder_anti_99",() ->
                 new PowderAnti99Block(
                         -16777216,
-                BlockBehaviour.Properties.of()
-                        .strength(0.5f, 250f)
-                        .sound(SoundType.SAND)
-        ));
+                        BlockBehaviour.Properties.of()
+                                .strength(0.5f, 250f)
+                                .sound(SoundType.SAND)
+                ));
 
         public static final RegistryObject<Block> BLACK_HOLE = BLOCKS.register("black_hole",
                 () -> new BlackHoleBlock(
@@ -111,12 +108,11 @@ public class Something {
                 ));
     }
 
-
     public static class PrankItems {
         //模组中专门整蛊的部分……
         public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
         //顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 -> 刷怪蛋
-        //“钻石镐” 24*24
+        //"钻石镐" 24*24
         public static final RegistryObject<Item> REAL_DIAMOND_PICKAXE = ITEMS.register("real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
@@ -127,7 +123,7 @@ public class Something {
                                 .rarity(Rarity.UNCOMMON)
                 ));
 
-        //“钻 石 镐” 32*32
+        //"钻 石 镐" 32*32
         public static final RegistryObject<Item> LONG_REAL_DIAMOND_PICKAXE = ITEMS.register("long_real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
@@ -138,7 +134,7 @@ public class Something {
                                 .rarity(Rarity.UNCOMMON)
                 ));
 
-        //“钻  石  镐” 40*40
+        //"钻  石  镐" 40*40
         public static final RegistryObject<Item> LONGER_REAL_DIAMOND_PICKAXE = ITEMS.register("longer_real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
@@ -149,7 +145,7 @@ public class Something {
                                 .rarity(Rarity.UNCOMMON)
                 ));
 
-        //“钻   石   镐” 48*48
+        //"钻   石   镐" 48*48
         public static final RegistryObject<Item> LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register("longest_real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
                         Tiers.DIAMOND,
@@ -160,7 +156,7 @@ public class Something {
                                 .rarity(Rarity.UNCOMMON)
                 ));
 
-        //“钻    石    镐” 56*56
+        //"钻    石    镐" 56*56
         public static final RegistryObject<Item> THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register(
                 "the_longest_real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
@@ -172,7 +168,7 @@ public class Something {
                                 .rarity(Rarity.UNCOMMON)
                 ));
 
-        //“钻     石     镐” 64*64
+        //"钻     石     镐" 64*64
         public static final RegistryObject<Item> THE_THE_LONGEST_REAL_DIAMOND_PICKAXE = ITEMS.register(
                 "the_the_longest_real_diamond_pickaxe",
                 () -> new LongCourseItem.RealPickaxeItem(
@@ -184,7 +180,7 @@ public class Something {
                                 .rarity(Rarity.UNCOMMON)
                 ));
 
-        //“钻石镐”.zip
+        //"钻石镐".zip
         public static final RegistryObject<Item> REAL_DIAMOND_PICKAXE_ZIP = ITEMS.register("real_diamond_pickaxe_zip",
                 () -> new PickaxeItem(
                         Tiers.DIAMOND,
@@ -271,25 +267,10 @@ public class Something {
                         new Item.Properties()
                                 .stacksTo(1)
                 ));
-        //
-//        public static final RegistryObject<Item> BOMB_FUCK = ITEMS.register("bomb_sheep",
-//                () -> new BombItem(new Item.Properties()
-//                        .stacksTo(1)
-//                ));
-
-        //渲染超格物品
-        public static void registerModels(ModelEvent.RegisterAdditional event) {
-            event.register(new ModelResourceLocation(
-                    new ResourceLocation(Main.MODID, "real_diamond_pickaxe"), "inventory"
-            ));
-            event.register(new ModelResourceLocation(
-                    new ResourceLocation(Main.MODID, "long_stick"),"inventory"
-            ));
-
-
-
-        }
     }
+
+
+
     public static class Paintings {
         public static final DeferredRegister<PaintingVariant> PAINTING_VARIANTS =
                 DeferredRegister.create(ForgeRegistries.PAINTING_VARIANTS, Main.MODID);
@@ -301,7 +282,7 @@ public class Something {
 
         //画作 - 参数：(宽度, 高度) 单位：像素
 
-    // 慢门配方系列 (Spf, Slow shutter speed PeiFang series)
+        // 慢门配方系列 (Spf, Slow shutter speed PeiFang series)
         // 1 - 月牙天冲  -  塑料瓶匿迹于残影，也乱他脸于不可见
         public static final RegistryObject<PaintingVariant> SPF1 = rpv("spf1", 32, 32);
 
@@ -314,9 +295,9 @@ public class Something {
         // 4 - 平观光洒  -  他捧着惨白与狂烈，任光洒在前胸与脸颊
         public static final RegistryObject<PaintingVariant> SPF4 = rpv("spf4", 32, 16);
 
-    // 图片系列(p, Painting series)
+        // 图片系列(p, Painting series)
         // 1 - 好臭啊（悲）
-         public static final RegistryObject<PaintingVariant> P1 = rpv("p1", 32, 32);
+        public static final RegistryObject<PaintingVariant> P1 = rpv("p1", 32, 32);
     }
 
 
