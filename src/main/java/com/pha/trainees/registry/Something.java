@@ -4,7 +4,7 @@ import com.pha.trainees.Main;
 import com.pha.trainees.block.BlackHoleBlock;
 import com.pha.trainees.block.PowderAnti99Block;
 import com.pha.trainees.item.*;
-import com.pha.trainees.way.math.MAth;
+import com.pha.trainees.util.math.MAth;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;

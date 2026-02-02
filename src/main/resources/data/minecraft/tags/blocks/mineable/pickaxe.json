@@ -1,7 +1,16 @@
 {
   "replace": false,
   "values": [
+    "trainees:kun_altar",
     "trainees:two_half_ingot_block",
-    "trainees:polyester_ore"
+    "trainees:waxed_two_half_ingot_block",
+    "trainees:auriversite_block",
+    "trainees:selenaurite_ore",
+    "trainees:deepslate_selenaurite_ore",
+    "trainees:selenaurite_block",
+    "trainees:nyctium_ore",
+    "trainees:deepslate_nyctium_ore",
+    "trainees:nyctium_block",
+    "trainees:banalium_block"
   ]
 }

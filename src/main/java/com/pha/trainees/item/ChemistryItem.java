@@ -1,7 +1,6 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.way.chemistry.ReactionSystem;
-import net.minecraft.client.gui.screens.Screen;
+import com.pha.trainees.util.game.chemistry.ReactionSystem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BookItem;

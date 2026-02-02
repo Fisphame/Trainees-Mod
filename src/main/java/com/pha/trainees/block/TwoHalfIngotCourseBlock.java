@@ -2,7 +2,7 @@ package com.pha.trainees.block;
 
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModChemistry;
-import com.pha.trainees.way.game.Tools;
+import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;

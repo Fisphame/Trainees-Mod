@@ -3,7 +3,7 @@ package com.pha.trainees.registry;
 import com.pha.trainees.Main;
 import com.pha.trainees.item.*;
 import com.pha.trainees.materials.TRAIN;
-import com.pha.trainees.util.ModTiers;
+import com.pha.trainees.util.game.ModTiers;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -37,11 +37,110 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.FEATHER_BLOCK.get(),
             new Item.Properties()
     ));
-    //聚酯纤维矿
-    public static final RegistryObject<Item> POLYESTER_ORE_ITEM = ITEMS.register("polyester_ore",
-            () -> new BlockItem(ModBlocks.POLYESTER_ORE.get(),
+    //鈅矿
+    public static final RegistryObject<Item> SELENAURITE_ORE_ITEM = ITEMS.register("selenaurite_ore",
+            () -> new BlockItem(ModBlocks.SELENAURITE_ORE.get(),
             new Item.Properties()
     ));
+    //深层鈅矿
+    public static final RegistryObject<Item> DEEPSLATE_SELENAURITE_ORE_ITEM = ITEMS.register("deepslate_selenaurite_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_SELENAURITE_ORE.get(),
+                    new Item.Properties()
+            ));
+    //鈅块
+    public static final RegistryObject<Item> SELENAURITE_BLOCK_ITEM = ITEMS.register("selenaurite_block",
+            () -> new BlockItem(ModBlocks.SELENAURITE_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    // 一堆矿石
+    public static final RegistryObject<Item> NYCTIUM_ORE_ITEM = ITEMS.register("nyctium_ore",
+            () -> new BlockItem(ModBlocks.NYCTIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> DEEPSLATE_NYCTIUM_ORE_ITEM = ITEMS.register("deepslate_nyctium_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_NYCTIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> NYCTIUM_BLOCK_ITEM = ITEMS.register("nyctium_block",
+            () -> new BlockItem(ModBlocks.NYCTIUM_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> TERAPIUM_ORE_ITEM = ITEMS.register("terapium_ore",
+            () -> new BlockItem(ModBlocks.TERAPIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> DEEPSLATE_TERAPIUM_ORE_ITEM = ITEMS.register("deepslate_terapium_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_TERAPIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> TERAPIUM_BLOCK_ITEM = ITEMS.register("terapium_block",
+            () -> new BlockItem(ModBlocks.TERAPIUM_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> BANALIUM_ORE_ITEM = ITEMS.register("banalium_ore",
+            () -> new BlockItem(ModBlocks.BANALIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> DEEPSLATE_BANALIUM_ORE_ITEM = ITEMS.register("deepslate_banalium_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_BANALIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> BANALIUM_BLOCK_ITEM = ITEMS.register("banalium_block",
+            () -> new BlockItem(ModBlocks.BANALIUM_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> NIVTIUM_ORE_ITEM = ITEMS.register("nivtium_ore",
+            () -> new BlockItem(ModBlocks.NIVTIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> DEEPSLATE_NIVTIUM_ORE_ITEM = ITEMS.register("deepslate_nivtium_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_NIVTIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> NIVTIUM_BLOCK_ITEM = ITEMS.register("nivtium_block",
+            () -> new BlockItem(ModBlocks.NIVTIUM_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> CRUCIUM_ORE_ITEM = ITEMS.register("crucium_ore",
+            () -> new BlockItem(ModBlocks.CRUCIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> DEEPSLATE_CRUCIUM_ORE_ITEM = ITEMS.register("deepslate_crucium_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_CRUCIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> CRUCIUM_BLOCK_ITEM = ITEMS.register("crucium_block",
+            () -> new BlockItem(ModBlocks.CRUCIUM_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> SERTIUM_ORE_ITEM = ITEMS.register("sertium_ore",
+            () -> new BlockItem(ModBlocks.SERTIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> DEEPSLATE_SERTIUM_ORE_ITEM = ITEMS.register("deepslate_sertium_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_SERTIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> SERTIUM_BLOCK_ITEM = ITEMS.register("sertium_block",
+            () -> new BlockItem(ModBlocks.SERTIUM_BLOCK.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> PLACIUM_ORE_ITEM = ITEMS.register("placium_ore",
+            () -> new BlockItem(ModBlocks.PLACIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> DEEPSLATE_PLACIUM_ORE_ITEM = ITEMS.register("deepslate_placium_ore",
+            () -> new BlockItem(ModBlocks.DEEPSLATE_PLACIUM_ORE.get(),
+                    new Item.Properties()
+            ));
+    public static final RegistryObject<Item> PLACIUM_BLOCK_ITEM = ITEMS.register("placium_block",
+            () -> new BlockItem(ModBlocks.PLACIUM_BLOCK.get(),
+                    new Item.Properties()
+            ));
+
+
+
+
     //只因方块
     public static final RegistryObject<Item> myblockitem = ITEMS.register("myblock",
             () -> new BlockItem(ModBlocks.MYBLOCK.get(),
@@ -58,6 +157,18 @@ public class ModItems {
     //反应炉
     public static final RegistryObject<Item> REACTING_FURNACE_BLOCK_ITEM = ITEMS.register("reacting_furnace",
             () -> new BlockItem(ModBlocks.REACTING_FURNACE.get(),
+                    new Item.Properties()
+            )
+    );
+    //祭坛核心
+    public static final RegistryObject<Item> ALTAR_CORE_BLOCK_ITEM = ITEMS.register("altar_core_block",
+            () -> new BlockItem(ModBlocks.ALTAR_CORE_BLOCK.get(),
+                    new Item.Properties()
+            )
+    );
+    //只因祭坛
+    public static final RegistryObject<Item> KUN_ALTAR_BLOCK_ITEM = ITEMS.register("kun_altar",
+            () -> new BlockItem(ModBlocks.KUN_ALTAR.get(),
                     new Item.Properties()
             )
     );
@@ -377,7 +488,7 @@ public class ModItems {
 
     //石棍
     public static final RegistryObject<Item> STONE_STICK = ITEMS.register("stone_stick",
-            ()-> new Item(new Item.Properties())
+            ()-> new StoneStickItem(new Item.Properties())
     );
     //只因粒
     public static final RegistryObject<Item> KUN_NUGGET = ITEMS.register("kun_nugget",
@@ -407,16 +518,54 @@ public class ModItems {
     public static final RegistryObject<Item> AURIVERSITE_NUGGET = ITEMS.register("auriversite_nugget",
             () -> new Item(new Item.Properties())
     );
-    //聚酯纤维（PET）
-    public static final RegistryObject<Item> POLYESTER = ITEMS.register("polyester",
-            ()-> new Item(new Item.Properties())
+    // 鈅锭
+    public static final RegistryObject<Item> SELENAURITE_INGOT = ITEMS.register("selenaurite_ingot",
+            () -> new Item(new Item.Properties())
     );
+    // 鈅粒
+    public static final RegistryObject<Item> SELENAURITE_NUGGET = ITEMS.register("selenaurite_nugget",
+            () -> new Item(new Item.Properties())
+    );
+    public static final RegistryObject<Item> NYCTIUM_INGOT = ITEMS.register("nyctium_ingot",
+            () -> new Item( new Item.Properties())
+    );
+    public static final RegistryObject<Item> TERAPIUM_INGOT = ITEMS.register("terapium_ingot",
+            () -> new Item( new Item.Properties())
+    );
+    public static final RegistryObject<Item> BANALIUM_INGOT = ITEMS.register("banalium_ingot",
+            () -> new Item( new Item.Properties())
+    );
+    public static final RegistryObject<Item> NIVTIUM_INGOT = ITEMS.register("nivtium_ingot",
+            () -> new Item( new Item.Properties())
+    );
+    public static final RegistryObject<Item> CRUCIUM_INGOT = ITEMS.register("crucium_ingot",
+            () -> new Item( new Item.Properties())
+    );
+    public static final RegistryObject<Item> SERTIUM_INGOT = ITEMS.register("sertium_ingot",
+            () -> new Item( new Item.Properties())
+    );
+    public static final RegistryObject<Item> PLACIUM_INGOT = ITEMS.register("placium_ingot",
+            () -> new Item( new Item.Properties())
+    );
+
+    //聚酯纤维（PET）
+//    public static final RegistryObject<Item> POLYESTER = ITEMS.register("polyester",
+//            ()-> new Item(new Item.Properties())
+//    );
     //弹性材料
     public static final RegistryObject<Item> ELASTOMERIC_MATERIAL = ITEMS.register("elastomeric_material",
             ()-> new Item(new Item.Properties())
     );
     //弹性核心
     public static final RegistryObject<Item> ELASTOMERIC_CORE = ITEMS.register("elastomeric_core",
+            ()-> new Item(new Item.Properties())
+    );
+    //祭坛核心
+    public static final RegistryObject<Item> ALTAR_CORE = ITEMS.register("altar_core",
+            () -> new Item(new Item.Properties())
+    );
+    //金羽毛
+    public static final RegistryObject<Item> GOLD_FEATHER = ITEMS.register("gold_feather",
             ()-> new Item(new Item.Properties())
     );
     //兑换券
@@ -444,6 +593,11 @@ public class ModItems {
             () -> new EggCourseItem.BlackEggItem(new Item.Properties()
                     .stacksTo(16)
             ));
+    //金蛋
+    public static final RegistryObject<Item> GOLD_EGG = ITEMS.register("gold_egg",
+            () -> new EggCourseItem.GoldEggItem(new Item.Properties()
+                    .stacksTo(16)
+            ));
 
 
     //练习鸡刷怪蛋
@@ -460,10 +614,22 @@ public class ModItems {
     public static final RegistryObject<Item> KUN_ANTI_SPAWN_EGG = ITEMS.register("kun_anti_spawn_egg",
             () -> new ForgeSpawnEggItem(
                     ModEntities.KUN_ANTI,
-                    0x9f9f9f,// 主颜色（蛋底色）
-                    0x272727,// 副颜色（斑点色）
+                    0x9f9f9f,
+                    0x272727,
                     new Item.Properties()
                             .stacksTo(64)
             )
     );
+    //金鸡刷怪蛋
+    public static final RegistryObject<Item> GOLD_CHICKEN_SPAWN_EGG = ITEMS.register("gold_chicken_spawn_egg",
+            () -> new ForgeSpawnEggItem(
+                    ModEntities.GOLD_CHICKEN,
+                    0xFFD700,
+                    0xFFDF00,
+                    new Item.Properties()
+                            .stacksTo(64)
+                            .rarity(Rarity.UNCOMMON)
+            )
+    );
+
 }

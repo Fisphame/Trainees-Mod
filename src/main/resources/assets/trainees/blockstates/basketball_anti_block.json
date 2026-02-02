@@ -1,21 +1,7 @@
 {
   "variants": {
-    "": [
-      {
-        "model": "trainees:block/basketball_anti_block"
-      },
-      {
-        "model": "trainees:block/basketball_anti_block",
-        "y": 90
-      },
-      {
-        "model": "trainees:block/basketball_anti_block",
-        "y": 180
-      },
-      {
-        "model": "trainees:block/basketball_anti_block",
-        "y": 270
-      }
-    ]
+    "": {
+      "model": "trainees:block/basketball_anti_block"
+    }
   }
 }

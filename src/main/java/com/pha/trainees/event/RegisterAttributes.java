@@ -1,6 +1,7 @@
 package com.pha.trainees.event;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.entity.GoldChickenEntity;
 import com.pha.trainees.entity.KunAntiEntity;
 import com.pha.trainees.entity.KunTraineesEntity;
 import com.pha.trainees.registry.ModEntities;
@@ -14,5 +15,6 @@ public class RegisterAttributes {
     public static void entityAttributeCreation(EntityAttributeCreationEvent event) {
         event.put(ModEntities.KUN_TRAINEES.get(), KunTraineesEntity.createAttributes().build());
         event.put(ModEntities.KUN_ANTI.get(), KunAntiEntity.createAttributes().build());
+        event.put(ModEntities.GOLD_CHICKEN.get(), GoldChickenEntity.createAttributes().build());
     }
 }

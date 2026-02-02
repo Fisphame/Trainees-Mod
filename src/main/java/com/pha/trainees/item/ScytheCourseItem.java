@@ -1,7 +1,6 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.way.math.MAth;
-import net.minecraft.client.gui.screens.Screen;
+import com.pha.trainees.util.math.MAth;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;

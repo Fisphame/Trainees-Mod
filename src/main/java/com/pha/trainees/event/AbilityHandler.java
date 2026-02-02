@@ -3,7 +3,7 @@ package com.pha.trainees.event;
 import com.pha.trainees.entity.CalledSwordEntity;
 import com.pha.trainees.registry.ModEnchantments;
 import com.pha.trainees.registry.ModEntities;
-import com.pha.trainees.way.game.Tools;
+import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;

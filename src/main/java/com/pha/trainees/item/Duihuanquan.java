@@ -35,7 +35,7 @@ public class Duihuanquan extends Item {
         BlockPos blockpos = context.getClickedPos();
         BlockState blockstate = level.getBlockState(blockpos);
         Block block = blockstate.getBlock();
-        if (block == ModBlocks.MYBLOCK.get() || player != null || true) {
+        if (player != null && (block == ModBlocks.MYBLOCK.get() || true)) {
             itemStack.shrink(1);
             ItemStack spawnStack = new ItemStack(ModItems.UPGRADE_THEME.get(), 1);
             ItemEntity itemEntity = new ItemEntity(level, blockpos.getX(), blockpos.getY() + 1, blockpos.getZ(), spawnStack);

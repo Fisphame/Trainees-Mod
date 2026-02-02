@@ -4,8 +4,8 @@ import com.pha.trainees.Main;
 import com.pha.trainees.block.CheJibpBlock;
 import com.pha.trainees.block.ChemistryBlock;
 import com.pha.trainees.item.ChemistryItem;
-import com.pha.trainees.way.chemistry.ChemicalEquation;
-import com.pha.trainees.way.chemistry.ReactionConditions;
+import com.pha.trainees.util.game.chemistry.ChemicalEquation;
+import com.pha.trainees.util.game.chemistry.ReactionConditions;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -16,9 +16,6 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-
-import static net.minecraft.world.item.Items.BUCKET;
-import static net.minecraft.world.item.Items.registerItem;
 
 public class ModChemistry {
     public static class ModChemistryBlocks {
@@ -153,15 +150,6 @@ public class ModChemistry {
                 )
         );
 
-        // 杂质
-        public static final RegistryObject<Item> IMPERFECTION = ITEMS.register("imperfection",
-                () -> new Item(
-                        new Item.Properties()
-                                .fireResistant()
-                                .rarity(Rarity.UNCOMMON)
-                                .setNoRepair()
-                ));
-
         //相酸桶
 //        public static final RegistryObject<Item> CHE_HBP_BUCKET = ITEMS.register("che_hbp_bucket",
 //                () -> new BucketItem(
@@ -182,8 +170,16 @@ public class ModChemistry {
 //        public static final Item JI_BUCKET = registerItem("ji_bucket",
 //                new BucketItem(ModFluid.JI, (new Item.Properties()).craftRemainder(BUCKET).stacksTo(1)));
 
+        // 杂质
+        public static final RegistryObject<Item> IMPERFECTION = ITEMS.register("imperfection",
+                () -> new Item(
+                        new Item.Properties()
+                                .fireResistant()
+                                .rarity(Rarity.UNCOMMON)
+                                .setNoRepair()
+                ));
         // 氧化鸡锭
-        public static final RegistryObject<Item> CHE_JI2O = ITEMS.register("che_ji2o_ingot",
+        public static final RegistryObject<Item> CHE_JI2O_INGOT = ITEMS.register("che_ji2o_ingot",
                 () -> new ChemistryItem.Ji2O(new Item.Properties()
                 ));
         // 氧化鸡粒
@@ -207,23 +203,23 @@ public class ModChemistry {
                 () -> new ChemistryItem.BpO3(new Item.Properties()
                 ));
         // 黑化氢粉末
-        public static final RegistryObject<Item> CHE_HBP = ITEMS.register("che_hbp_powder",
+        public static final RegistryObject<Item> CHE_HBP_POWDER = ITEMS.register("che_hbp_powder",
                 () -> new ChemistryItem.HBp(new Item.Properties()
                 ));
         // 次黑酸粉末
-        public static final RegistryObject<Item> CHE_HBPO = ITEMS.register("che_hbpo_powder",
+        public static final RegistryObject<Item> CHE_HBPO_POWDER = ITEMS.register("che_hbpo_powder",
                 () -> new ChemistryItem.HBpO(new Item.Properties()
                 ));
         // 黑酸粉末
-        public static final RegistryObject<Item> CHE_HBPO3 = ITEMS.register("che_hbpo3_powder",
+        public static final RegistryObject<Item> CHE_HBPO_3_POWDER = ITEMS.register("che_hbpo3_powder",
                 () -> new ChemistryItem.HBpO3(new Item.Properties()
                 ));
         // 高黑酸粉末
-        public static final RegistryObject<Item> CHE_HBPO4 = ITEMS.register("che_hbpo4_powder",
+        public static final RegistryObject<Item> CHE_HBPO_4_POWDER = ITEMS.register("che_hbpo4_powder",
                 () -> new ChemistryItem.HBpO4(new Item.Properties()
                 ));
         // 氢氧化鸡锭
-        public static final RegistryObject<Item> CHE_JIOH = ITEMS.register("che_jioh_ingot",
+        public static final RegistryObject<Item> CHE_JIOH_INGOT = ITEMS.register("che_jioh_ingot",
                 () -> new ChemistryItem.JiOH(new Item.Properties()
                 ));
         // 氢氧化鸡粒
@@ -231,22 +227,23 @@ public class ModChemistry {
                 () -> new ChemistryItem.JiOH(new Item.Properties()
                 ));
         // 反相素
-        public static final RegistryObject<Item> CHE_JIBP = ITEMS.register("che_jibp_piece",
+        public static final RegistryObject<Item> CHE_JIBP_PIECE = ITEMS.register("che_jibp_piece",
                 () -> new ChemistryItem.JiBp(new Item.Properties()
                         .rarity(Rarity.UNCOMMON)
                 ));
         // 次黑酸鸡
-        public static final RegistryObject<Item> CHE_JIBPO = ITEMS.register("che_jibpo_crystallization",
+        public static final RegistryObject<Item> CHE_JIBPO_CRYSTALLIZATION = ITEMS.register("che_jibpo_crystallization",
                 () -> new ChemistryItem.JiBpO(new Item.Properties()
                 ));
         // 黑酸鸡
-        public static final RegistryObject<Item> CHE_JIBPO3 = ITEMS.register("che_jibpo3_crystallization",
+        public static final RegistryObject<Item> CHE_JIBPO_3_CRYSTALLIZATION = ITEMS.register("che_jibpo3_crystallization",
                 () -> new ChemistryItem.JiBpO3(new Item.Properties()
                 ));
         // 黑酸鸡
-        public static final RegistryObject<Item> CHE_JIBPO4 = ITEMS.register("che_jibpo4_crystallization",
+        public static final RegistryObject<Item> CHE_JIBPO_4_CRYSTALLIZATION = ITEMS.register("che_jibpo4_crystallization",
                 () -> new ChemistryItem.JiBpO4(new Item.Properties()
                 ));
+
     }
 
     public static class ModChemistryEquations {
@@ -255,16 +252,16 @@ public class ModChemistry {
                 new ChemicalEquation.Builder("hbpo_decomposition")
                         .withName("HBpO光分解")
                         .withDescription("次黑酸在光照下分解为纽黑粉末和氧气")
-                        .addReactant(ModChemistry.ModChemistryItems.CHE_HBPO.get(), 2, "次黑酸")
-                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBP.get(), 2, "纽黑粉末")
+                        .addReactant(ModChemistry.ModChemistryItems.CHE_HBPO_POWDER.get(), 2, "次黑酸")
+                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBP_POWDER.get(), 2, "纽黑粉末")
                         // .addProduct(ModChemistry.ModChemistryItems.CHE_O2.get(), 1, "氧气")
                         .withTimedConditions(
                                 ReactionConditions.hbpoDecomposeCondition.get(),
                                 ReactionConditions.hbpoDurationProvider.get()
                         )
-                        .addTag("decomposition")
-                        .addTag("photochemical")
-                        .addTag("redox")
+//                        .addTag("decomposition")
+//                        .addTag("photochemical")
+//                        .addTag("redox")
                         .build();
 
         // Bp2与水反应: Bp2 + H2O == HBp + HBpO
@@ -272,14 +269,28 @@ public class ModChemistry {
                 new ChemicalEquation.Builder("bp2_water_reaction")
                         .withName("黑单质水解")
                         .addReactant(ModItems.POWDER_ANTI.get(), 1, "黑单质")
-                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBP.get(), 1, "纽黑粉末")
-                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBPO.get(), 1, "次黑酸")
+                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBP_POWDER.get(), 1, "纽黑粉末")
+                        .addProduct(ModChemistry.ModChemistryItems.CHE_HBPO_POWDER.get(), 1, "次黑酸")
                         .withTimedConditions(
                                 ReactionConditions.bp2AndWaterCondition.get(),
                                 ReactionConditions.random5to10
                         )
-                        .addTag("hydrolysis")
-                        .addTag("redox")
+//                        .addTag("hydrolysis")
+//                        .addTag("redox")
+                        .build();
+
+        // Ji与水反应
+        public static final ChemicalEquation JI_WATER_REACTION =
+                new ChemicalEquation.Builder("ji_water_reaction")
+                        .withName("鸡单质水解")
+                        .addReactant(ModItems.TWO_HALF_INGOT.get(), 2)
+                        .addProduct(ModChemistryItems.CHE_JIOH_INGOT.get(), 2)
+                        .withTimedConditions(
+                                ReactionConditions.jiAndWaterCondition.get(),
+                                ReactionConditions.dur0
+                        )
+//                        .addTag("hydrolysis")
+//                        .addTag("redox")
                         .build();
     }
 }

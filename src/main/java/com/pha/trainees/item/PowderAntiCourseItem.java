@@ -1,7 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.way.chemistry.ChemicalReaction;
-import com.pha.trainees.way.chemistry.ReactionSystem;
+import com.pha.trainees.util.game.chemistry.ChemicalReaction;
+import com.pha.trainees.util.game.chemistry.ReactionSystem;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;

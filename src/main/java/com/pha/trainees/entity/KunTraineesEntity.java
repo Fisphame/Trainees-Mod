@@ -3,8 +3,6 @@ package com.pha.trainees.entity;
 import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModEntities;
 import com.pha.trainees.registry.ModItems;
-import com.pha.trainees.registry.ModTags;
-import com.pha.trainees.way.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -17,11 +15,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import org.checkerframework.checker.units.qual.A;
 
 public class KunTraineesEntity extends Chicken {
     public KunTraineesEntity(EntityType<? extends Chicken> type, Level level) {

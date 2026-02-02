@@ -4,7 +4,8 @@ import com.mojang.logging.LogUtils;
 import com.pha.trainees.event.*;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.thetwice.Object;
-import com.pha.trainees.way.chemistry.ChemicalReaction;
+import com.pha.trainees.util.game.chemistry.ChemicalReaction;
+import com.pha.trainees.util.game.chemistry.ReactionConditions;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -28,6 +29,7 @@ public class Main {
 
 
         ModBlocks.BLOCKS.register(bus);
+        ModBlocks.ModBlockEntities.BLOCK_ENTITIES.register(bus);
         ModChemistry.ModChemistryBlocks.BLOCKS.register(bus);
         ModSounds.SOUNDS.register(bus);
         ModEnchantments.ENCHANTMENTS.register(bus);
@@ -54,11 +56,11 @@ public class Main {
 
 
         bus.register(new RegisterAttributes());
-
+        bus.addListener(this::commonSetup);
 
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
-        ebus.register(MiningSoundEvents.class);
+//        ebus.register(MiningSoundEvents.class);
         ebus.register(SweepHandler.class);
 //        ebus.register(RegisterModels.class);
 //        ebus.register(RegisterAttributes.class);
@@ -71,8 +73,29 @@ public class Main {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        // 延迟执行，确保注册表已就绪
-        event.enqueueWork(ChemicalReaction::registerAllReactions);
+        Main.LOGGER.info("Chemistry System: Starting commonSetup");
+
+        event.enqueueWork(() -> {
+            Main.LOGGER.info("Chemistry System: Executing enqueueWork");
+            try {
+                // Pre-initialize conditions
+                Main.LOGGER.info("Chemistry System: Pre-initializing conditions...");
+                ReactionConditions.IS_JI.get();
+                ReactionConditions.hbpoDecomposeCondition.get();
+                ReactionConditions.bp2AndWaterCondition.get();
+                Main.LOGGER.info("Chemistry System: Condition pre-initialization complete");
+
+                // Register reactions
+                Main.LOGGER.info("Chemistry System: Calling registerAllReactions()");
+                ChemicalReaction.registerAllReactions();
+                Main.LOGGER.info("Chemistry System: registerAllReactions() call complete");
+
+            } catch (Exception e) {
+                Main.LOGGER.error("Chemistry System: Initialization failed", e);
+            }
+        });
+
+        Main.LOGGER.info("Chemistry System: commonSetup completed");
     }
 
 //    private void setupMixinCompatibility() {

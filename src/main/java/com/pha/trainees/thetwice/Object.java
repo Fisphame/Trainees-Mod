@@ -1,7 +1,7 @@
 package com.pha.trainees.thetwice;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.util.ModTiers;
+import com.pha.trainees.util.game.ModTiers;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;

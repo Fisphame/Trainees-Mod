@@ -24,7 +24,7 @@ public class ModCommand {
         );
 
         ALLOW_REACTION_EXPLODE = GameRules.register(
-                "allow_reaction_explode",
+                "allowreactionexplode",
                 GameRules.Category.PLAYER,
                 createBooleanRule(true)
         );

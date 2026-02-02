@@ -1,6 +1,6 @@
 package com.pha.trainees.entity;
 
-import com.pha.trainees.way.game.Tools;
+import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -154,7 +154,7 @@ public class CalledSwordEntity extends Entity {
                     pos.set(xn, yn, zn);
                     BlockState blockState = level().getBlockState(pos);
                     Block block = blockState.getBlock();
-                    if (enchantBreakBlock && Tools.canBreak(block)) {
+                    if (enchantBreakBlock && Tools.BlockCourse.canBreak(block)) {
                         this.level().destroyBlock(pos, enchantBrokenBlockDrop); // 生成掉落物
                         if (Tools.chance(level(), 0.2f)){
                             Tools.Particle.spawnExplosionEffect(

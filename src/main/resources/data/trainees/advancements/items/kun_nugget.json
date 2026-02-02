@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "trainees:root",
+  "parent": "trainees:entity/kun_trainees",
   "criteria": {
     "obtain_kun_nugget": {
       "trigger": "minecraft:inventory_changed",

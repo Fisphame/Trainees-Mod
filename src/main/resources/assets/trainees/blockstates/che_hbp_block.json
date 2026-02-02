@@ -1,7 +1,7 @@
 {
-    "variants": {
-        "": {
-            "model": "trainees:block/che_hbp_block"
-        }
+  "variants": {
+    "": {
+      "model": "trainees:block/che_hbp_block"
     }
+  }
 }

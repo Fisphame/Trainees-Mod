@@ -1,9 +1,6 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.entity.KunAntiEntity;
-import com.pha.trainees.entity.KunTraineesEntity;
-import com.pha.trainees.registry.ModEntities;
-import net.minecraft.client.gui.screens.Screen;
+import com.pha.trainees.item.ThrownEggCourseItem.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -11,12 +8,11 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ThrownEgg;
 import net.minecraft.world.item.EggItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.HitResult;
+
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -37,10 +33,10 @@ public class EggCourseItem {
 
             if (!level.isClientSide) {
                 // 创建自定义的投掷坤蛋实体
-                ThrownKunEgg thrownKunEgg = new ThrownKunEgg(level, player);
-                thrownKunEgg.setItem(itemstack);
-                thrownKunEgg.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
-                level.addFreshEntity(thrownKunEgg);
+                ThrownKunEgg thrownEgg = new ThrownKunEgg(level, player);
+                thrownEgg.setItem(itemstack);
+                thrownEgg.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
+                level.addFreshEntity(thrownEgg);
             }
 
             player.awardStat(Stats.ITEM_USED.get(this));
@@ -51,30 +47,6 @@ public class EggCourseItem {
             return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
         }
 
-        // 自定义投掷黑蛋实体类
-        public static class ThrownKunEgg extends ThrownEgg {
-
-            public ThrownKunEgg(Level level, Player player) {
-                super(level, player);
-            }
-
-            protected void onHit(HitResult HitResult) {
-                super.onHit(HitResult);
-
-                if (!this.level().isClientSide) {
-                    // 生成幼年KunTraineesEntity而不是原版鸡
-                    KunTraineesEntity kunTrainees = ModEntities.KUN_TRAINEES.get().create(this.level());
-                    if (kunTrainees != null) {
-                        kunTrainees.setAge(-24000); // 设置为幼年
-                        kunTrainees.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), 0.0F);
-                        this.level().addFreshEntity(kunTrainees);
-                    }
-
-                    this.level().broadcastEntityEvent(this, (byte)3);
-                    this.discard();
-                }
-            }
-        }
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
@@ -102,10 +74,10 @@ public class EggCourseItem {
 
             if (!level.isClientSide) {
                 // 创建自定义的投掷黑蛋实体
-                ThrownBlackEgg thrownBlackEgg = new ThrownBlackEgg(level, player);
-                thrownBlackEgg.setItem(itemstack);
-                thrownBlackEgg.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
-                level.addFreshEntity(thrownBlackEgg);
+                ThrownBlackEgg thrownEgg = new ThrownBlackEgg(level, player);
+                thrownEgg.setItem(itemstack);
+                thrownEgg.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
+                level.addFreshEntity(thrownEgg);
             }
 
             player.awardStat(Stats.ITEM_USED.get(this));
@@ -116,31 +88,7 @@ public class EggCourseItem {
             return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
         }
 
-        // 自定义投掷黑蛋实体类
-        public static class ThrownBlackEgg extends ThrownEgg {
 
-            public ThrownBlackEgg(Level level, Player player) {
-                super(level, player);
-            }
-
-            protected void onHit(HitResult HitResult) {
-                super.onHit(HitResult);
-
-                if (!this.level().isClientSide) {
-                    // 生成幼年KunAntiEntity而不是原版鸡
-                    KunAntiEntity kunAnti = ModEntities.KUN_ANTI.get().create(this.level());
-                    if (kunAnti != null) {
-                        kunAnti.setAge(-24000); // 设置为幼年
-                        kunAnti.moveTo(this.getX(), this.getY(), this.getZ(),
-                                this.getYRot(), 0.0F);
-                        this.level().addFreshEntity(kunAnti);
-                    }
-
-                    this.level().broadcastEntityEvent(this, (byte)3);
-                    this.discard();
-                }
-            }
-        }
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
@@ -149,6 +97,50 @@ public class EggCourseItem {
             if (flag.isAdvanced()) {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item"));
                 tooltipComponents.add(Component.translatable("tooltip.trainees.black_egg_item.2"));
+            } else {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            }
+        }
+    }
+
+    public static class GoldEggItem extends EggItem {
+
+        public GoldEggItem(Properties properties) {
+            super(properties);
+        }
+
+        @Override
+        public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+            ItemStack itemstack = player.getItemInHand(hand);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.EGG_THROW, SoundSource.PLAYERS,
+                    0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
+
+            if (!level.isClientSide) {
+                // 创建自定义的投掷坤蛋实体
+                ThrownGoldEgg thrownEgg = new ThrownGoldEgg(level, player);
+                thrownEgg.setItem(itemstack);
+                thrownEgg.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
+                level.addFreshEntity(thrownEgg);
+            }
+
+            player.awardStat(Stats.ITEM_USED.get(this));
+            if (!player.getAbilities().instabuild) {
+                itemstack.shrink(1);
+            }
+
+            return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
+        }
+
+
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+
+            if (flag.isAdvanced()) {
+                tooltipComponents.add(Component.translatable("tooltip.trainees.gold_egg_item"));
+                tooltipComponents.add(Component.translatable("tooltip.trainees.gold_egg_item.2"));
             } else {
                 tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
             }

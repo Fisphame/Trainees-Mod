@@ -1,21 +1,7 @@
 {
   "variants": {
-    "": [
-      {
-        "model": "trainees:block/powder_anti_99"
-      },
-      {
-        "model": "trainees:block/powder_anti_99",
-        "y": 90
-      },
-      {
-        "model": "trainees:block/powder_anti_99",
-        "y": 180
-      },
-      {
-        "model": "trainees:block/powder_anti_99",
-        "y": 270
-      }
-    ]
+    "": {
+      "model": "trainees:block/powder_anti_99"
+    }
   }
 }

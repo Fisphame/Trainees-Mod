@@ -1,12 +1,14 @@
 {
   "advancements.trainees.root.title": "练习生",
   "advancements.trainees.root.description": "谁人踏上不归的练习之路……",
+  "advancements.trainees.kun_trainees.title":"练习生" ,
+  "advancements.trainees.kun_trainees.description":"我是练习时长……的个人练习生……",
   "advancements.trainees.kun_nugget.title": "不寻常的鸡",
   "advancements.trainees.kun_nugget.description": "或许你该建一个养鸡场……",
   "advancements.trainees.two_half_ingot.title": "5/2=2.5！",
-  "advancements.trainees.two_half_ingot.description": "两锭半，非常形象的名字。",
+  "advancements.trainees.two_half_ingot.description": "两锭半，非常形象。",
   "advancements.trainees.stone_stick.title": "来硬的……棍子",
-  "advancements.trainees.stone_stick.description": "石棍可能不硬，但砸到人脑壳人就硬了。",
+  "advancements.trainees.stone_stick.description": "石棍敲头，至少脑壳硬。",
   "advancements.trainees.real_diamond_pickaxe.title": "这是钻石镐么……？",
   "advancements.trainees.real_diamond_pickaxe.description": "合成出不明觉厉的东西……",
   "advancements.trainees.the_the_longest_real_diamond_pickaxe.title": "滴水穿石，海枯石烂",
@@ -27,6 +29,8 @@
   "advancements.trainees.pei_fang_ball.description": "刘浩然是个球！！",
   "advancements.trainees.kun_anti.title": "小黑子！",
   "advancements.trainees.kun_anti.description": "食不食油饼？",
+  "advancements.trainees.gold_chicken.title": "财富的象征",
+  "advancements.trainees.gold_chicken.description": "金钱！",
   "advancements.trainees.powder_anti_92.title": "压缩包压缩压缩包",
   "advancements.trainees.powder_anti_92.description": "9^2=81",
   "advancements.trainees.powder_anti_93.title": "不对劲……",
@@ -51,7 +55,7 @@
   "block.trainees.two_half_ingot_block": "两锭半块",
   "block.trainees.waxed_two_half_ingot_block": "涂蜡的两锭半块",
   "block.trainees.auriversite_block": "金矽块",
-  "block.trainees.polyester_ore": "聚酯纤维矿",
+  "block.trainees.selenaurite_ore": "鈅矿",
   "block.trainees.feather_block": "羽毛块",
   "block.trainees.purification_station": "提纯台",
   "block.trainees.reacting_furnace": "反应炉",
@@ -106,7 +110,10 @@
   "item.trainees.basketball_anti": "反相篮球",
   "item.trainees.basketball_anti.effect.empty": "反相篮球",
   "item.trainees.basketball_anti.effect.harming": "[瞬伤]反相篮球",
+  "item.trainees.gold_chicken_spawn_egg": "金鸡刷怪蛋",
   "item.trainees.kun_egg": "只因蛋",
+  "item.trainees.gold_egg": "金蛋",
+  "item.trainees.gold_feather": "金羽毛",
   
   "subtitles.trainees.final_mining_sound_1": "终极只因镐：挖掘",
   "subtitles.trainees.final_mining_sound_2": "终极只因镐：挖掘",
@@ -122,7 +129,9 @@
   "tooltip.trainees.black_egg_item": "§l黑蛋",
   "tooltip.trainees.black_egg_item.2": "投掷后固定生成幼年“黑粉”。（由于不可抗力概率同时生成幼年鸡，或许可以理解为黑转粉？）",
   "tooltip.trainees.kun_egg_item": "§l只因蛋",
-  "tooltip.trainees.kun_egg_item.2": "投掷后固定生成幼年“练习鸡”。（由于不可抗力概率同时生成幼年鸡，或许可以理解纯路人？）",
+  "tooltip.trainees.kun_egg_item.2": "投掷后固定生成幼年“练习鸡”。（由于不可抗力概率同时生成幼年鸡，或许可以理解为纯路人？）",
+  "tooltip.trainees.gold_egg_item": "§l金蛋",
+  "tooltip.trainees.gold_egg_item.2": "投掷后固定生成幼年“金鸡”。（由于不可抗力概率同时生成幼年鸡……）",
   "tooltip.trainees.compound_scythe_item": "§l镰刀",
   "tooltip.trainees.compound_scythe_item.2": "横扫伤害为主手伤害的6倍，范围提升至4倍。（主手伤害不变）",
   "tooltip.trainees.duihuanquan": "§l兑换券",
@@ -137,14 +146,23 @@
   "tooltip.trainees.black_powder_scythe_item.2": "横扫伤害为主手的38742倍，范围提升至38742倍。（主手伤害不变）\n注：实际伤害范围取决于模拟距离(范围半径≈模拟距离×16)，所以不用担心电脑爆炸啦qwq\n",
   "tooltip.trainees.fuck": "手持该物品右键，“可能”会导致游戏卡顿、程序未响应、服务器崩溃、cpu热损伤、cpu满负载、内存控制器过热、内存过载、DRAM芯片损耗、总线负载、SSD写入放大、NAND闪存磨损、SSD控制器过热、电压波动、电容老化、VRM压力、MOSFET损耗、电感饱和、风扇高转、硅脂干涸、算数异常、栈溢出、堆内存溢出、类型转换异常、并发修改异常、空指针异常、数组越界……嘻嘻嘻，我想谋杀你的（服主的）电脑（尤其是cpu）哦……",
   "tooltip.trainees.fuck.2": "注：如果你的或服主的电脑配置（尤其是cpu性能）一般，切勿轻易尝试！！！（纯递归计算斐波那契第n项，n为30~50内的随机整数，时间复杂度2^n，一般水平纯净最长耗时约42s）",
-  
+  "tooltip.trainees.auriversite_rapier": "§l刺剑 & 动能系统",
+  "tooltip.trainees.auriversite_rapier.2.1": "§7刺剑: 使用物品时迅速向前突进",
+  "tooltip.trainees.auriversite_rapier.2.2": "§7动能系统: 积累动能，攻击时消耗动能造成额外伤害",
+  "tooltip.trainees.auriversite_rapier.state": "动能系统状态: ",
+  "tooltip.trainees.auriversite_rapier.on": "开启",
+  "tooltip.trainees.auriversite_rapier.off": "关闭",
   
   "enchantment.trainees.ten_thousand_sword": "万剑归宗",
-  "msg.trainees.isOnCooldown": "冷却中",
+  "enchantment.trainees.sprint": "冲刺",
+  "enchantment.trainees.advent": "降临",
+  "enchantment.trainees.balance": "平衡",
+  "enchantment.trainees.conversion": "转化",
+  "enchantment.trainees.exceeded": "超限",
   
   "entity.trainees.kun_trainees": "练习鸡",
   "entity.trainees.kun_anti": "黑粉",
-  
+  "entity.trainees.gold_chicken": "金鸡",
   
   
   "itemGroup.trainees.chemistry_tab": "化学讲堂",
@@ -234,6 +252,7 @@
   "itemGroup.trainees.prank_tab":"整蛊",
   
   "block.trainees.powder_anti_99": "黑粉块",
+  "block.trainees.black_hole": "黑洞",
 
   "item.trainees.left_half_diamond_pickaxe":"左半镐",
   "item.trainees.right_half_diamond_pickaxe":"右半镐",
@@ -280,5 +299,6 @@
   "config.trainees.saved": "配置已保存！新值: %s",
   "config.trainees.invalid_range": "数值必须在 0-10000 范围内",
   "config.trainees.invalid_number": "请输入有效的数字",
-  "config.trainees.reset_default": "已重置为默认值 10"
+  "config.trainees.reset_default": "已重置为默认值 10",
+  "item.trainees.custom_book": "Trainee's Guide"
 }

@@ -1,9 +1,7 @@
 package com.pha.trainees.client;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.entity.CalledSwordEntity;
-import com.pha.trainees.entity.KunAntiEntity;
-import com.pha.trainees.entity.KunTraineesEntity;
+import com.pha.trainees.entity.*;
 import net.minecraft.client.model.ChickenModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -42,6 +40,39 @@ public class Renderers {
         @Override
         public ResourceLocation getTextureLocation(KunAntiEntity entity) {
             return new ResourceLocation(Main.MODID, "textures/entity/kun_anti.png");
+        }
+    }
+
+    public static class GoldChickenRenderer extends MobRenderer<GoldChickenEntity, ChickenModel<GoldChickenEntity>> {
+        public GoldChickenRenderer(EntityRendererProvider.Context context) {
+            super(context, new ChickenModel<>(context.bakeLayer(ModelLayers.CHICKEN)), 0.3F);
+        }
+
+        @Override
+        public ResourceLocation getTextureLocation(GoldChickenEntity entity) {
+            return new ResourceLocation(Main.MODID, "textures/entity/gold_chicken.png");
+        }
+    }
+
+    public static class HydrogenRenderer extends EntityRenderer<GasEntities.HydrogenEntity> {
+        public HydrogenRenderer(EntityRendererProvider.Context context) {
+            super(context);
+        }
+
+        @Override
+        public ResourceLocation getTextureLocation(GasEntities.HydrogenEntity entity) {
+            return new ResourceLocation(Main.MODID, "textures/entity/hydrogen.png");
+        }
+    }
+
+    public static class OxygenRenderer extends EntityRenderer<GasEntities.OxygenEntity> {
+        public OxygenRenderer(EntityRendererProvider.Context context) {
+            super(context);
+        }
+
+        @Override
+        public ResourceLocation getTextureLocation(GasEntities.OxygenEntity entity) {
+            return new ResourceLocation(Main.MODID, "textures/entity/oxygen.png");
         }
     }
 }

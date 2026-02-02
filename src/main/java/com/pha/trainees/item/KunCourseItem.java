@@ -1,9 +1,12 @@
 package com.pha.trainees.item;
 
 import com.pha.trainees.registry.ModBlocks;
-import com.pha.trainees.way.chemistry.ReactionSystem;
-import com.pha.trainees.way.game.Tools;
+import com.pha.trainees.util.game.chemistry.ReactionSystem;
+import com.pha.trainees.util.game.Tools;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -23,7 +26,7 @@ import java.util.List;
 
 public class KunCourseItem {
 
-    public static boolean on(ItemStack stack, ItemEntity entity) {
+    public static boolean on(ItemStack stack, @NotNull ItemEntity entity) {
         if (!entity.level().isClientSide) {
             return ReactionSystem.ReactionRegistry.triggerReactions(stack, entity);
         }
@@ -71,7 +74,7 @@ public class KunCourseItem {
         }
 
         @Override
-        public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+        public boolean isCorrectToolForDrops(@NotNull ItemStack stack, @NotNull BlockState state) {
             if (state.is(ModBlocks.MYBLOCK.get())) {
                 return true;
             }
@@ -82,6 +85,23 @@ public class KunCourseItem {
         @Override
         public float getDestroySpeed(ItemStack stack, BlockState state) {
             return super.getDestroySpeed(stack, state) * 4.0f;
+        }
+
+        @Override
+        public boolean mineBlock(ItemStack stack, @NotNull Level level, BlockState state,
+                                 BlockPos pos, LivingEntity miningEntity) {
+            boolean result = super.mineBlock(stack, level, state, pos, miningEntity);
+
+            if (!level.isClientSide()) {
+                SoundEvent sound = Tools.getIndexSound(Tools.FINAL_MINING_SOUND, level);
+                level.playSound(null, pos,
+                        sound, SoundSource.BLOCKS,
+                        0.8F,
+                        1.0F + (level.getRandom().nextFloat() - 0.5F) * 0.2F
+                );
+            }
+
+            return result;
         }
 
         @Override
