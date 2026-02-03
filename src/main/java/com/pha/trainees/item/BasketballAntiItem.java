@@ -1,6 +1,7 @@
 package com.pha.trainees.item;
 
 
+import com.pha.trainees.item.interfaces.HoverText;
 import com.pha.trainees.registry.ModBlocks;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -32,7 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BasketballAntiItem extends SplashPotionItem {
+public class BasketballAntiItem extends SplashPotionItem implements HoverText {
 
     public BasketballAntiItem(Properties properties) {
         super(properties);
@@ -71,7 +72,6 @@ public class BasketballAntiItem extends SplashPotionItem {
             // 获取玩家视线指向的方块位置
             BlockHitResult blockhitresult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
 
-            // 如果玩家视线指向了某个方块
             if (blockhitresult.getType() == HitResult.Type.BLOCK) {
                 // 尝试放置方块
                 InteractionResult placementResult = this.tryPlaceBlock(new BlockPlaceContext(
@@ -79,7 +79,6 @@ public class BasketballAntiItem extends SplashPotionItem {
                 ));
 
                 if (placementResult.consumesAction()) {
-                    // 放置成功，消耗物品
                     if (!player.getAbilities().instabuild) {
                         itemstack.shrink(1);
                     }
@@ -87,7 +86,6 @@ public class BasketballAntiItem extends SplashPotionItem {
                 }
             }
 
-            // 放置失败，返回传递
             return InteractionResultHolder.pass(itemstack);
         } else {
             // 正常投掷药水，但不消耗物品
@@ -96,26 +94,6 @@ public class BasketballAntiItem extends SplashPotionItem {
         }
     }
 
-    // 获取玩家视线指向的方块
-    public static BlockHitResult getPlayerPOVHitResult(Level level, Player player, ClipContext.Fluid fluidMode) {
-        // 获取玩家视线方向
-        float f = player.getXRot();
-        float f1 = player.getYRot();
-        Vec3 vec3 = player.getEyePosition();
-        float f2 = Mth.cos(-f1 * ((float)Math.PI / 180F) - (float)Math.PI);
-        float f3 = Mth.sin(-f1 * ((float)Math.PI / 180F) - (float)Math.PI);
-        float f4 = -Mth.cos(-f * ((float)Math.PI / 180F));
-        float f5 = Mth.sin(-f * ((float)Math.PI / 180F));
-        float f6 = f3 * f4;
-        float f7 = f2 * f4;
-        double d0 = player.getBlockReach();
-        Vec3 vec31 = vec3.add((double)f6 * d0, (double)f5 * d0, (double)f7 * d0);
-
-        // 返回视线与方块的碰撞结果
-        return level.clip(new ClipContext(vec3, vec31, ClipContext.Block.OUTLINE, fluidMode, player));
-    }
-
-    // 尝试放置方块
     // 在tryPlaceBlock方法中添加保存NBT数据的逻辑
     private InteractionResult tryPlaceBlock(BlockPlaceContext context) {
         Level level = context.getLevel();
@@ -127,17 +105,14 @@ public class BasketballAntiItem extends SplashPotionItem {
             BlockState stateToPlace = ModBlocks.BASKETBALL_ANTI_BLOCK.get().getStateForPlacement(context);
 
             if (stateToPlace != null && level.setBlock(pos, stateToPlace, 11)) {
-                // 方块放置成功
                 level.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
                 return InteractionResult.SUCCESS;
             }
         }
 
-        // 放置失败
         return InteractionResult.FAIL;
     }
 
-    // 投掷药水但不消耗物品
     private void throwPotionWithoutConsuming(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
 
@@ -177,20 +152,12 @@ public class BasketballAntiItem extends SplashPotionItem {
             }
         }
 
-        // 默认行为（传递）
         return InteractionResult.PASS;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltipComponents, flag);
-
-        if (flag.isAdvanced()) {
-            tooltipComponents.add(Component.translatable("tooltip.trainees.basketball_anti_item"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.basketball_anti_item.2"));
-        }
-        else {
-            tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-        }
+        addHoverText(stack, level, tooltipComponents, flag, "basketball_anti_item");
     }
 }

@@ -48,11 +48,9 @@ public class TRAIN{
             ));//修复材料
 
 
-
-
     // ==========  I ==========
     public static class I implements ArmorMaterial {
-        private static final int level=0;
+        private static final int level = 0;
         @Override
         public int getDurabilityForType(ArmorItem.Type type) {return DURABILITY_PER_SLOT[type.getSlot().getIndex()] * DURABILITY_PER_SLOT_COEFFICIENT[level];}
         @Override
@@ -77,7 +75,7 @@ public class TRAIN{
 
     // ==========  II ==========
     public static class II implements ArmorMaterial {
-        private static final int level=1;
+        private static final int level = 1;
         @Override
         public int getDurabilityForType(ArmorItem.Type type) {return DURABILITY_PER_SLOT[type.getSlot().getIndex()] * DURABILITY_PER_SLOT_COEFFICIENT[level];}
         @Override
@@ -102,7 +100,7 @@ public class TRAIN{
 
     // ==========  III ==========
     public static class III implements ArmorMaterial {
-        private static final int level=2;
+        private static final int level = 2;
         @Override
         public int getDurabilityForType(ArmorItem.Type type) {return DURABILITY_PER_SLOT[type.getSlot().getIndex()] * DURABILITY_PER_SLOT_COEFFICIENT[level];}
         @Override

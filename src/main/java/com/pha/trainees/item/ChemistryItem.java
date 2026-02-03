@@ -1,6 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.util.game.chemistry.ReactionSystem;
+import com.pha.trainees.item.interfaces.Chemistry;
+import com.pha.trainees.item.interfaces.HoverText;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BookItem;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class ChemistryItem {
 
-    public static class ChemistryBookItem extends BookItem {
+    public static class ChemistryBookItem extends BookItem implements HoverText {
 
 
         public ChemistryBookItem(Properties properties) {
@@ -26,11 +27,12 @@ public class ChemistryItem {
             super.appendHoverText(stack, level, tooltipComponents, flag);
 
             if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.title"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.pre"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.che_book.content"));
+                String id = "che_book";
+                tooltipComponents.add(getTooltip(id, "title"));
+                tooltipComponents.add(getTooltip(id, "pre"));
+                tooltipComponents.add(getTooltip(id, "context"));
             } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+                addTip(tooltipComponents);
             }
         }
     }
@@ -67,107 +69,70 @@ public class ChemistryItem {
 
 
     */
+
+
     /// 氧化物
     // 氧化鸡
-    public static class Ji2O extends Item {
+    public static class Ji2O extends Item implements Chemistry, HoverText {
         public Ji2O(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "ji2o");
         }
     }
 
     // 过氧化鸡
-    public static class Ji2O2 extends Item {
+    public static class Ji2O2 extends Item implements Chemistry, HoverText{
         public Ji2O2(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o2"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.ji2o2.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "ji2o2");
         }
     }
 
     // 二氧化黑
-    public static class BpO2 extends Item {
+    public static class BpO2 extends Item implements Chemistry, HoverText{
         public BpO2(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo2"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo2.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "bpo2");
         }
     }
 
     // 三氧化黑
-    public static class BpO3 extends Item {
+    public static class BpO3 extends Item implements Chemistry, HoverText{
         public BpO3(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo3"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.bpo3.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "bpo3");
         }
     }
-
-
 
 
 ///     酸
 
     // 黑化氢
-    public static class HBp extends Item {
+    public static class HBp extends Item implements Chemistry, HoverText{
         public HBp(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbp"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbp.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "hbp");
         }
     }
 
     // 次黑酸
-    public static class HBpO extends Item {
+    public static class HBpO extends Item implements Chemistry, HoverText{
         public HBpO(Properties p_41383_) {super(p_41383_);}
-
-        public static boolean on(ItemStack stack, ItemEntity entity) {
-            if (!entity.level().isClientSide) {
-                return ReactionSystem.ReactionRegistry.triggerReactions(stack, entity);
-            }
-            return false;
-        }
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
@@ -177,140 +142,93 @@ public class ChemistryItem {
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "hbpo");
         }
     }
 
     // 黑酸
-    public static class HBpO3 extends Item {
+    public static class HBpO3 extends Item implements Chemistry, HoverText{
         public HBpO3(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo3"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo3.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "hbpo3");
         }
     }
 
     // 高黑酸
-    public static class HBpO4 extends Item {
+    public static class HBpO4 extends Item implements Chemistry, HoverText{
         public HBpO4(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo4"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.hbpo4.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "hbpo4");
         }
     }
+
 
     /// 碱
 
     // 氢氧化鸡
-    public static class JiOH extends Item {
+    public static class JiOH extends Item implements Chemistry, HoverText{
         public JiOH(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jioh"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jioh.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "jioh");
         }
     }
 
 
     /// 盐
     // 黑化鸡
-    public static class JiBp extends Item {
+    public static class JiBp extends Item implements Chemistry, HoverText{
         public JiBp(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibp"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibp.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "jibp");
         }
     }
 
     // 次黑酸鸡
-    public static class JiBpO extends Item {
+    public static class JiBpO extends Item implements Chemistry, HoverText{
         public JiBpO(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "jibpo");
         }
     }
 
     // 黑酸鸡
-    public static class JiBpO3 extends Item {
+    public static class JiBpO3 extends Item implements Chemistry, HoverText{
         public JiBpO3(Properties p_41383_) {super(p_41383_);}
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo3"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo3.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "jibpo3");
         }
     }
 
     // 高黑酸鸡
-    public static class JiBpO4 extends Item {
-        public JiBpO4(Properties p_41383_) {super(p_41383_);}
+    public static class JiBpO4 extends Item implements Chemistry, HoverText {
+        public JiBpO4(Properties p_41383_) {
+            super(p_41383_);
+        }
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo4"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.jibpo4.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "jibpo4");
         }
     }
-
-
-
-
 }
+
+

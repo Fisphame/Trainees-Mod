@@ -1,152 +1,65 @@
 package com.pha.trainees.item;
 
+import com.pha.trainees.item.interfaces.HoverText;
+import com.pha.trainees.item.interfaces.Scythe;
 import com.pha.trainees.util.math.MAth;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ScytheCourseItem {
-    public static class ScytheItem extends SwordItem {
+public class ScytheCourseItem{
+    public static abstract class BaseScytheItem extends SwordItem implements Scythe, HoverText {
+        private final int tier;
+        private final String itemId;
+
+        public BaseScytheItem(Tier tier, int attackDamage, float attackSpeed,
+                              Properties properties, int tierIndex, String itemId) {
+            super(tier, attackDamage, attackSpeed, properties);
+            this.tier = tierIndex;
+            this.itemId = itemId;
+        }
+
+        @Override
+        public int getTierIndex() {
+            return tier;
+        }
+
+        @Override
+        public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+            return onHurtEnemy(stack, target, attacker) &&
+                    super.hurtEnemy(stack, target, attacker);
+        }
+
+        @Override
+        public void appendHoverText(ItemStack stack, @Nullable Level level,
+                                    List<Component> tooltipComponents, TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltipComponents, flag);
+            addHoverText(stack, level, tooltipComponents, flag, itemId);
+        }
+    }
+
+    public static class ScytheItem extends BaseScytheItem {
         public ScytheItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
-            super(tier, attackDamage, attackSpeed, properties);
-        }
-        private static final float SWEEP_RADIUS = 2F; // 横扫范围（原版为1.0）
-        private static final float SWEEP_DAMAGE_MULTIPLIER = 2F; // 伤害倍率（原版为1.0）
-
-        @Override
-        public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-            if (!attacker.level().isClientSide && attacker instanceof Player player) {
-                // 检测是否满足横扫条件（原版逻辑）
-                float attackStrength = player.getAttackStrengthScale(0.5F);
-                if (attackStrength > 0.9F) {
-                    // 获取范围内的所有生物
-                    AABB area = target.getBoundingBox().inflate(SWEEP_RADIUS, 0.25, SWEEP_RADIUS);
-                    List<LivingEntity> entities = player.level().getEntitiesOfClass(
-                            LivingEntity.class, area,
-                            e -> e != player && e != target && !e.isAlliedTo(player)
-                    );
-
-                    // 对每个生物应用伤害
-                    for (LivingEntity entity : entities) {
-                        float baseDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                        float sweepDamage = baseDamage * SWEEP_DAMAGE_MULTIPLIER;
-                        entity.hurt(player.damageSources().playerAttack(player), sweepDamage);
-                    }
-                }
-            }
-            return super.hurtEnemy(stack, target, attacker);
-        }
-
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
-            super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.scythe_item.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            super(tier, attackDamage, attackSpeed, properties, 0, "scythe_item");
         }
     }
 
-    public static class CompoundScytheItem extends SwordItem {
+    public static class CompoundScytheItem extends BaseScytheItem {
         public CompoundScytheItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
-            super(tier, attackDamage, attackSpeed, properties);
-        }
-        private static final float SWEEP_RADIUS = 4F; // 横扫范围（原版为1.0）
-        private static final float SWEEP_DAMAGE_MULTIPLIER = 6F; // 伤害倍率（原版为1.0）
-
-        @Override
-        public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-            // 仅在主线程处理，避免客户端逻辑干扰
-            if (!attacker.level().isClientSide && attacker instanceof Player player) {
-                // 检测是否满足横扫条件（原版逻辑）
-                float attackStrength = player.getAttackStrengthScale(0.5F);
-                if (attackStrength > 0.9F) {
-                    // 获取范围内的所有生物
-                    AABB area = target.getBoundingBox().inflate(SWEEP_RADIUS, 0.25, SWEEP_RADIUS);
-                    List<LivingEntity> entities = player.level().getEntitiesOfClass(
-                            LivingEntity.class, area,
-                            e -> e != player && e != target && !e.isAlliedTo(player)
-                    );
-
-                    // 对每个生物应用伤害
-                    for (LivingEntity entity : entities) {
-                        float baseDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                        float sweepDamage = baseDamage * SWEEP_DAMAGE_MULTIPLIER;
-                        entity.hurt(player.damageSources().playerAttack(player), sweepDamage);
-                    }
-                }
-            }
-            return super.hurtEnemy(stack, target, attacker);
-        }
-
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
-            super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.compound_scythe_item.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            super(tier, attackDamage, attackSpeed, properties, 1, "compound_scythe_item");
         }
     }
 
-    public static class BlackPowderScytheItem extends SwordItem {
+    public static class BlackPowderScytheItem extends BaseScytheItem {
         public BlackPowderScytheItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
-            super(tier, attackDamage, attackSpeed, properties);
-        }
-        private static final float SWEEP_RADIUS = MAth.MATH99; // 横扫范围（原版为1.0）
-        private static final float SWEEP_DAMAGE_MULTIPLIER = MAth.MATH99; // 伤害倍率（原版为1.0）
-
-        @Override
-        public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-            // 仅在主线程处理，避免客户端逻辑干扰
-            if (!attacker.level().isClientSide && attacker instanceof Player player) {
-                // 检测是否满足横扫条件（原版逻辑）
-                float attackStrength = player.getAttackStrengthScale(0.5F);
-                if (attackStrength > 0.9F) {
-                    // 获取范围内的所有生物
-                    AABB area = target.getBoundingBox().inflate(SWEEP_RADIUS, 0.25, SWEEP_RADIUS);
-                    List<LivingEntity> entities = player.level().getEntitiesOfClass(
-                            LivingEntity.class, area,
-                            e -> e != player && e != target && !e.isAlliedTo(player)
-                    );
-
-                    // 对每个生物应用伤害
-                    for (LivingEntity entity : entities) {
-                        float baseDamage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                        float sweepDamage = baseDamage * SWEEP_DAMAGE_MULTIPLIER;
-                        entity.hurt(player.damageSources().playerAttack(player), sweepDamage);
-                    }
-                }
-            }
-            return super.hurtEnemy(stack, target, attacker);
-        }
-
-        @Override
-        public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
-            super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.black_powder_scythe_item.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            super(tier, attackDamage, attackSpeed, properties, 2, "black_powder_scythe_item");
         }
     }
 }

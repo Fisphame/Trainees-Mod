@@ -1,5 +1,6 @@
 package com.pha.trainees.util.game;
 
+import com.pha.trainees.Main;
 import com.pha.trainees.enchantments.*;
 import com.pha.trainees.item.AuriversiteRapierItem;
 import com.pha.trainees.item.KunCourseItem;
@@ -16,6 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.core.particles.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,9 +42,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -1902,6 +1906,12 @@ public class Tools {
          */
         public static float getEffectiveMaxKineticEnergy(ItemStack stack) {
             return getModifiedMaxKineticEnergy(stack, KineticData.MAX_KINETIC_ENERGY);
+        }
+    }
+
+    public static class Strings {
+        public static class HoverText{
+
         }
     }
 

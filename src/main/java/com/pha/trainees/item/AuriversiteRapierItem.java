@@ -1,13 +1,10 @@
 package com.pha.trainees.item;
 
 import com.pha.trainees.item.interfaces.Chargeable;
+import com.pha.trainees.item.interfaces.HoverText;
 import com.pha.trainees.item.interfaces.KineticWeapon;
-import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.math.MAth;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -22,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class AuriversiteRapierItem extends SwordItem implements Chargeable, KineticWeapon {
+public class AuriversiteRapierItem extends SwordItem implements Chargeable, KineticWeapon, HoverText {
     public static final String TAG_KINETIC_UPDATE_ENABLED = "KineticUpdateEnabled";
 
     public AuriversiteRapierItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
@@ -32,10 +29,7 @@ public class AuriversiteRapierItem extends SwordItem implements Chargeable, Kine
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         float damage = applyKineticDamage(stack, target, attacker);
-        if (KineticWeapon.isKineticUpdateEnabled(stack) && attacker instanceof Player player) {
-            Tools.Particle.send(player.level(), ParticleTypes.LAVA, target.getX(), target.getY(), target.getZ(),
-                    MAth.inInterval((int) (damage * 2.5f), 10, 500), 0.1, 0.1, 0.1, 0.1);
-        }
+        applyParticle(stack, target, attacker, damage);
 
         return super.hurtEnemy(stack, target, attacker);
     }
@@ -44,9 +38,7 @@ public class AuriversiteRapierItem extends SwordItem implements Chargeable, Kine
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
 
-        // 只在服务器端更新动能
         if (!level.isClientSide) {
-            // 根据NBT状态决定是否更新动能
             if (KineticWeapon.isKineticUpdateEnabled(stack)) {
                 updateKineticEnergy(level, entity, stack, isSelected);
             }
@@ -61,17 +53,8 @@ public class AuriversiteRapierItem extends SwordItem implements Chargeable, Kine
             return charge(level, player, hand);
         }
         if (!level.isClientSide()) {
-            boolean currentState = KineticWeapon.isKineticUpdateEnabled(stack);
-            boolean newState = !currentState;
-            KineticWeapon.setKineticUpdateEnabled(stack, newState);
-
-            Component message = Component.literal(newState ? "--[ - ]--" : "--[ x ]--")
-                    .withStyle(newState ? ChatFormatting.GREEN : ChatFormatting.RED);
-            player.displayClientMessage(message, true);
-            player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.5f, 1.0f);
+            changeEnabled(stack, player);
         }
-
-        player.swing(hand); // 播放挥手动画
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
 
@@ -82,32 +65,21 @@ public class AuriversiteRapierItem extends SwordItem implements Chargeable, Kine
         return 15;
     }
 
-    /**
-     * 切换物品的动能更新状态
-     * @return 切换后的新状态
-     */
-    public static boolean toggleKineticUpdateEnabled(ItemStack stack) {
-        boolean current = KineticWeapon.isKineticUpdateEnabled(stack);
-        boolean newState = !current;
-        KineticWeapon.setKineticUpdateEnabled(stack, newState);
-        return newState;
-    }
-
     @Override
     public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltipComponents, flag);
 
         if (flag.isAdvanced()) {
             boolean enabled = KineticWeapon.isKineticUpdateEnabled(stack);
-            tooltipComponents.add(Component.translatable("tooltip.trainees.auriversite_rapier"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.auriversite_rapier.2.1"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.auriversite_rapier.2.2"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.auriversite_rapier.state")
-                    .append(Component.translatable(enabled ? "tooltip.trainees.auriversite_rapier.on" :
-                                    "tooltip.trainees.auriversite_rapier.off")
+            String id = "auriversite_rapier";
+            tooltipComponents.add(getTooltip(id));
+            tooltipComponents.add(getTooltip(id, 2, 1));
+            tooltipComponents.add(getTooltip(id, 2, 2));
+            tooltipComponents.add(getTooltip(id, "state")
+                    .append(tr(enabled ? ky(id, "on") : ky(id, "off"))
                             .withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.RED)));
         } else {
-            tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
+            addTip(tooltipComponents);
         }
     }
 }

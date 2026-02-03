@@ -1,5 +1,7 @@
 package com.pha.trainees.item;
 
+import com.pha.trainees.item.interfaces.HoverText;
+import com.pha.trainees.item.interfaces.MineBlock;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -24,7 +26,7 @@ public class LongCourseItem {
         }
     }
 
-    public static class RealPickaxeItem extends PickaxeItem {
+    public static class RealPickaxeItem extends PickaxeItem implements MineBlock, HoverText {
         public RealPickaxeItem(Tier p_42961_, int p_42962_, float p_42963_, Properties p_42964_) {
             super(p_42961_, p_42962_, p_42963_, p_42964_);
         }
@@ -33,28 +35,14 @@ public class LongCourseItem {
         public boolean mineBlock(ItemStack stack, @NotNull Level level, BlockState state,
                                  BlockPos pos, LivingEntity miningEntity) {
             boolean result = super.mineBlock(stack, level, state, pos, miningEntity);
-
-            if (!level.isClientSide()) {
-                SoundEvent sound = Tools.getIndexSound(Tools.MINING_SOUNDS, level);
-                level.playSound(null, pos,
-                        sound, SoundSource.BLOCKS,
-                        0.8F,
-                        1.0F);
-            }
-
+            whatDoesItMeanMining(level, pos);
             return result;
         }
 
         @Override
         public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltipComponents, flag);
-
-            if (flag.isAdvanced()) {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.real_pickaxe_item"));
-                tooltipComponents.add(Component.translatable("tooltip.trainees.real_pickaxe_item.2"));
-            } else {
-                tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-            }
+            addHoverText(stack, level, tooltipComponents, flag, "real_pickaxe_item");
         }
     }
 }

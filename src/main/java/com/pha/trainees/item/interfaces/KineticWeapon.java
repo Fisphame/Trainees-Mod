@@ -1,8 +1,12 @@
 package com.pha.trainees.item.interfaces;
 
-
+import com.pha.trainees.util.game.Tools;
+import com.pha.trainees.util.math.MAth;
 import com.pha.trainees.util.physics.KineticEnergySystem;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -34,6 +38,25 @@ public interface KineticWeapon {
         }
         return 0;
     }
+
+    default void applyParticle(ItemStack stack, LivingEntity target, LivingEntity attacker, float damage){
+        if (KineticWeapon.isKineticUpdateEnabled(stack) && attacker instanceof Player player) {
+            Tools.Particle.send(player.level(), ParticleTypes.LAVA, target.getX(), target.getY(), target.getZ(),
+                    MAth.inInterval((int) (damage * 3f), 10, 500), 0.1, 0.1, 0.1, 0.1);
+        }
+    }
+
+    default boolean changeEnabled(ItemStack stack, Player player){
+        boolean currentState = KineticWeapon.isKineticUpdateEnabled(stack);
+        boolean newState = !currentState;
+        KineticWeapon.setKineticUpdateEnabled(stack, newState);
+
+        Component message = Component.literal(newState ? "--[ - ]--" : "--[ x ]--")
+                .withStyle(newState ? ChatFormatting.GREEN : ChatFormatting.RED);
+        player.displayClientMessage(message, true);
+        return newState;
+    }
+
 
     /**
      * 默认的动能更新状态键名

@@ -1,5 +1,6 @@
 package com.pha.trainees.item;
 
+import com.pha.trainees.item.interfaces.HoverText;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import net.minecraft.client.gui.screens.Screen;
@@ -23,7 +24,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 
-public class Duihuanquan extends Item {
+public class Duihuanquan extends Item implements HoverText {
     public Duihuanquan(Properties p_41383_){
         super(p_41383_);
     }
@@ -49,13 +50,7 @@ public class Duihuanquan extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltipComponents, flag);
-
-        if (flag.isAdvanced()) {
-            tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan"));
-            tooltipComponents.add(Component.translatable("tooltip.trainees.duihuanquan.2"));
-        } else {
-            tooltipComponents.add(Component.translatable("tooltip.trainees.item.press_shift"));
-        }
+        addHoverText(stack, level, tooltipComponents, flag, "duihuanquan");
     }
 }
 
