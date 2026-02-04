@@ -6,5 +6,5 @@
 A Minecraft Forge mod that adds something fun? to the game.
 
 # Installation
-Download the mod from [Releases](https://github.com/Fisphamce/Trainees-Mod/releases)
-Of course, you can also select "release" branch to download
+Download the mod from where?
+idk, more on that later.
