@@ -12,10 +12,26 @@ out
 *.iws
 *.iml
 .idea
+*.project
+.settings/
 
 # gradle
 build
 .gradle
+.gradle/
+build/
+out/
+bin/
+classes/
+!src/main/resources/
+!src/test/resources/
+
+# Runtime
+run/
+logs/
+crash-reports/
+debug/
+hs_err_*.log
 
 # other
 eclipse
@@ -23,3 +39,28 @@ run
 
 # Files from Forge MDK
 forge*changelog.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ForgeGradle
+eclipse/
+runData/
+buildData/
+
+# Local
+local/
+.gradle/loom-cache/
+
+# Mod Development
+src/generated/
+src/main/resources/data/curios/tags/
+
+# User-specific
+*.properties
+*.cfg
+config/
+saves/
+resourcepacks/
+shaderpacks/

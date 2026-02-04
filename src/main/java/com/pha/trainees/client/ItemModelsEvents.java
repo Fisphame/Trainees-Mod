@@ -15,11 +15,11 @@ public class ItemModelsEvents {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void registerModels(ModelEvent.RegisterAdditional event) {
-        event.register(new ModelResourceLocation(
-                new ResourceLocation(Main.MODID, "real_diamond_pickaxe"), "inventory"
-        ));
-        event.register(new ModelResourceLocation(
-                new ResourceLocation(Main.MODID, "long_stick"),"inventory"
-        ));
+//        event.register(new ModelResourceLocation(
+//                new ResourceLocation(Main.MODID, "real_diamond_pickaxe"), "inventory"
+//        ));
+//        event.register(new ModelResourceLocation(
+//                new ResourceLocation(Main.MODID, "long_stick"),"inventory"
+//        ));
     }
 }

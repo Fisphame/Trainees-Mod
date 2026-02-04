@@ -8,7 +8,6 @@ import net.minecraft.world.item.Item;
 
 public class ModTags {
 
-    // 自定义物品标签
     public static final TagKey<Item> POWDER_ANTI_2 = create("powder_anti_2");
     public static final TagKey<Item> KUN_ITEMS = create("kun_items");
     public static final TagKey<Item> CHEMISTRY_ITEMS = create("chemistry_items");

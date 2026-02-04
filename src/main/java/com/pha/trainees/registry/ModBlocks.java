@@ -3,6 +3,7 @@ package com.pha.trainees.registry;
 import com.pha.trainees.Main;
 import com.pha.trainees.block.*;
 import com.pha.trainees.block.entity.KunAltarBlockEntity;
+import com.pha.trainees.blockentity.PurificationStationBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -25,6 +26,14 @@ public class ModBlocks {
                                 KunAltarBlockEntity::new,
                                 ModBlocks.KUN_ALTAR.get()
                         ).build(null));
+
+        public static final RegistryObject<BlockEntityType<PurificationStationBlockEntity>> PURIFICATION_STATION =
+                BLOCK_ENTITIES.register("purification_station",
+                        () -> BlockEntityType.Builder.of(
+                                PurificationStationBlockEntity::new,
+                                ModBlocks.PURIFICATION_STATION.get()
+                        ).build(null)
+                );
     }
 
     public static final DeferredRegister<Block> BLOCKS =

@@ -6,8 +6,11 @@ import com.pha.trainees.registry.*;
 import com.pha.trainees.thetwice.Object;
 import com.pha.trainees.util.game.chemistry.ChemicalReaction;
 import com.pha.trainees.util.game.chemistry.ReactionConditions;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -19,14 +22,9 @@ public class Main {
     public static final String MODID = "trainees";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-
-
     public Main() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus ebus = MinecraftForge.EVENT_BUS;
-
-        Object.ITEMS.register(bus);
-
 
         ModBlocks.BLOCKS.register(bus);
         ModBlocks.ModBlockEntities.BLOCK_ENTITIES.register(bus);
@@ -45,31 +43,25 @@ public class Main {
         HiddenItem.BLOCKS.register(bus);
         HiddenItem.ITEMS.register(bus);
         ModCreativeModeTabs.CREATIVE_MODE_TABS.register(bus);
-        ModBlockEntities.BLOCK_ENTITIES.register(bus);
         ModMenuTypes.MENUS.register(bus);
         ModRecipeTypes.RECIPE_SERIALIZERS.register(bus);
         ModRecipeTypes.RECIPE_TYPES.register(bus);
         ModFluid.FLUID_TYPES.register(bus);
         ModFluid.FLUIDS.register(bus);
         ModCommand.register();
-//        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, TraineesConfig.SPEC);
 
+        Object.ITEMS.register(bus);
 
-        bus.register(new RegisterAttributes());
+        bus.register(new Register());
         bus.addListener(this::commonSetup);
-
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
-//        ebus.register(MiningSoundEvents.class);
         ebus.register(SweepHandler.class);
-//        ebus.register(RegisterModels.class);
-//        ebus.register(RegisterAttributes.class);
+        // 注册我们的事件处理器
+//        ebus.register(this);
 
-        // 注册配置屏幕
-//        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
-
-//        setupMixinCompatibility();
-
+        // 注册ModRegistries的RegisterEvent监听
+//        ebus.addListener(Register::onRegisterEvent);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -97,25 +89,4 @@ public class Main {
 
         Main.LOGGER.info("Chemistry System: commonSetup completed");
     }
-
-//    private void setupMixinCompatibility() {
-//        // 检查是否有冲突的 Mixin
-//        try {
-//            // 确保使用正确的映射表
-//            System.setProperty("mixin.env.compatLevel", "JAVA_17");
-//            System.setProperty("mixin.checks", "true");
-//        } catch (Exception e) {
-//            LOGGER.warn("Mixin compatibility setup failed, but continuing...");
-//        }
-//    }
-
-//    private void onClientSetup(final FMLClientSetupEvent event) {
-//        // 注册配置屏幕工厂
-//        ModLoadingContext.get().registerExtensionPoint(
-//                ConfigScreenHandler.ConfigScreenFactory.class,
-//                () -> new ConfigScreenHandler.ConfigScreenFactory(
-//                        (minecraft, screen) -> new TraineesConfigScreen(screen)
-//                )
-//        );
-//    }
 }

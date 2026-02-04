@@ -5,12 +5,14 @@ import com.pha.trainees.entity.GoldChickenEntity;
 import com.pha.trainees.entity.KunAntiEntity;
 import com.pha.trainees.entity.KunTraineesEntity;
 import com.pha.trainees.registry.ModEntities;
+import net.minecraft.core.registries.Registries;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.RegisterEvent;
 
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class RegisterAttributes {
+public class Register {
     @SubscribeEvent
     public static void entityAttributeCreation(EntityAttributeCreationEvent event) {
         event.put(ModEntities.KUN_TRAINEES.get(), KunTraineesEntity.createAttributes().build());

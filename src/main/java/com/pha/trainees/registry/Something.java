@@ -274,10 +274,8 @@ public class Something {
     public static class Paintings {
         public static final DeferredRegister<PaintingVariant> PAINTING_VARIANTS =
                 DeferredRegister.create(ForgeRegistries.PAINTING_VARIANTS, Main.MODID);
-        private static RegistryObject<PaintingVariant> rpv(String name,int width,int height) {
-            return PAINTING_VARIANTS.register(name,
-                    () -> new PaintingVariant(width, height)
-            );
+        private static RegistryObject<PaintingVariant> rpv(String name, int width, int height) {
+            return PAINTING_VARIANTS.register(name, () -> new PaintingVariant(width, height));
         }
 
         //画作 - 参数：(宽度, 高度) 单位：像素

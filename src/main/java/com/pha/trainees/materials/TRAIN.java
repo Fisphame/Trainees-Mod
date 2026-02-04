@@ -1,6 +1,7 @@
 package com.pha.trainees.materials;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.registry.ModItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -44,8 +45,7 @@ public class TRAIN{
             // 纹理路径: train_i(i)(i)_layer_1.png
     }; //材质名字
     private static final Supplier<Ingredient> REPAIR_MATERIAL = () ->
-            Ingredient.of(ForgeRegistries.ITEMS.getValue(new ResourceLocation(Main.MODID, "two_half_ingot")
-            ));//修复材料
+            Ingredient.of(ModItems.TWO_HALF_INGOT.get());
 
 
     // ==========  I ==========
