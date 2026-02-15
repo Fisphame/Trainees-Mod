@@ -2,7 +2,7 @@ package com.pha.trainees.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.pha.trainees.block.entity.KunAltarBlockEntity;
+import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;

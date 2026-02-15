@@ -2,10 +2,8 @@ package com.pha.trainees.multiblock;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.block.KunAltarBlock;
-import com.pha.trainees.block.entity.KunAltarBlockEntity;
-import com.pha.trainees.materials.TRAIN;
+import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.registry.ModBlocks;
-import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.util.game.ItemPair4;
 import com.pha.trainees.util.game.ItemPair4Manager;
 import com.pha.trainees.util.game.KunAltarType;
@@ -17,14 +15,10 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.function.BiConsumer;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Trainer Altar 多方块结构
@@ -32,19 +26,14 @@ import java.util.function.BiConsumer;
 public class TrainerAltarPattern {
     public static final String STRUCTURE_ID = "trainees:trainer_altar";
 
-    public static final ItemPair4[] PAIRS = new ItemPair4[]{
-            new ItemPair4(ModItems.TWO_HALF_INGOT.get(), ModItems.TWO_HALF_INGOT.get(),
-                    ModItems.TWO_HALF_INGOT.get(), ModItems.TWO_HALF_INGOT.get(),
-                    new ItemStack(ModItems.TWO_HALF_INGOT.get(), 9)),
-            new ItemPair4(ModItems.GOLD_FEATHER.get(), ModItems.GOLD_FEATHER.get(),
-                    ModItems.GOLD_FEATHER.get(), Items.AIR,
-                    new ItemStack(ModItems.KUN_EGG.get(), 1))
-    };
+    public static ActiveStructureManager manager;
     public static final ItemPair4Manager pair4Manager = new ItemPair4Manager();
+    // 1 - north  2 - east  3 - south  4 - west
     public static KunAltarBlockEntity altarBlockEntity1;
     public static KunAltarBlockEntity altarBlockEntity2;
     public static KunAltarBlockEntity altarBlockEntity3;
     public static KunAltarBlockEntity altarBlockEntity4;
+
 
     public static void register() {
         // 创建激活处理器
@@ -157,100 +146,62 @@ public class TrainerAltarPattern {
         @Override
         public void onActivate(Level level, BlockPos matchPos) {
             Main.LOGGER.info("Trainer Altar activated at {}", matchPos);
+            double x = matchPos.getX(); double y = matchPos.getY(); double z = matchPos.getZ();
+            Vec3 center = Tools.BlockCourse.getCenter(matchPos);
+            double cx = center.x; double cy = center.y; double cz = center.z;
 
             // 记录激活状态
-            ActiveStructureManager manager = ActiveStructureManager.get(level);
+            manager = ActiveStructureManager.get(level);
             manager.addActiveStructure(level, STRUCTURE_ID, matchPos);
 
             if (level.isClientSide) return;
 
-            level.playSound(null, matchPos,
-                    SoundEvents.BEACON_ACTIVATE,
-                    SoundSource.BLOCKS,
-                    1.0F, 1.0F);
-            Tools.Particle.send(
-                    level, ParticleTypes.SOUL_FIRE_FLAME,
-                    matchPos.getX() + 0.5, matchPos.getY() + 0.5, matchPos.getZ() + 0.5,
-                    200,          // 数量
-                    0.5, 0, 0.5,  // 偏移
-                    0.15       // 速度
-            );
-            Tools.Particle.send(
-                    level, ParticleTypes.FLAME,
-                    matchPos.getX() + 0.5, matchPos.getY() + 0.5, matchPos.getZ() + 0.5,
-                    200,          // 数量
-                    0.5, 0, 0.5,  // 偏移
-                    0.15       // 速度
-            );
+            level.playSound(null, matchPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0F, 1.0F);
+            Tools.Particle.send(level, ParticleTypes.SOUL_FIRE_FLAME, cx, cy, cz, 200, 0.5, 0, 0.5, 0.15);
+            Tools.Particle.send(level, ParticleTypes.FLAME, cx, cy, cz, 200, 0.5, 0, 0.5, 0.15);
 
-            // 寻找附近的玩家（用于发送消息）
-            Player nearestPlayer = level.getNearestPlayer(matchPos.getX(), matchPos.getY(), matchPos.getZ(), 10, false);
-            if (nearestPlayer != null) {
-                nearestPlayer.displayClientMessage(
-                        Component.literal("--[ - ]--").withStyle(ChatFormatting.GREEN),
-                        true
-                );
-            }
+
 
             saveActivationData(level, matchPos);
-
-            for (int i = 0; i < PAIRS.length; i ++) {
-                pair4Manager.registerPair(PAIRS[i]);
-            }
+            setAltarBlockEntities(level, matchPos);
+            TrainerAltarRecipes.registerRecipes(pair4Manager);
         }
 
         @Override
         public void onActivationFailed(Level level, BlockPos matchPos, String reason) {
+            double x = matchPos.getX(); double y = matchPos.getY(); double z = matchPos.getZ();
             // 给玩家反馈
-            Player nearestPlayer = level.getNearestPlayer(matchPos.getX(), matchPos.getY(), matchPos.getZ(), 10, false);
+            Player nearestPlayer = level.getNearestPlayer(x, y, z, 10, false);
             if (nearestPlayer != null) {
                 nearestPlayer.displayClientMessage(
-                        Component.literal("---!---：" + reason).withStyle(ChatFormatting.RED),
-                        true
+                        Component.literal("---!---：" + reason).withStyle(ChatFormatting.RED), true
                 );
             }
         }
 
         @Override
         public void onActiveTick(Level level, BlockPos matchPos, long activeTime) {
+            double x = matchPos.getX(); double y = matchPos.getY(); double z = matchPos.getZ();
+            Vec3 center = Tools.BlockCourse.getCenter(matchPos);
+            double cx = center.x; double cy = center.y; double cz = center.z;
             Tools.Particle.send(
-                    level, ParticleTypes.SOUL_FIRE_FLAME,
-                    matchPos.getX() + 0.5, matchPos.getY() + 0.5, matchPos.getZ() + 0.5,
-                    5,          // 数量
-                    3, 1, 3,  // 偏移
-                    0.01       // 速度
+                    level, ParticleTypes.SOUL_FIRE_FLAME, cx, cy, cz, 5, 3, 1, 3, 0.01
             );
             Tools.Particle.send(
-                    level, ParticleTypes.FLAME,
-                    matchPos.getX() + 0.5, matchPos.getY() + 0.5, matchPos.getZ() + 0.5,
-                    5,          // 数量
-                    3, 1, 3,  // 偏移
-                    0.01       // 速度
+                    level, ParticleTypes.FLAME, cx, cy, cz, 5, 3, 1, 3, 0.01
             );
+            ItemPair4 nowPair = getStoredItem();
 
-            // TODO: 执行合成/仪式逻辑
-            setAltarBlockEntities(level, matchPos);
-            if (altarBlockEntity1 == null){
-                Main.LOGGER.error("fuck null entity");
-                throw new NullPointerException("fuck");
-            }
-            ItemPair4 nowPair = new ItemPair4(
-                    altarBlockEntity1.getStoredItem().getItem(), altarBlockEntity2.getStoredItem().getItem(),
-                    altarBlockEntity3.getStoredItem().getItem(), altarBlockEntity4.getStoredItem().getItem(),
-                    null);
 //            Main.LOGGER.info(nowPair.toString());
-            ItemPair4 pair = pair4Manager.findMatchingPair(nowPair);
-            if (pair != null) {
-                ItemEntity itemEntity = new ItemEntity(level,
-                        matchPos.getX() + 0.5, matchPos.getY() + 2, matchPos.getZ() + 0.5,
-                        pair.getReItem());
-                Tools.EntityWay.spawnItemEntity(level, itemEntity);
-                altarBlockEntity1.clearStoredItem(); altarBlockEntity2.clearStoredItem();
-                altarBlockEntity3.clearStoredItem(); altarBlockEntity4.clearStoredItem();
-            }
-            else {
+//            ItemPair4 pair = pair4Manager.findMatchingPair(nowPair);
+//            if (pair != null) {
+//                ItemEntity itemEntity = new ItemEntity(level, cx, y + 2.0, cz, pair.getResultItem());
+//                Tools.EntityWay.spawnItemEntity(level, itemEntity);
+//                clearStoredItem();
+//            }
+//            else {
 //                Main.LOGGER.info("fuck pair is null fky");
-            }
+//            }
 
         }
 
@@ -292,45 +243,84 @@ public class TrainerAltarPattern {
         }
     }
 
-    /**
-     * 实用方法：从激活位置获取所有结构方块位置
-     */
-    public static void forEachStructureBlock(Level level, BlockPos corePos, BiConsumer<BlockPos, BlockState> consumer) {
-        // 计算结构原点
-        BlockPos originPos = corePos.offset(-2, -1, -2);
-
-        // 遍历所有结构位置
-        BlockPos[] positions = {
-                // 基础方块
-                originPos.offset(2, 0, 2),
-                originPos.offset(2, 2, 2),
-                // 核心方块
-                originPos.offset(2, 1, 2),
-                // KunAltar 方块
-                originPos.offset(0, 0, 2),
-                originPos.offset(4, 0, 2),
-                originPos.offset(2, 0, 0),
-                originPos.offset(2, 0, 4)
-        };
-
-        for (BlockPos pos : positions) {
-            BlockState state = level.getBlockState(pos);
-            consumer.accept(pos, state);
-        }
-    }
+//    /**
+//     * 实用方法：从激活位置获取所有结构方块位置
+//     */
+//    public static void forEachStructureBlock(Level level, BlockPos corePos,
+//                                             BiConsumer<BlockPos, BlockState> consumer) {
+//        // 计算结构原点
+//        BlockPos originPos = corePos.offset(-2, -1, -2);
+//
+//        // 遍历所有结构位置
+//        BlockPos[] positions = {
+//                // 基础方块
+//                originPos.offset(2, 0, 2),
+//                originPos.offset(2, 2, 2),
+//                // 核心方块
+//                originPos.offset(2, 1, 2),
+//                // KunAltar 方块
+//                originPos.offset(0, 0, 2),
+//                originPos.offset(4, 0, 2),
+//                originPos.offset(2, 0, 0),
+//                originPos.offset(2, 0, 4)
+//        };
+//
+//        for (BlockPos pos : positions) {
+//            BlockState state = level.getBlockState(pos);
+//            consumer.accept(pos, state);
+//        }
+//    }
 
     public static void setAltarBlockEntities(Level level, BlockPos corePos) {
-        if (level.getBlockEntity(corePos.offset(-3, -1, 0)) instanceof KunAltarBlockEntity blockEntity){
+        if (level.getBlockEntity(corePos.offset(0, -1, -3)) instanceof KunAltarBlockEntity blockEntity){
             altarBlockEntity1 = blockEntity;
         }
-        if (level.getBlockEntity(corePos.offset(0, -1, -3)) instanceof KunAltarBlockEntity blockEntity){
+        if (level.getBlockEntity(corePos.offset(3, -1, 0)) instanceof KunAltarBlockEntity blockEntity){
             altarBlockEntity2 = blockEntity;
         }
-        if (level.getBlockEntity(corePos.offset(3, -1, 0)) instanceof KunAltarBlockEntity blockEntity){
+        if (level.getBlockEntity(corePos.offset(0, -1, 3)) instanceof KunAltarBlockEntity blockEntity){
             altarBlockEntity3 = blockEntity;
         }
-        if (level.getBlockEntity(corePos.offset(0, -1, 3)) instanceof KunAltarBlockEntity blockEntity){
+        if (level.getBlockEntity(corePos.offset(-3, -1, 0)) instanceof KunAltarBlockEntity blockEntity){
             altarBlockEntity4 = blockEntity;
         }
     }
+
+    public static ItemPair4 getStoredItem() {
+        return new ItemPair4(
+                altarBlockEntity1.getStoredItem().getItem(),
+                altarBlockEntity2.getStoredItem().getItem(),
+                altarBlockEntity3.getStoredItem().getItem(),
+                altarBlockEntity4.getStoredItem().getItem(),
+                null
+        );
+    }
+
+    public void setStoredItem(ItemPair4 itemPair4) {
+        altarBlockEntity1.setStoredItem(new ItemStack(itemPair4.getItem1(), 1));
+        altarBlockEntity2.setStoredItem(new ItemStack(itemPair4.getItem2(), 1));
+        altarBlockEntity3.setStoredItem(new ItemStack(itemPair4.getItem3(), 1));
+        altarBlockEntity4.setStoredItem(new ItemStack(itemPair4.getItem4(), 1));
+    }
+
+    public static void clearStoredItem() {
+        altarBlockEntity1.clearStoredItem();
+        altarBlockEntity2.clearStoredItem();
+        altarBlockEntity3.clearStoredItem();
+        altarBlockEntity4.clearStoredItem();
+    }
+
+    public boolean hasStoredItem() {
+        return altarBlockEntity1.hasStoredItem() && altarBlockEntity2.hasStoredItem()
+                && altarBlockEntity3.hasStoredItem() && altarBlockEntity4.hasStoredItem();
+    }
+
+    public void dropStoredItem(Level level) {
+        if (level == null || level.isClientSide()) return;
+        altarBlockEntity1.dropStoredItem();
+        altarBlockEntity2.dropStoredItem();
+        altarBlockEntity3.dropStoredItem();
+        altarBlockEntity4.dropStoredItem();
+    }
 }
+

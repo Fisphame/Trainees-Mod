@@ -2,7 +2,8 @@ package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.block.*;
-import com.pha.trainees.block.entity.KunAltarBlockEntity;
+import com.pha.trainees.blockentity.AbsorbBlockEntity;
+import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.blockentity.PurificationStationBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -25,6 +26,13 @@ public class ModBlocks {
                         () -> BlockEntityType.Builder.of(
                                 KunAltarBlockEntity::new,
                                 ModBlocks.KUN_ALTAR.get()
+                        ).build(null));
+
+        public static final RegistryObject<BlockEntityType<AbsorbBlockEntity>> ABSORB_BLOCK_ENTITY =
+                BLOCK_ENTITIES.register("absorb_block",
+                        () -> BlockEntityType.Builder.of(
+                                AbsorbBlockEntity::new,
+                                ModBlocks.ABSORB_BLOCK.get()
                         ).build(null));
 
         public static final RegistryObject<BlockEntityType<PurificationStationBlockEntity>> PURIFICATION_STATION =
@@ -296,6 +304,7 @@ public class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .lightLevel(state -> 7)
                     .emissiveRendering((state,world,pos) -> true)
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE)
     ));
 
 
@@ -316,15 +325,27 @@ public class ModBlocks {
                     BlockBehaviour.Properties.of()
                             .strength(0.01f,3f)
                             .sound(SoundType.WOOL)
+                            .mapColor(MapColor.COLOR_BLUE)
             )
     );
 
-    //高爆炸抗性的反相篮球
-    public static final RegistryObject<Block> BASKETBALL_ANTI_BLOCK_RGT = BLOCKS.register("basketball_anti_block_rgt",
-            () -> new BasketballAntiBlock(
+//    //高爆炸抗性的反相篮球
+//    public static final RegistryObject<Block> BASKETBALL_ANTI_BLOCK_RGT = BLOCKS.register("basketball_anti_block_rgt",
+//            () -> new BasketballAntiBlock(
+//                    BlockBehaviour.Properties.of()
+//                            .strength(0.5f,1200f)
+//                            .sound(SoundType.WOOL)
+//                            .mapColor(MapColor.COLOR_BLUE)
+//            )
+//    );
+
+    public static final RegistryObject<Block> ALTAR_CORE_BLOCK = BLOCKS.register("altar_core_block",
+            () -> new AltarCoreBlock(
                     BlockBehaviour.Properties.of()
-                            .strength(0.5f,1200f)
-                            .sound(SoundType.WOOL)
+                            .strength(7.5f, 15f)
+                            .sound(SoundType.NETHER_BRICKS)
+                            .mapColor(MapColor.STONE)
+                            .requiresCorrectToolForDrops()
             )
     );
 
@@ -338,17 +359,7 @@ public class ModBlocks {
             )
     );
 
-    public static final RegistryObject<Block> ALTAR_CORE_BLOCK = BLOCKS.register("altar_core_block",
-            () -> new AltarCoreBlock(
-                    BlockBehaviour.Properties.of()
-                            .strength(7.5f, 15f)
-                            .sound(SoundType.NETHER_BRICKS)
-                            .mapColor(MapColor.STONE)
-                            .requiresCorrectToolForDrops()
-            )
-    );
-
-    public static final RegistryObject<Block> REACTING_FURNACE = BLOCKS .register("reacting_furnace",
+    public static final RegistryObject<Block> REACTING_FURNACE = BLOCKS.register("reacting_furnace",
             () -> new ReactingFurnaceBlock(
                     BlockBehaviour.Properties.of()
                             .strength(1.0f, 2.0f)
@@ -356,8 +367,14 @@ public class ModBlocks {
                             .requiresCorrectToolForDrops()
             ));
 
-
-
+    public static final RegistryObject<Block> ABSORB_BLOCK = BLOCKS.register("absorb_block",
+            () -> new AbsorbBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(1.5f, 4.5f)
+                            .sound(SoundType.STONE)
+                            .mapColor(MapColor.STONE)
+            )
+    );
 
 
 }

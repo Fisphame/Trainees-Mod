@@ -1,6 +1,6 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.HoverText;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;

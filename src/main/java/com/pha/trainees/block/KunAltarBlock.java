@@ -1,15 +1,16 @@
 package com.pha.trainees.block;
 
-import com.pha.trainees.block.entity.KunAltarBlockEntity;
+import com.pha.trainees.blockentity.AbsorbBlockEntity;
+import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.util.game.KunAltarType;
 import com.pha.trainees.util.game.Tools;
+import com.pha.trainees.util.interfaces.Machine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
@@ -26,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 
-public class KunAltarBlock extends BaseEntityBlock {
+public class KunAltarBlock extends BaseEntityBlock implements Machine {
 
 
     public KunAltarBlock(Properties p_49224_) {
@@ -80,6 +81,16 @@ public class KunAltarBlock extends BaseEntityBlock {
     }
 
     @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (level.isClientSide()) return;
+        CompoundTag tag = stack.getTagElement("BlockEntityTag");
+        if (tag != null && level.getBlockEntity(pos) instanceof KunAltarBlockEntity ka) {
+            ka.load(tag);
+        }
+    }
+
+    @Override
     public @NotNull RenderShape getRenderShape(BlockState state) {
         // 使用实体渲染，而不是模型渲染
         return RenderShape.ENTITYBLOCK_ANIMATED;
@@ -110,5 +121,19 @@ public class KunAltarBlock extends BaseEntityBlock {
             return blockEntity.getAltarType();
         }
         return KunAltarType.COMPLETE;
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) {
+        return true; // 声明此方块可输出比较器信号
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof KunAltarBlockEntity entity) {
+            return entity.getComparatorOutput();
+        }
+        return 0;
     }
 }

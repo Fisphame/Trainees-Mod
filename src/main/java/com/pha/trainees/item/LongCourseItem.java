@@ -1,15 +1,9 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.HoverText;
-import com.pha.trainees.item.interfaces.MineBlock;
-import com.pha.trainees.util.game.Tools;
-import net.minecraft.client.gui.screens.Screen;
+import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.MineBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;

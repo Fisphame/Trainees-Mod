@@ -1,6 +1,6 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.Chemistry;
+import com.pha.trainees.util.interfaces.Chemistry;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;

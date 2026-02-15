@@ -1,9 +1,9 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.BackStab;
-import com.pha.trainees.item.interfaces.Chemistry;
-import com.pha.trainees.item.interfaces.HoverText;
-import com.pha.trainees.item.interfaces.MineBlock;
+import com.pha.trainees.util.interfaces.BackStab;
+import com.pha.trainees.util.interfaces.Chemistry;
+import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.MineBlock;
 import com.pha.trainees.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

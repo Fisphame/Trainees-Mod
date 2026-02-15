@@ -1,8 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.HoverText;
-import com.pha.trainees.item.interfaces.Scythe;
-import com.pha.trainees.util.math.MAth;
+import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.Scythe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +32,7 @@ public class ScytheCourseItem{
 
         @Override
         public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-            return onHurtEnemy(stack, target, attacker) &&
+            return onHurtEnemy(stack, target, attacker, tier) &&
                     super.hurtEnemy(stack, target, attacker);
         }
 

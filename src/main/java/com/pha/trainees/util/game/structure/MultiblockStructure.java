@@ -55,7 +55,6 @@ public class MultiblockStructure {
      * 尝试激活结构
      */
     public static Booleanf tryActivateStructure(Level level, BlockPos pos, String structureId, @Nullable Player player) {
-
         // 检查结构是否存在
         MultiblockPattern pattern = REGISTERED_STRUCTURES.get(structureId);
         if (pattern == null) {
@@ -70,8 +69,7 @@ public class MultiblockStructure {
 
         // 检查是否已激活
         ActiveStructureManager manager = ActiveStructureManager.get(level);
-        if (!manager.shouldActivate(level, structureId, pos)) {
-
+        if (manager.isPositionActive(level, structureId, pos.above())) {
             return new Booleanf(false, 4);
         }
 

@@ -1,9 +1,8 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.HoverText;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;

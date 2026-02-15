@@ -1,6 +1,6 @@
 package com.pha.trainees.enchantments;
 
-import com.pha.trainees.item.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.KineticWeapon;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
 
 public class KineticEnchantmentCategory {

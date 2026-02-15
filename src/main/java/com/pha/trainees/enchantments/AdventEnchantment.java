@@ -1,6 +1,6 @@
 package com.pha.trainees.enchantments;
 
-import com.pha.trainees.item.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.KineticWeapon;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -10,7 +10,7 @@ import static com.pha.trainees.enchantments.KineticEnchantmentCategory.KINETIC_W
 
 public class AdventEnchantment extends Enchantment{
     // 每级增加的重力转换系数
-    public static final float GRAVITY_FACTOR_BONUS_PER_LEVEL = 0.25f;
+    public static final float GRAVITY_FACTOR_BONUS_PER_LEVEL = 0.5f;
 
     public AdventEnchantment(Rarity rarity) {
         super(rarity, KINETIC_WEAPON, new EquipmentSlot[]{

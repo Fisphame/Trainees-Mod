@@ -47,6 +47,8 @@
   "advancements.trainees.powder_anti_98.description": "9^8=43,046,721………………………………",
   "advancements.trainees.powder_anti_99.title": "你就是模组作者……",
   "advancements.trainees.powder_anti_99.description": "9^9=387,420,489………………！",
+  "advancements.trainees.altar.title": "魔法祭坛",
+  "advancements.trainees.altar.description": "激活一个只因祭坛。",
 
 
   "itemGroup.trainees.kun_tab": "练习生",
@@ -56,12 +58,38 @@
   "block.trainees.waxed_two_half_ingot_block": "涂蜡的两锭半块",
   "block.trainees.auriversite_block": "金矽块",
   "block.trainees.selenaurite_ore": "鈅矿",
+  "block.trainees.deepslate_selenaurite_ore": "深层鈅矿",
+  "block.trainees.selenaurite_block": "鈅块",
+  "block.trainees.nyctium_ore": "鍢矿",
+  "block.trainees.deepslate_nyctium_ore":"深层鍢矿",
+  "block.trainees.nyctium_block":"鍢块",
+  "block.trainees.terapium_ore": "金寺矿",
+  "block.trainees.deepslate_terapium_ore":"深层金寺矿",
+  "block.trainees.terapium_block": "金寺块",
+  "block.trainees.banalium_ore": "錋矿",
+  "block.trainees.deepslate_banalium_ore":"深层錋矿",
+  "block.trainees.banalium_block":"錋块",
+  "block.trainees.nivtium_ore": "金宁矿",
+  "block.trainees.deepslate_nivtium_ore":"深层金宁矿",
+  "block.trainees.nivtium_block": "金宁块",
+  "block.trainees.crucium_ore": "鋴矿",
+  "block.trainees.deepslate_crucium_ore":"深层鋴矿",
+  "block.trainees.crucium_block":"鋴块",
+  "block.trainees.sertium_ore": "鐖矿",
+  "block.trainees.deepslate_sertium_ore":"深层鐖矿",
+  "block.trainees.sertium_block": "鐖块",
+  "block.trainees.placium_ore": "鈚矿",
+  "block.trainees.deepslate_placium_ore":"深层鈚矿",
+  "block.trainees.placium_block":"鈚块",
   "block.trainees.feather_block": "羽毛块",
   "block.trainees.purification_station": "提纯台",
   "block.trainees.reacting_furnace": "反应炉",
   "block.trainees.basketball_anti_block": "[方块]反相篮球",
   "block.trainees.basketball_anti_block_rgt": "反相篮球",
-
+  "block.trainees.altar_core_block": "祭坛核心立方",
+  "block.trainees.kun_altar": "土申祭坛",
+  "block.trainees.absorb_block": "汲取立方",
+  
   "item.trainees.kun_axe": "只因斧",
   "item.trainees.kun_hoe": "只因锄",
   "item.trainees.kun_pickaxe": "只因镐",
@@ -114,6 +142,16 @@
   "item.trainees.kun_egg": "只因蛋",
   "item.trainees.gold_egg": "金蛋",
   "item.trainees.gold_feather": "金羽毛",
+  "item.trainees.selenaurite_ingot": "鈅锭",
+  "item.trainees.nyctium_ingot": "鍢锭",
+  "item.trainees.terapium_ingot": "金寺锭",
+  "item.trainees.banalium_ingot": "錋锭",
+  "item.trainees.nivtium_ingot": "金宁锭",
+  "item.trainees.crucium_ingot": "鋴锭",
+  "item.trainees.sertium_ingot": "鐖锭",
+  "item.trainees.placium_ingot": "鈚锭",
+  "item.trainees.altar_core": "祭坛核心",
+  
   
   "subtitles.trainees.final_mining_sound_1": "终极只因镐：挖掘",
   "subtitles.trainees.final_mining_sound_2": "终极只因镐：挖掘",
@@ -175,6 +213,7 @@
   
   "item.trainees.chemistry_book": "化学书",
   "item.trainees.che_hbp_bucket": "相酸桶",
+  "item.trainees.imperfection": "杂质",
   
   "item.trainees.che_ji2o_ingot": "渴鸡锭",
   "item.trainees.che_ji2o_nugget": "渴鸡粒",
@@ -198,7 +237,7 @@
   
   "tooltip.trainees.che_book.title": "§l化学 · 练习生-选择性必修一",
   "tooltip.trainees.che_book.pre": " 法莫斯·费希佩姆 著",
-  "tooltip.trainees.che_book.content": "§l§e119 Ji 钅鸡(称“鸡”)§r§7，固态银色带有淡金光泽的金属，密度8.0g/cm³，熔点20°C，沸点550°C；元素类别-碱金属，价电子构型[Og] 8s¹，常见氧化态+1，电负性0.7，第一电离能350kJ/mol，电子亲和能40kJ/mol，高放射性，α或β衰变，半衰期很短；游戏内表现为只因粒单质及其合成物。\n§l§e117 Bp 石黑（称黑）§r§7，固态黑色或深灰黑色的粉末非金属，密度9.5/cm³，熔点350°C，沸点500°C；元素类别-卤素，价电子构型[Lv] 7s²7p⁵，常见氧化态-1、+1、+3、+5、+7，电负性2.6 ，第一电离能800kJ/mol，电子亲和能200kJ/mol，高放射性，α衰变，半衰期很短；游戏内表现为黑粉单质及其合成物。\n§l§e离子化合物JiBp 反相素§r§7，白色固体（类似盐），游戏中为可投掷物品，遇水或撞击时解离为Ji⁺和Bk⁻离子。由于Bk⁻离子具有生物毒性（类似氰化物），会产生瞬间伤害（药水）效果。\n   §7两者均为超重元素，具有放射性，密度远超其同族较轻的元素；Ji极易失1个电子，是极强的还原剂。Bk极易得1个电子，具有很高的电子亲和能，是极强的氧化剂。Ji只有+1价。Bk类似砹(At)，有多种正价态，但与Ji反应时表现为-1价。\n§r§f  化合物：JiOH 鸡碱/氢氧化鸡；HBp 黑酸；JiBp 反相素/黑化鸡,可合成反相篮球；Ji2O 氧化鸡。\n  §l2Ji + 2H2O == 2JiOH + H2↑§r 放出热量、爆炸、发光，危险！\n  §l4Bp + 2H2O == 4HBp + O2↑§r 放出热量，反应较慢。\n  §lJi + Bp == JiBp§r 剧烈放热，剧烈爆炸，发光，极度危险！！\n  §lJiOH + HBp == JiBp + H2O§r 放出大量热，反应剧烈，谨慎。\n  §l2Ji + O2 =点燃= Ji2O 放出热量，谨慎。§r\n§7注：1.所有放热、发光、气体在游戏中均忽略。所有爆炸以tnt爆炸表现，效果与tnt逻辑一致。2.两物质均为放射性物质，但在游戏中忽略其放射性。3.所有数据均为大约数据。§0§r",
+  "tooltip.trainees.che_book.context": "§l§e119 Ji 钅鸡(称“鸡”)§r§7，固态银色带有淡金光泽的金属，密度8.0g/cm³，熔点20°C，沸点550°C；元素类别-碱金属，价电子构型[Og] 8s¹，常见氧化态+1，电负性0.7，第一电离能350kJ/mol，电子亲和能40kJ/mol，高放射性，α或β衰变，半衰期很短；游戏内表现为只因粒单质及其合成物。\n§l§e117 Bp 石黑（称黑）§r§7，固态黑色或深灰黑色的粉末非金属，密度9.5/cm³，熔点350°C，沸点500°C；元素类别-卤素，价电子构型[Lv] 7s²7p⁵，常见氧化态-1、+1、+3、+5、+7，电负性2.6 ，第一电离能800kJ/mol，电子亲和能200kJ/mol，高放射性，α衰变，半衰期很短；游戏内表现为黑粉单质及其合成物。\n§l§e离子化合物JiBp 反相素§r§7，白色固体（类似盐），游戏中为可投掷物品，遇水或撞击时解离为Ji⁺和Bk⁻离子。由于Bk⁻离子具有生物毒性（类似氰化物），会产生瞬间伤害（药水）效果。\n   §7两者均为超重元素，具有放射性，密度远超其同族较轻的元素；Ji极易失1个电子，是极强的还原剂。Bk极易得1个电子，具有很高的电子亲和能，是极强的氧化剂。Ji只有+1价。Bk类似砹(At)，有多种正价态，但与Ji反应时表现为-1价。\n§r§f  化合物：JiOH 鸡碱/氢氧化鸡；HBp 黑酸；JiBp 反相素/黑化鸡,可合成反相篮球；Ji2O 氧化鸡。\n  §l2Ji + 2H2O == 2JiOH + H2↑§r 放出热量、爆炸、发光，危险！\n  §l4Bp + 2H2O == 4HBp + O2↑§r 放出热量，反应较慢。\n  §lJi + Bp == JiBp§r 剧烈放热，剧烈爆炸，发光，极度危险！！\n  §lJiOH + HBp == JiBp + H2O§r 放出大量热，反应剧烈，谨慎。\n  §l2Ji + O2 =点燃= Ji2O 放出热量，谨慎。§r\n§7注：1.所有放热、发光、气体在游戏中均忽略。所有爆炸以tnt爆炸表现，效果与tnt逻辑一致。2.两物质均为放射性物质，但在游戏中忽略其放射性。3.所有数据均为大约数据。§0§r",
   "tooltip.trainees.ji2o": "§l氧化鸡",
   "tooltip.trainees.ji2o.2": "Ji2O 氧化物",
   "tooltip.trainees.ji2o2": "§l过氧化鸡",
@@ -228,10 +267,6 @@
   
  
   
-  
-  
-  "itemGroup.trainees.hao_tab": "一些东西",
-
   "block.trainees.pei_fang_block": "配方块",
   "item.trainees.hao_ge": "豪哥",
   "item.trainees.pei_fang": "配方",
@@ -276,7 +311,6 @@
   "item.trainees.powder_anti_99_scythe": "黑化镰刀",
   "item.trainees.black_hole": "黑洞",
   
-  "itemGroup.trainees.gun_mu_tab":" ",
   "item.trainees.gun_mu":" ",
 
   "subtitles.trainees.ahkun_sound": "只因你太美！",
@@ -288,17 +322,5 @@
   "container.trainees.purification_station": "提纯台",
   "container.trainees.purification_station.input_slot": "材料",
   "container.trainees.purification_station.fuel_slot": "升级/提纯物……",
-  "button.trainees.purify": "提升",
-  
-  "config.trainees.title": "Trainees 模组配置",
-  "config.trainees.movement_max": "生成物随机运动上限",
-  "config.trainees.movement_max.tooltip": "这个值会影响物品实体等随机移动的范围 (0-10000)",
-  "config.trainees.save": "保存",
-  "config.trainees.cancel": "取消",
-  "config.trainees.reset": "重置",
-  "config.trainees.saved": "配置已保存！新值: %s",
-  "config.trainees.invalid_range": "数值必须在 0-10000 范围内",
-  "config.trainees.invalid_number": "请输入有效的数字",
-  "config.trainees.reset_default": "已重置为默认值 10",
-  "item.trainees.custom_book": "Trainee's Guide"
+  "button.trainees.purify": "提升"
 }

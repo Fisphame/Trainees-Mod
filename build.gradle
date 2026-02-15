@@ -26,6 +26,8 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 "${mod_id}" {
@@ -38,6 +40,11 @@ minecraft {
             property 'forge.enabledGameTestNamespaces', mod_id
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                trainees {
+                    source sourceSets.main
+                }
+            }
         }
 
         server {
@@ -63,13 +70,24 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    flatDir {
+        dirs 'libs'
+    }
     maven { url 'https://maven.blamejared.com' }
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
+    maven { url = "https://maven.createmod.net" }
     mavenCentral()
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+//    implementation 'org.spongepowered:mixin:0.8.5'
+//    compileOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:{flywheel_version}")
+//    runtimeOnly fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:{flywheel_version}")
+//    implementation fg.deobf(files("libs/thetwice-1.0.0-dev.jar"))
+//    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:1.0.92"))
+
 //    compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84.1-FORGE:api")
 //    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84.1-FORGE")
 }
@@ -80,7 +98,7 @@ tasks.named('processResources', ProcessResources).configure {
             forge_version: forge_version, forge_version_range: forge_version_range,
             loader_version_range: loader_version_range,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors: mod_authors, mod_description: mod_description,
+            mod_authors: mod_authors, mod_description: mod_description
     ]
     inputs.properties replaceProperties
 
@@ -88,6 +106,15 @@ tasks.named('processResources', ProcessResources).configure {
         expand replaceProperties + [project: project]
     }
 }
+
+//// 确保在运行前生成正确的映射文件
+//tasks.named('runClient').configure {
+//    dependsOn 'createSrgToMcp'
+//}
+//
+//tasks.named('runServer').configure {
+//    dependsOn 'createSrgToMcp'
+//}
 
 // Example for how to get properties into the manifest for reading at runtime.
 tasks.named('jar', Jar).configure {
@@ -106,6 +133,45 @@ tasks.named('jar', Jar).configure {
     finalizedBy 'reobfJar'
 }
 
+// 创建开发版本JAR（自动包含反混淆的类）
+tasks.register('devJar', Jar) {
+    archiveClassifier = 'dev'
+    from sourceSets.main.output
+    includeEmptyDirs = false
+
+    manifest {
+        attributes([
+                'FMLModType'            : 'LIBRARY',
+                'Specification-Title'   : 'trainees',
+                'Specification-Vendor'  : 'pha',
+                'Specification-Version' : '1',
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor' : 'pha',
+                'Built-By'              : System.getProperty('user.name'),
+                'Build-Timestamp'       : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'Build-Jdk'             : System.getProperty('java.version'),
+        ])
+    }
+}
+
+// 创建源码JAR（可选，但推荐）
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier = 'sources'
+    from sourceSets.main.allJava
+    includeEmptyDirs = false
+}
+
+// ========== 构建配置 ==========
+// 确保build任务包含开发版本
+tasks.build.dependsOn devJar, sourcesJar
+
+// 将所有生成的JAR添加到artifacts
+artifacts {
+    archives jar
+    archives devJar
+    archives sourcesJar
+}
 
 publishing {
     publications {

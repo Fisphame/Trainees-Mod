@@ -1,6 +1,6 @@
 package com.pha.trainees.enchantments;
 
-import com.pha.trainees.item.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.KineticWeapon;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;

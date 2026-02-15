@@ -4,7 +4,7 @@ import com.pha.trainees.enchantments.*;
 import com.pha.trainees.item.AuriversiteRapierItem;
 import com.pha.trainees.item.KunCourseItem;
 import com.pha.trainees.item.ScytheCourseItem;
-import com.pha.trainees.item.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.KineticWeapon;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.util.math.LogarithmicFunc;
 import com.pha.trainees.util.math.MAth;
@@ -39,15 +39,14 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
-import org.checkerframework.checker.units.qual.A;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.time.Year;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -331,44 +330,44 @@ public class Tools {
 
     }
 
-//    public static void setDeltaMovement(ItemEntity entity, int number) {
-//        // 安全地获取配置值
-//        int movementMax = TraineesConfig.ENTITY_RANDOM_MOVEMENT_MAX.get();
-//
-//        if (number >= 1) {
-//            entity.setDeltaMovement(entity.getDeltaMovement().x, 0.5, entity.getDeltaMovement().z);
-//        } else {
-//            entity.setDeltaMovement(
-//                    entity.level().random.nextDouble() * 2 - 1.0,
-//                    entity.level().random.nextDouble() - 0.5,
-//                    entity.level().random.nextDouble() * 2 - 1.0
-//            );
-//        }
-//    }
 
-    public static final List<SoundEvent> MINING_SOUNDS = List.of(
-            MINING_SOUND_1.get(), MINING_SOUND_2.get(), MINING_SOUND_3.get(),
-            MINING_SOUND_4.get(), MINING_SOUND_5.get(), MINING_SOUND_6.get()
-    );
+    public static class SoundCourse{
+        private static Lazy<List<SoundEvent>> registerSoundList(SoundEvent... events) {
+            return Lazy.of(() -> List.of(events));
+        }
 
-    public static final List<SoundEvent> RELEASING_SWORD_WIND_SOUNDS = List.of(
-            RELEASING_SWORD_WIND_1.get(), RELEASING_SWORD_WIND_2.get(), RELEASING_SWORD_WIND_3.get(),
-            RELEASING_SWORD_WIND_4.get()
-    );
+        public static final Lazy<List<SoundEvent>> MINING_SOUNDS = registerSoundList(
+                MINING_SOUND_1.get(), MINING_SOUND_2.get(), MINING_SOUND_3.get(),
+                MINING_SOUND_4.get(), MINING_SOUND_5.get(), MINING_SOUND_6.get()
+        );
 
-    public static final List<SoundEvent> FINAL_MINING_SOUND = List.of(
-            FINAL_MINING_SOUND_1.get(), FINAL_MINING_SOUND_2.get(), FINAL_MINING_SOUND_3.get(),
-            FINAL_MINING_SOUND_4.get(), FINAL_MINING_SOUND_5.get()
-    );
+        public static final Lazy<List<SoundEvent>> RELEASING_SWORD_WIND_SOUNDS =registerSoundList(
+                RELEASING_SWORD_WIND_1.get(), RELEASING_SWORD_WIND_2.get(), RELEASING_SWORD_WIND_3.get(),
+                RELEASING_SWORD_WIND_4.get()
+        );
 
-    public static SoundEvent getIndexSound(List<SoundEvent> soundEventList, Player player){
-        int index = player.getRandom().nextInt(soundEventList.size());
-        return soundEventList.get(index);
+        public static final Lazy<List<SoundEvent>> FINAL_MINING_SOUNDS = registerSoundList(
+                FINAL_MINING_SOUND_1.get(), FINAL_MINING_SOUND_2.get(), FINAL_MINING_SOUND_3.get(),
+                FINAL_MINING_SOUND_4.get(), FINAL_MINING_SOUND_5.get()
+        );
+
+        public static final Lazy<List<SoundEvent>> HIT_SOUNDS = registerSoundList(
+                HIT.get(), HEAVY_HIT.get(), HIT_RESET.get(), HEAVY_HIT_RESET.get()
+        );
+
+        public static SoundEvent getIndexSound(List<SoundEvent> soundEventList, Player player){
+            int index = player.getRandom().nextInt(soundEventList.size());
+            return soundEventList.get(index);
+        }
+        public static SoundEvent getIndexSound(List<SoundEvent> soundEventList, Level level){
+            int index = level.getRandom().nextInt(soundEventList.size());
+            return soundEventList.get(index);
+        }
     }
-    public static SoundEvent getIndexSound(List<SoundEvent> soundEventList, Level level){
-        int index = level.getRandom().nextInt(soundEventList.size());
-        return soundEventList.get(index);
-    }
+
+
+
+
     public static class isInstanceof{
         public static Boolean scythe(Item item){
             return item instanceof ScytheCourseItem.ScytheItem || item instanceof ScytheCourseItem.CompoundScytheItem;
@@ -411,6 +410,13 @@ public class Tools {
                     level.getBlockState(pos).getBlock() == Blocks.SOUL_WALL_TORCH ||
                     level.getBlockState(pos).getBlock() == Blocks.CAMPFIRE ||
                     level.getBlockState(pos).getBlock() == Blocks.SOUL_CAMPFIRE;
+        }
+
+        public static Vec3 getCenter(BlockPos pos) {
+            return getCenter(pos.getX(), pos.getY(), pos.getZ());
+        }
+        public static Vec3 getCenter(double x, double y, double z) {
+            return new Vec3(x + 0.5, y + 0.5, z + 0.5);
         }
     }
 
@@ -769,6 +775,19 @@ public class Tools {
                         dx, dy, dz,
                         speed
                 );
+            }
+        }
+        public static void sendSurfaces(Level level, ParticleOptions particleType, BlockPos pos, int count,
+                                       double dx, double dy, double dz, double speed){
+            if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
+                double x = pos.getX(), y = pos.getY(), z = pos.getZ();
+                double spread = 0.2D;
+                send(serverLevel, particleType, x + 0.5, y + 0.5, z - spread, count, dx, dy, 0, speed);
+                send(serverLevel, particleType, x + 0.5, y - speed, z + 0.5, count, dx, 0, dz, speed);
+                send(serverLevel, particleType, x - speed, y + 0.5, z + 0.5, count, 0, dy, dz, speed);
+                send(serverLevel, particleType, x + 0.5, y + 0.5, z + 1.0 + speed, count, dx, dy, 0, speed);
+                send(serverLevel, particleType, x + 0.5, y + 1.0 + speed, z + 0.5, count, dx, 0, dz, speed);
+                send(serverLevel, particleType, x + 1.0 + speed, y + 0.5, z + 0.5, count, 0, dy, dz, speed);
             }
         }
         public static void sendGradientDust(Level level, double x, double y, double z, double dx, double dy, double dz,
@@ -1485,11 +1504,6 @@ public class Tools {
         }
         public static void spawnItemEntity(Level level, ItemEntity itemEntity, double spread){
             itemEntity.setDefaultPickUpDelay();
-            itemEntity.setDeltaMovement(
-                    (level.random.nextDouble() - 0.5) * spread,
-                    randomInRange(level, 0.2, 0.3),
-                    (level.random.nextDouble() - 0.5) * spread
-            );
             level.addFreshEntity(itemEntity);
         }
 

@@ -1,8 +1,8 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.Chargeable;
-import com.pha.trainees.item.interfaces.HoverText;
-import com.pha.trainees.item.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.Chargeable;
+import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.KineticWeapon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;

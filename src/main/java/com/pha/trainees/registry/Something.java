@@ -17,7 +17,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 
 public class Something {
-    public static class SomethingBlocks {
+    public static class PrankBlocks {
         public static final DeferredRegister<Block> BLOCKS =
                 DeferredRegister.create(ForgeRegistries.BLOCKS, Main.MODID);
         //神人（真的是人）方块
@@ -26,7 +26,7 @@ public class Something {
 
         public static final RegistryObject<Block> PEI_FANG_BLOCK = BLOCKS.register("pei_fang_block", () -> new Block(
                 BlockBehaviour.Properties.of()
-                        .strength(1.0f,1.0f)
+                        .strength(1.0f,1000.0f)
                         .sound(SoundType.SAND)
                         .requiresCorrectToolForDrops()
                         .lightLevel(state -> 15)
@@ -50,62 +50,6 @@ public class Something {
                                 .requiresCorrectToolForDrops()
                 ));
 
-    }
-    public static class SomethingItems {
-        //神人（真的是人）物品
-        public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
-        //顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 -> 刷怪蛋
-
-        //配方块
-        public static final RegistryObject<Item> PEI_FANG_BLOCK_ITEM = ITEMS.register("pei_fang_block",
-                () -> new BlockItem(SomethingBlocks.PEI_FANG_BLOCK.get(),
-                        new Item.Properties()
-                                .rarity(Rarity.UNCOMMON)
-                ));
-
-//        //豪哥
-//        public static final RegistryObject<Item> HAO_GE = ITEMS.register("hao_ge",
-//                () -> new AxeItem(
-//                        Tiers.NETHERITE,
-//                        8,
-//                        -2.0F,
-//                        new Item.Properties()
-//                                .food(new FoodProperties.Builder()
-//                                        .nutrition(10)
-//                                        .saturationMod(0.3f)
-//                                        .alwaysEat()
-//                                        .build()
-//                                )
-//                                .durability(250)
-//                                .rarity(Rarity.UNCOMMON)
-//                )
-//        );
-
-        //配方球
-        public static final RegistryObject<Item> PEI_FANG_BALL = ITEMS.register("pei_fang_ball",
-                () -> new SnowballItem(
-                        new Item.Properties()
-                                .rarity(Rarity.UNCOMMON)
-                ));
-
-        //配方
-        public static final RegistryObject<Item> PEI_FANG = ITEMS.register("pei_fang",
-                () -> new SwordItem(
-                        Tiers.NETHERITE,
-                        0,
-                        1003,
-                        new Item.Properties()
-                                .food(new FoodProperties.Builder()
-                                        .nutrition(1)
-                                        .saturationMod(1f)
-                                        .alwaysEat()
-                                        .build()
-                                )
-                                .durability(25000)
-                                .rarity(Rarity.UNCOMMON)
-                                .fireResistant()
-                                .setNoRepair()
-                ));
     }
 
     public static class PrankItems {
@@ -259,14 +203,52 @@ public class Something {
                 () -> new PowderAntiCourseItem.PowderAnti98Item(new Item.Properties()));
         //黑粉块
         public static final RegistryObject<Item> POWDER_ANTI_99_BLOCK_ITEM = ITEMS.register("powder_anti_99",
-                () -> new BlockItem(SomethingBlocks.POWDER_ANTI_99_BLOCK.get(),
+                () -> new BlockItem(PrankBlocks.POWDER_ANTI_99_BLOCK.get(),
                         new Item.Properties()));
         //黑洞
         public static final RegistryObject<Item> BLACK_HOLE = ITEMS.register("black_hole",
-                () -> new BlockItem(SomethingBlocks.BLACK_HOLE.get(),
+                () -> new BlockItem(PrankBlocks.BLACK_HOLE.get(),
                         new Item.Properties()
                                 .stacksTo(1)
                 ));
+
+
+        //配方块
+        public static final RegistryObject<Item> PEI_FANG_BLOCK_ITEM = ITEMS.register("pei_fang_block",
+                () -> new BlockItem(PrankBlocks.PEI_FANG_BLOCK.get(),
+                        new Item.Properties()
+                                .rarity(Rarity.UNCOMMON)
+                ));
+
+        //配方球
+        public static final RegistryObject<Item> PEI_FANG_BALL = ITEMS.register("pei_fang_ball",
+                () -> new SnowballItem(
+                        new Item.Properties()
+                                .rarity(Rarity.UNCOMMON)
+                ));
+        //配方
+        public static final RegistryObject<Item> PEI_FANG = ITEMS.register("pei_fang",
+                () -> new SwordItem(
+                        Tiers.NETHERITE,
+                        0,
+                        1003,
+                        new Item.Properties()
+                                .food(new FoodProperties.Builder()
+                                        .nutrition(1)
+                                        .saturationMod(1f)
+                                        .alwaysEat()
+                                        .build()
+                                )
+                                .durability(25000)
+                                .rarity(Rarity.UNCOMMON)
+                                .fireResistant()
+                                .setNoRepair()
+                )
+        );
+
+        //注册了一个什么物品啊？怎么只有空格啊？？？而且怎么还不报错？
+        public static final RegistryObject<Item> GunMu = ITEMS.register("gun_mu",
+                ()-> new Item(new Item.Properties()));
     }
 
 
@@ -297,16 +279,4 @@ public class Something {
         // 1 - 好臭啊（悲）
         public static final RegistryObject<PaintingVariant> P1 = rpv("p1", 32, 32);
     }
-
-
-    //这个类怎么没名字啊？怎么做到的？？P的吧
-    public static class OttoMother {
-
-        public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
-
-        //注册了一个什么物品啊？怎么只有空格啊？？？而且怎么还不报错？
-        public static final RegistryObject<Item> GunMu = ITEMS.register("gun_mu",
-                ()-> new Item(new Item.Properties()));
-    }
-
 }

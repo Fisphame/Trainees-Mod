@@ -17,40 +17,29 @@ public class StructureBreakHandler {
     // 修改 StructureBreakHandler 中的事件监听
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
-        try {
-            Level level = (Level) event.getLevel();
-            BlockPos pos = event.getPos();
+        Level level = (Level) event.getLevel();
+        BlockPos pos = event.getPos();
 
-            // 只在服务器端处理
-            if (level.isClientSide) return;
+        // 只在服务器端处理
+        if (level.isClientSide) return;
 
-            // 检查这个方块是否属于任何激活的结构
-            ActiveStructureManager manager = ActiveStructureManager.get(level);
+        // 检查这个方块是否属于任何激活的结构
+        ActiveStructureManager manager = ActiveStructureManager.get(level);
 
-            // 获取所有激活的结构
-            List<ActiveStructureManager.ActiveStructureData> activeStructures =
-                    manager.getActiveStructures(level, null);
+        // 获取所有激活的结构
+        List<ActiveStructureManager.ActiveStructureData> activeStructures =
+                manager.getActiveStructures(level, null);
 
-            for (ActiveStructureManager.ActiveStructureData data : activeStructures) {
-                // 安全地计算距离，避免空指针
-                if (data != null && data.matchPos != null) {
-                    int radius = 3;
-                    if (pos.closerThan(data.matchPos, radius)) {
-                        // 安全地移除激活状态
-                        boolean removed = manager.removeActiveStructureSafely(level, data.structureId, data.matchPos);
-
-                        if (removed && event.getPlayer() != null) {
-//                            event.getPlayer().displayClientMessage(
-//                                    Component.literal("§e破坏了激活的祭坛结构！"),
-//                                    true
-//                            );
-                        }
-                        break;
-                    }
+        for (ActiveStructureManager.ActiveStructureData data : activeStructures) {
+            // 安全地计算距离，避免空指针
+            if (data != null && data.matchPos != null) {
+                int radius = 3;
+                if (pos.closerThan(data.matchPos, radius)) {
+                    // 安全地移除激活状态
+                    manager.removeActiveStructureSafely(level, data.structureId, data.matchPos);
+                    break;
                 }
             }
-        } catch (Exception e) {
-            Main.LOGGER.error("Error in onBlockBreak", e);
         }
     }
 

@@ -21,7 +21,7 @@ public class KineticData {
     // 配置参数
     public static float KINETIC_DECAY_RATE = 1.5f; // 每检查时间衰减%
     public static float LINEAR_CONVERSION_FACTOR = 0.0025f; // 线性动能转换系数
-    public static float GRAVITY_CONVERSION_FACTOR = 0.8f; // 重力转换系数k，当0.2，每米下落提供1%动能
+    public static float GRAVITY_CONVERSION_FACTOR = 1.5f; // 重力转换系数k，当0.2，每米下落提供1%动能
     public static float DIRECTION_CHANGE_FACTOR = 5.0f; // 90度急转 = 5%动能
     public static float DAMAGE_CONVERSION_FACTOR = 15.0f; // 伤害转化系数
     public static int CHECK_INTERVAL_TICKS = 1; // 检查时间间隔（tick）

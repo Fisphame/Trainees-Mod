@@ -3,17 +3,14 @@ package com.pha.trainees;
 import com.mojang.logging.LogUtils;
 import com.pha.trainees.event.*;
 import com.pha.trainees.registry.*;
-import com.pha.trainees.thetwice.Object;
 import com.pha.trainees.util.game.chemistry.ChemicalReaction;
 import com.pha.trainees.util.game.chemistry.ReactionConditions;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 @Mod(Main.MODID)
@@ -35,11 +32,9 @@ public class Main {
         ModChemistry.ModChemistryBlockItems.ITEMS.register(bus);
         ModChemistry.ModChemistryItems.ITEMS.register(bus);
         ModEntities.ENTITIES.register(bus);
-        Something.SomethingBlocks.BLOCKS.register(bus);
-        Something.SomethingItems.ITEMS.register(bus);
+        Something.PrankBlocks.BLOCKS.register(bus);
         Something.PrankItems.ITEMS.register(bus);
         Something.Paintings.PAINTING_VARIANTS.register(bus);
-        Something.OttoMother.ITEMS.register(bus);
         HiddenItem.BLOCKS.register(bus);
         HiddenItem.ITEMS.register(bus);
         ModCreativeModeTabs.CREATIVE_MODE_TABS.register(bus);
@@ -50,21 +45,13 @@ public class Main {
         ModFluid.FLUIDS.register(bus);
         ModCommand.register();
 
-        Object.ITEMS.register(bus);
-
         bus.register(new Register());
         bus.addListener(this::commonSetup);
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
-        ebus.register(SweepHandler.class);
-        // 注册我们的事件处理器
-//        ebus.register(this);
-
-        // 注册ModRegistries的RegisterEvent监听
-//        ebus.addListener(Register::onRegisterEvent);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event) {
+    private void commonSetup(final @NotNull FMLCommonSetupEvent event) {
         Main.LOGGER.info("Chemistry System: Starting commonSetup");
 
         event.enqueueWork(() -> {

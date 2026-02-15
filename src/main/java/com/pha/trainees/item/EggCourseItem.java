@@ -1,7 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.item.interfaces.Eggs;
-import com.pha.trainees.item.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.Eggs;
+import com.pha.trainees.util.interfaces.HoverText;
 import com.pha.trainees.registry.ModEntities;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;

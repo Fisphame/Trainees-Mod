@@ -4,6 +4,7 @@ import com.pha.trainees.entity.CalledSwordEntity;
 import com.pha.trainees.registry.ModEnchantments;
 import com.pha.trainees.registry.ModEntities;
 import com.pha.trainees.util.game.Tools;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -38,59 +39,63 @@ public class AbilityHandler {
         ItemStack stack = player.getMainHandItem();
 
         // 检查是否持有剑且附魔存在
-        if (stack.getItem() instanceof SwordItem &&
-                stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get()) > 0) {
-            Item item = stack.getItem();
-            int degree = stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get());
-            float basicDamage = ((SwordItem) stack.getItem()).getDamage();
-            float enchantDamage = EnchantmentHelper.getDamageBonus(stack, MobType.UNDEFINED);
-            if (Tools.isInstanceof.scythe(item)){
-                basicDamage *= 2;
-                degree += 1;
-                BASE_DISTANCE = 2.0;
-                ARRAY_RADIUS = 3.5;
-                VERTICAL_SPREAD = 0.5;
-            }
-            else if (Tools.isInstanceof.repair(item)){
-                basicDamage /= 2;
-                degree -= 1;
-                BASE_DISTANCE = 0.5;
-                ARRAY_RADIUS = 1.5;
-                VERTICAL_SPREAD = 1.5;
-            }
-            else if (Tools.isInstanceof.kunSword(item)){
-                degree += 1;
-                BASE_DISTANCE = 3.0;
-                ARRAY_RADIUS = 2.5;
-                VERTICAL_SPREAD = 2.0;
-            }
-            else {
-                BASE_DISTANCE = 3.0;
-                ARRAY_RADIUS = 2.5;
-                VERTICAL_SPREAD = 1.5;
-            }
-            float damage = basicDamage + enchantDamage * 2;
-            if (player.getCooldowns().isOnCooldown(item)){
-                player.displayClientMessage(Component.translatable("msg.trainees.isOnCooldown"), true);
-                return;
-            }
-            level.playSound(null, new BlockPos(player.getBlockX(), player.getBlockY(), player.getBlockZ()),
-                    SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 0.5F, 1.0F);
+        if (!(stack.getItem() instanceof SwordItem) || stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get()) <= 0) {
+            return;
+        }
 
-            // 触发技能
-            activateAbility(player, damage, degree, level);
+        Item item = stack.getItem();
+        int degree = stack.getEnchantmentLevel(ModEnchantments.ten_thousand_sword.get());
+        float basicDamage = ((SwordItem) stack.getItem()).getDamage();
+        float enchantDamage = EnchantmentHelper.getDamageBonus(stack, MobType.UNDEFINED);
+        if (Tools.isInstanceof.scythe(item)){
+            basicDamage *= 2;
+            degree += 1;
+            BASE_DISTANCE = 2.0;
+            ARRAY_RADIUS = 3.5;
+            VERTICAL_SPREAD = 0.5;
+        }
+        else if (Tools.isInstanceof.repair(item)){
+            basicDamage /= 2;
+            degree -= 1;
+            BASE_DISTANCE = 0.5;
+            ARRAY_RADIUS = 1.5;
+            VERTICAL_SPREAD = 1.5;
+        }
+        else if (Tools.isInstanceof.kunSword(item)){
+            degree += 1;
+            BASE_DISTANCE = 3.0;
+            ARRAY_RADIUS = 2.5;
+            VERTICAL_SPREAD = 2.0;
+        }
+        else {
+            BASE_DISTANCE = 3.0;
+            ARRAY_RADIUS = 2.5;
+            VERTICAL_SPREAD = 1.5;
+        }
+        float damage = basicDamage + enchantDamage * 2;
+        if (player.getCooldowns().isOnCooldown(item)){
+            player.displayClientMessage(
+                    Component.literal("...!").withStyle(ChatFormatting.RED),
+                    true
+            );
+            return;
+        }
+        level.playSound(null, new BlockPos(player.getBlockX(), player.getBlockY(), player.getBlockZ()),
+                SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 0.5F, 1.0F);
 
-            if (!player.isCreative()) {
-                if (!Tools.isInstanceof.repair(item)){
-                    player.getCooldowns().addCooldown(item, COOLDOWN_TICKS);
-                }
-                stack.hurtAndBreak(HURT_BREAK, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+        // 触发技能
+        activateAbility(player, damage, degree, level);
+
+        if (!Tools.isInstanceof.repair(item)) {
+            if (player.isCreative()) {
+                player.getCooldowns().addCooldown(item, CREATIVE_COOLDOWN_TICKS);
             }
-            else if (player.isCreative()){
-                if (!Tools.isInstanceof.repair(item)){
-                    player.getCooldowns().addCooldown(item, CREATIVE_COOLDOWN_TICKS);
-                }
+            else if (!player.isCreative()) {
+                player.getCooldowns().addCooldown(item, COOLDOWN_TICKS);
             }
+        }
+        if (!player.isCreative()) {
+            stack.hurtAndBreak(HURT_BREAK, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
         }
     }
 

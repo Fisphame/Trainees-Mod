@@ -4,8 +4,10 @@ import com.pha.trainees.Main;
 import com.pha.trainees.item.*;
 import com.pha.trainees.materials.TRAIN;
 import com.pha.trainees.util.game.ModTiers;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -16,6 +18,13 @@ public class ModItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
 
     //顺序：方块（block item） -> 工具与实用物品 -> 战斗用品 -> 食物与饮品 -> 原材料 -> 刷怪蛋
+
+    private static RegistryObject<Item> registerBlockItem(String name, Block block) {
+        return registerBlockItem(name, block, new Item.Properties());
+    }
+    private static RegistryObject<Item> registerBlockItem(String name, Block block, Item.Properties properties) {
+        return ITEMS.register(name, () -> new BlockItem(block, properties));
+    }
 
     //两锭半块
     public static final RegistryObject<Item> TWO_HALF_INGOT_BLOCK_ITEM = ITEMS.register("two_half_ingot_block",
@@ -172,14 +181,19 @@ public class ModItems {
                     new Item.Properties()
             )
     );
+    // 汲取方块
+    public static final RegistryObject<Item> ABSORB_BLOCK_ITEM = ITEMS.register("absorb_block",
+            () -> new BlockItem(ModBlocks.ABSORB_BLOCK.get(),
+                    new Item.Properties()
+            )
+    );
+
     //反相篮球
     public static final RegistryObject<Item> BASKETBALL_ANTI_BLOCK_ITEM = ITEMS.register("basketball_anti_block",
             () -> new BlockItem(ModBlocks.BASKETBALL_ANTI_BLOCK.get(),
                     new Item.Properties()
             )
     );
-
-
     //只因锹
     public static final RegistryObject<Item> KUN_SHOVEL= ITEMS.register("kun_shovel" ,
             ()-> new ShovelItem(
@@ -548,10 +562,6 @@ public class ModItems {
             () -> new Item( new Item.Properties())
     );
 
-    //聚酯纤维（PET）
-//    public static final RegistryObject<Item> POLYESTER = ITEMS.register("polyester",
-//            ()-> new Item(new Item.Properties())
-//    );
     //弹性材料
     public static final RegistryObject<Item> ELASTOMERIC_MATERIAL = ITEMS.register("elastomeric_material",
             ()-> new Item(new Item.Properties())

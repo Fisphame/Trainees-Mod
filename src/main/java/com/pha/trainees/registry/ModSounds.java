@@ -3,7 +3,8 @@ package com.pha.trainees.registry;
 import com.pha.trainees.Main;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -37,4 +38,11 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> FINAL_MINING_SOUND_3 = registerSound("final_mining_sound_3");
     public static final RegistryObject<SoundEvent> FINAL_MINING_SOUND_4 = registerSound("final_mining_sound_4");
     public static final RegistryObject<SoundEvent> FINAL_MINING_SOUND_5 = registerSound("final_mining_sound_5");
+    public static final RegistryObject<SoundEvent> HIT = registerSound("hit");
+    public static final RegistryObject<SoundEvent> HIT_RESET = registerSound("hit_reset");
+    public static final RegistryObject<SoundEvent> HEAVY_HIT = registerSound("heavy_hit");
+    public static final RegistryObject<SoundEvent> HEAVY_HIT_RESET = registerSound("heavy_hit_reset");
+    public static final RegistryObject<SoundEvent> HEAVY_HITS = registerSound("heavy_hits");
+
+
 }

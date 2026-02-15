@@ -3,10 +3,13 @@ package com.pha.trainees.item;
 import com.pha.trainees.Main;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.util.game.AchievementManager;
 import com.pha.trainees.util.game.Booleanf;
 import com.pha.trainees.util.game.structure.MultiblockStructure;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -44,28 +47,41 @@ public class StoneStickItem extends Item {
                 player
         );
 
-        // 记录结果
         if (activated.bool()) {
             Main.LOGGER.info("Trainer Altar activated success");
+            player.displayClientMessage(
+                    Component.literal("--[ - ]--").withStyle(ChatFormatting.GREEN),
+                    true
+            );
+            if (player instanceof ServerPlayer serverPlayer) {
+                AchievementManager.grantSpecificAchievement(
+                        serverPlayer,
+                        "trainees:structure/altar"  // altar.json
+                );
+            }
+
         } else {
             Main.LOGGER.info("Trainer Altar activation fail");
             player.displayClientMessage(
                     Component.literal(
                             switch (activated.num()) {
-                                case 0 -> "§c--x--";
-                                case 1 -> "§c--?--";
-                                case 2 -> "............";
-                                case 3 -> "§c-[-F-]-";
-                                case 4 -> "--[-]--";
-                                default -> "§cUnexpected";
+                                case 0 -> "--x--";
+                                case 1 -> "--?--";
+                                case 2 -> "···";
+                                case 3 -> "-[-x-]-";
+                                case 4 -> "--[ - ]--";
+                                default -> "Unexpected";
+                            }
+                    ).withStyle(
+                            switch (activated.num()) {
+                                case 2, 4 -> ChatFormatting.WHITE;
+                                default -> ChatFormatting.RED;
                             }
                     ),
                     true
             );
         }
         player.getCooldowns().addCooldown(itemStack.getItem(), 20);
-
-
         return InteractionResult.SUCCESS;
     }
 }

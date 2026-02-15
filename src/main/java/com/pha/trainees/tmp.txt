@@ -23,3 +23,21 @@
 // TODO 代码中兼容其他模组
 // TODO 拓展化学反应之第3弹
 // TODO 重构？代码 方块接口？
+
+
+selenaurite_ore
+deepslate_selenaurite_ore
+nyctium_ore
+deepslate_nyctium_ore
+terapium_ore
+deepslate_terapium_ore
+banalium_ore
+deepslate_banalium_ore
+nivtium_ore
+deepslate_nivtium_ore
+crucium_ore
+deepslate_crucium_ore
+sertium_ore
+deepslate_sertium_ore
+placium_ore
+deepslate_placium_ore

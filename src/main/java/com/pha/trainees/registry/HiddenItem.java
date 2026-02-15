@@ -17,11 +17,11 @@ public class HiddenItem {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Main.MODID);
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Main.MODID);
 
-    //RGT反相篮球
-    public static final RegistryObject<Item> BASKETBALL_ANTI_BLOCK_RGT_ITEM= ITEMS.register("basketball_anti_block_rgt",
-            () -> new BlockItem(ModBlocks.BASKETBALL_ANTI_BLOCK_RGT.get(),
-                    new Item.Properties()
-            ));
+//    //RGT反相篮球
+//    public static final RegistryObject<Item> BASKETBALL_ANTI_BLOCK_RGT_ITEM= ITEMS.register("basketball_anti_block_rgt",
+//            () -> new BlockItem(ModBlocks.BASKETBALL_ANTI_BLOCK_RGT.get(),
+//                    new Item.Properties()
+//            ));
 
     //RGT反相素方块
     public static final RegistryObject<Item> CHE_JIBP_BLOCK_RGT_ITEM = ITEMS.register("che_jibp_block_rgt",

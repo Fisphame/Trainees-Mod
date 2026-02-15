@@ -83,7 +83,7 @@ public class BlackHoleBlock extends Block {
             for (BlockPos pos : BlockPos.betweenClosed(minPos, maxPos)) {
                 BlockState state = level.getBlockState(pos);
 
-                if (state.isAir() || pos.equals(centerPos) || state.is(Something.SomethingBlocks.BLACK_HOLE.get()) ) continue;
+                if (state.isAir() || pos.equals(centerPos) || state.is(Something.PrankBlocks.BLACK_HOLE.get()) ) continue;
 
                 if (canBlockFall(level, pos, state)) {
                     AntiGravityFallingBlockEntity fallingBlock = AntiGravityFallingBlockEntity.fall(level, pos, state);

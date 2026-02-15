@@ -28,18 +28,6 @@ public class ModCreativeModeTabs{
                     .build()
     );
 
-    //something
-    public static final RegistryObject<CreativeModeTab> HAO_TAB = CREATIVE_MODE_TABS.register("hao_tab",
-            () -> CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.trainees.hao_tab"))
-                    .icon(() -> new ItemStack(Something.SomethingItems.PEI_FANG.get()))
-                    .displayItems((parm,output) -> {
-                        Something.SomethingItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()));
-                    })
-                    .build()
-    );
-
-
     // 整蛊
     public static final RegistryObject<CreativeModeTab> PRANK_TAB = CREATIVE_MODE_TABS.register("prank_tab",
             () -> CreativeModeTab.builder()
@@ -66,20 +54,6 @@ public class ModCreativeModeTabs{
                         output.accept(ModItems.POWDER_ANTI_4.get());
                         output.accept(ModItems.POWDER_ANTI_9.get());
                         ModChemistry.ModChemistryItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()));
-                    })
-                    .build()
-    );
-
-
-    // 什么_tab啊？字符串里总不该有空格吧，怎么回事啊？
-    public static final RegistryObject<CreativeModeTab> GUNMU_TAB = CREATIVE_MODE_TABS.register("gunmu_tab",
-            () -> CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.trainees.gun_mu_tab"))
-                    //这获取了个什么物品啊？怎么中间只有点啊？
-                    .icon(() -> new ItemStack(Something.OttoMother.GunMu.get()))
-                    .displayItems((parm,output) -> {
-                        //这添加了什么物品啊？明明写的是空的啊……
-                        output.accept(Something.OttoMother.GunMu.get());
                     })
                     .build()
     );

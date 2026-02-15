@@ -140,13 +140,10 @@ public class ActiveStructureManager extends SavedData {
      */
     public boolean isPositionActive(Level level, String structureId, BlockPos matchPos) {
         ResourceLocation dimension = level.dimension().location();
-
         Map<String, Set<ActiveStructureData>> dimensionMap = activeStructures.get(dimension);
         if (dimensionMap == null) return false;
-
         Set<ActiveStructureData> structureSet = dimensionMap.get(structureId);
         if (structureSet == null) return false;
-
         return structureSet.stream().anyMatch(data -> data.matchPos.equals(matchPos));
     }
 
@@ -177,21 +174,13 @@ public class ActiveStructureManager extends SavedData {
         }
     }
 
-    /**
-     * 检查结构是否应该被激活（考虑冷却时间）
-     */
-    public boolean shouldActivate(Level level, String structureId, BlockPos matchPos) {
-        // 如果位置已激活，检查是否允许重新激活
-        if (isPositionActive(level, structureId, matchPos)) {
-            MultiblockPattern pattern = MultiblockStructure.REGISTERED_STRUCTURES.get(structureId);
-            if (pattern != null && pattern.getActivationHandler() != null) {
-                return pattern.getActivationHandler().allowReactivate();
-            }
-            return false;
-        }
-
-        return true;
-    }
+//    /**
+//     * 检查结构是否应该被激活（考虑冷却时间）
+//     */
+//    public boolean shouldActivate(Level level, String structureId, BlockPos matchPos) {
+//        // 如果位置已激活，检查是否允许重新激活
+//        return !isPositionActive(level, structureId, matchPos);
+//    }
 
     /**
      * 获取所有激活的结构数据
