@@ -2,9 +2,8 @@ package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.item.*;
-import com.pha.trainees.materials.TRAIN;
+import com.pha.trainees.item.materials.TrainMaterial;
 import com.pha.trainees.util.game.ModTiers;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
@@ -146,9 +145,6 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.PLACIUM_BLOCK.get(),
                     new Item.Properties()
             ));
-
-
-
 
     //只因方块
     public static final RegistryObject<Item> myblockitem = ITEMS.register("myblock",
@@ -359,14 +355,14 @@ public class ModItems {
     //盔甲lv1
     public static final RegistryObject<Item> TRAIN_I_HELMET = ITEMS.register("train_i_helmet",
             () -> new ArmorItem(
-                    new TRAIN.I(),
+                    new TrainMaterial.LevelI(),
                     ArmorItem.Type.HELMET,
                     new Item.Properties()
             )
     );
     public static final RegistryObject<Item> TRAIN_I_CHESTPLATE = ITEMS.register("train_i_chestplate",
             () -> new ArmorItem(
-                    new TRAIN.I(),
+                    new TrainMaterial.LevelI(),
                     ArmorItem.Type.CHESTPLATE,
                     new Item.Properties()
             )
@@ -374,7 +370,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> TRAIN_I_LEGGINGS = ITEMS.register("train_i_leggings",
             () -> new ArmorItem(
-                    new TRAIN.I(),
+                    new TrainMaterial.LevelI(),
                     ArmorItem.Type.LEGGINGS,
                     new Item.Properties()
             )
@@ -382,7 +378,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> TRAIN_I_BOOTS = ITEMS.register("train_i_boots",
             () -> new ArmorItem(
-                    new TRAIN.I(),
+                    new TrainMaterial.LevelI(),
                     ArmorItem.Type.BOOTS,
                     new Item.Properties()
             )
@@ -391,7 +387,7 @@ public class ModItems {
     //盔甲lv2
     public static final RegistryObject<Item> TRAIN_II_HELMET = ITEMS.register("train_ii_helmet",
             () -> new ArmorItem(
-                    new TRAIN.II(),
+                    new TrainMaterial.LevelII(),
                     ArmorItem.Type.HELMET,
                     new Item.Properties()
                             .rarity(Rarity.UNCOMMON)
@@ -399,7 +395,7 @@ public class ModItems {
     );
     public static final RegistryObject<Item> TRAIN_II_CHESTPLATE = ITEMS.register("train_ii_chestplate",
             () -> new ArmorItem(
-                    new TRAIN.II(),
+                    new TrainMaterial.LevelII(),
                     ArmorItem.Type.CHESTPLATE,
                     new Item.Properties()
                             .rarity(Rarity.UNCOMMON)
@@ -408,7 +404,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> TRAIN_II_LEGGINGS = ITEMS.register("train_ii_leggings",
             () -> new ArmorItem(
-                    new TRAIN.II(),
+                    new TrainMaterial.LevelII(),
                     ArmorItem.Type.LEGGINGS,
                     new Item.Properties()
                             .rarity(Rarity.UNCOMMON)
@@ -417,7 +413,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> TRAIN_II_BOOTS = ITEMS.register("train_ii_boots",
             () -> new ArmorItem(
-                    new TRAIN.II(),
+                    new TrainMaterial.LevelII(),
                     ArmorItem.Type.BOOTS,
                     new Item.Properties()
                             .rarity(Rarity.UNCOMMON)
@@ -427,7 +423,7 @@ public class ModItems {
     //盔甲lv3
     public static final RegistryObject<Item> TRAIN_III_HELMET = ITEMS.register("train_iii_helmet",
             () -> new ArmorItem(
-                    new TRAIN.III(),
+                    new TrainMaterial.LevelIII(),
                     ArmorItem.Type.HELMET,
                     new Item.Properties()
                             .rarity(Rarity.RARE)
@@ -435,7 +431,7 @@ public class ModItems {
     );
     public static final RegistryObject<Item> TRAIN_III_CHESTPLATE = ITEMS.register("train_iii_chestplate",
             () -> new ArmorItem(
-                    new TRAIN.III(),
+                    new TrainMaterial.LevelIII(),
                     ArmorItem.Type.CHESTPLATE,
                     new Item.Properties()
                             .rarity(Rarity.RARE)
@@ -444,7 +440,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> TRAIN_III_LEGGINGS = ITEMS.register("train_iii_leggings",
             () -> new ArmorItem(
-                    new TRAIN.III(),
+                    new TrainMaterial.LevelIII(),
                     ArmorItem.Type.LEGGINGS,
                     new Item.Properties()
                             .rarity(Rarity.RARE)
@@ -453,7 +449,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> TRAIN_III_BOOTS = ITEMS.register("train_iii_boots",
             () -> new ArmorItem(
-                    new TRAIN.III(),
+                    new TrainMaterial.LevelIII(),
                     ArmorItem.Type.BOOTS,
                     new Item.Properties()
                             .rarity(Rarity.RARE)
@@ -534,10 +530,6 @@ public class ModItems {
     );
     // 鈅锭
     public static final RegistryObject<Item> SELENAURITE_INGOT = ITEMS.register("selenaurite_ingot",
-            () -> new Item(new Item.Properties())
-    );
-    // 鈅粒
-    public static final RegistryObject<Item> SELENAURITE_NUGGET = ITEMS.register("selenaurite_nugget",
             () -> new Item(new Item.Properties())
     );
     public static final RegistryObject<Item> NYCTIUM_INGOT = ITEMS.register("nyctium_ingot",

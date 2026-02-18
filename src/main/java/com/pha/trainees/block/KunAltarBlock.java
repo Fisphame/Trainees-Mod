@@ -1,6 +1,5 @@
 package com.pha.trainees.block;
 
-import com.pha.trainees.blockentity.AbsorbBlockEntity;
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.util.game.KunAltarType;
 import com.pha.trainees.util.game.Tools;
@@ -16,9 +15,12 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -29,9 +31,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class KunAltarBlock extends BaseEntityBlock implements Machine {
 
+    public static final EnumProperty<KunAltarType> TYPE = EnumProperty.create("type", KunAltarType.class);
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(TYPE);
+    }
 
     public KunAltarBlock(Properties p_49224_) {
         super(p_49224_);
+        this.registerDefaultState(this.stateDefinition.any().setValue(TYPE, KunAltarType.COMPLETE));
     }
 
     @Nullable
@@ -92,18 +101,12 @@ public class KunAltarBlock extends BaseEntityBlock implements Machine {
 
     @Override
     public @NotNull RenderShape getRenderShape(BlockState state) {
-        // 使用实体渲染，而不是模型渲染
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
-    // 根据方块实体中的状态返回不同的形状
     @Override
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (level.getBlockEntity(pos) instanceof KunAltarBlockEntity blockEntity) {
-            return blockEntity.getAltarType().getShape();
-        }
-        // 默认返回COMPLETE形状
-        return KunAltarType.COMPLETE.getShape();
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return state.getValue(TYPE).getShape();
     }
 
     @Override

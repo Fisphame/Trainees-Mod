@@ -195,6 +195,7 @@
   "enchantment.trainees.balance": "Balance",
   "enchantment.trainees.conversion": "Conversion",
   "enchantment.trainees.exceeded": "Exceeded",
+  "enchantment.trainees.lithe": "Lithe",
   
   "entity.trainees.kun_trainees": "Kun Chicken",
   "entity.trainees.kun_anti": "Anti-fan",
@@ -312,6 +313,10 @@
   "subtitles.trainees.mining_sound_2": "You",
   "subtitles.trainees.mining_sound_3": "Too",
   "subtitles.trainees.mining_sound_4": "Beautiful",
+  "subtitles.trainees.hit": "Charging",
+  "subtitles.trainees.hit_reset": "Charging",
+  "subtitles.trainees.heavy_hit": "Charging",
+  "subtitles.trainees.heavy_hit_reset": "Charging",
   
   "container.trainees.purification_station": "Purification Station",
   "container.trainees.purification_station.input_slot": "Material",

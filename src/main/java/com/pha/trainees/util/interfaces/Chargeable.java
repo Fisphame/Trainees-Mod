@@ -1,5 +1,6 @@
 package com.pha.trainees.util.interfaces;
 
+import com.pha.trainees.registry.ModEnchantments;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -17,10 +18,20 @@ public interface Chargeable {
         ItemStack stack = player.getItemInHand(hand);
         Vec3 look = player.getLookAngle();
 
+        // 水平方向速度
         look = new Vec3(look.x, 0, look.z).normalize();
         player.setDeltaMovement(look);
         player.awardStat(Stats.ITEM_USED.get(stack.getItem()));
         player.getCooldowns().addCooldown(stack.getItem(), getChargeCooldown());
+
+        // 重置摔落高度
+        if (!level.isClientSide()) { // 仅在服务端执行
+            int litheLevel = stack.getEnchantmentLevel(ModEnchantments.LITHE.get());
+            if (litheLevel > 0) {
+                player.fallDistance = 0.0F;
+            }
+        }
+
         if (consumesDurabilityOnCharge(player)) {
             stack.hurtAndBreak(1, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
         }

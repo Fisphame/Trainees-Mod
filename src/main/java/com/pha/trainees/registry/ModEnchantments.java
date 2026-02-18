@@ -24,16 +24,21 @@ public class ModEnchantments {
             ENCHANTMENTS.register("advent",
                     () -> new AdventEnchantment(Enchantment.Rarity.UNCOMMON)
             );
-    public static final RegistryObject<Enchantment> BALANCE=
+    public static final RegistryObject<Enchantment> BALANCE =
             ENCHANTMENTS.register("balance",
                     () -> new BalanceEnchantment(Enchantment.Rarity.UNCOMMON)
             );
-    public static final RegistryObject<Enchantment> EXCEEDED=
+    public static final RegistryObject<Enchantment> EXCEEDED =
             ENCHANTMENTS.register("exceeded",
                     () -> new ExceededEnchantment(Enchantment.Rarity.UNCOMMON)
             );
-    public static final RegistryObject<Enchantment> CONVERSION=
+    public static final RegistryObject<Enchantment> CONVERSION =
             ENCHANTMENTS.register("conversion",
                     () -> new ConversionEnchantment(Enchantment.Rarity.UNCOMMON)
+            );
+
+    public static final RegistryObject<Enchantment> LITHE =
+            ENCHANTMENTS.register("lithe",
+                    () -> new LitheEnchantment(Enchantment.Rarity.UNCOMMON)
             );
 }

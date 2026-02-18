@@ -9,6 +9,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -82,7 +84,13 @@ public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements Travers
             if (level != null) {
                 Tools.Particle.send(
                         level, ParticleTypes.SOUL_FIRE_FLAME, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
-                        5, 0.3, 0.3, 0.3, 0.1
+                        15, 0.3, 0.3, 0.3, 0.1
+                );
+            }
+
+            if (level != null && !level.isClientSide()) {
+                level.playSound(null, worldPosition,
+                        SoundEvents.DEEPSLATE_HIT, SoundSource.BLOCKS, 0.5F, 1.0F
                 );
             }
             return InteractionResult.SUCCESS;

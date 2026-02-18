@@ -197,6 +197,7 @@
   "enchantment.trainees.balance": "平衡",
   "enchantment.trainees.conversion": "转化",
   "enchantment.trainees.exceeded": "超限",
+  "enchantment.trainees.lithe": "轻盈",
   
   "entity.trainees.kun_trainees": "练习鸡",
   "entity.trainees.kun_anti": "黑粉",
@@ -318,6 +319,10 @@
   "subtitles.trainees.mining_sound_2": "你",
   "subtitles.trainees.mining_sound_3": "太",
   "subtitles.trainees.mining_sound_4": "美",
+  "subtitles.trainees.hit": "突进",
+  "subtitles.trainees.hit_reset": "突进",
+  "subtitles.trainees.heavy_hit": "突进",
+  "subtitles.trainees.heavy_hit_reset": "突进",
   
   "container.trainees.purification_station": "提纯台",
   "container.trainees.purification_station.input_slot": "材料",

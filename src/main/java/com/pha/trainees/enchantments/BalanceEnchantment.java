@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
-import static com.pha.trainees.enchantments.KineticEnchantmentCategory.KINETIC_WEAPON;
+import static com.pha.trainees.enchantments.EnchantmentCategories.KINETIC_WEAPON;
 
 public class BalanceEnchantment extends Enchantment {
     // 每级减少的“每检查时间衰减动能”

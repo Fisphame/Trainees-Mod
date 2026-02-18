@@ -1,14 +1,11 @@
-package com.pha.trainees.materials;
+package com.pha.trainees.item.materials;
 
-import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModItems;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
@@ -16,7 +13,7 @@ import java.util.function.Supplier;
 
 //  TRAIN 练习生盔甲材料体系  包含三个等级：I, II, III
 
-public class TRAIN{
+public class TrainMaterial {
     private static final int[][] PROTECTION_PER_SLOT ={
             new int[]{3, 6, 4, 1},
             new int[]{5, 8, 5, 2},
@@ -49,7 +46,7 @@ public class TRAIN{
 
 
     // ==========  I ==========
-    public static class I implements ArmorMaterial {
+    public static class LevelI implements ArmorMaterial {
         private static final int level = 0;
         @Override
         public int getDurabilityForType(ArmorItem.Type type) {return DURABILITY_PER_SLOT[type.getSlot().getIndex()] * DURABILITY_PER_SLOT_COEFFICIENT[level];}
@@ -74,7 +71,7 @@ public class TRAIN{
     }
 
     // ==========  II ==========
-    public static class II implements ArmorMaterial {
+    public static class LevelII implements ArmorMaterial {
         private static final int level = 1;
         @Override
         public int getDurabilityForType(ArmorItem.Type type) {return DURABILITY_PER_SLOT[type.getSlot().getIndex()] * DURABILITY_PER_SLOT_COEFFICIENT[level];}
@@ -99,7 +96,7 @@ public class TRAIN{
     }
 
     // ==========  III ==========
-    public static class III implements ArmorMaterial {
+    public static class LevelIII implements ArmorMaterial {
         private static final int level = 2;
         @Override
         public int getDurabilityForType(ArmorItem.Type type) {return DURABILITY_PER_SLOT[type.getSlot().getIndex()] * DURABILITY_PER_SLOT_COEFFICIENT[level];}
@@ -121,15 +118,5 @@ public class TRAIN{
         public float getToughness() {return TOUGHNESS_VALUE[level];}
         @Override
         public float getKnockbackResistance() {return KNOCKBACK_RESISTANCE_VALUE[level];}
-    }
-
-    // ========== 实用方法 ==========
-    public static ArmorMaterial getMaterial(int level) {
-        return switch (level) {
-            case 1 -> new I();
-            case 2 -> new II();
-            case 3 -> new III();
-            default -> throw new IllegalArgumentException("Invalid TRAIN level: " + level);
-        };
     }
 }

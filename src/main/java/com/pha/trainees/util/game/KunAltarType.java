@@ -1,10 +1,11 @@
 package com.pha.trainees.util.game;
 
 
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public enum KunAltarType {
+public enum KunAltarType implements StringRepresentable {
     COMPLETE("complete",
             Block.box(1.0D, 0.0D, 1.0D, 15.0D, 15.5D, 15.0D)),
     HALF("half",
@@ -31,5 +32,11 @@ public enum KunAltarType {
         KunAltarType[] values = values();
         int nextIndex = (this.ordinal() + 1) % values.length;
         return values[nextIndex];
+    }
+
+    @Override
+    public String getSerializedName() {
+        // 返回用于序列化的字符串，建议使用小写
+        return this.name;
     }
 }

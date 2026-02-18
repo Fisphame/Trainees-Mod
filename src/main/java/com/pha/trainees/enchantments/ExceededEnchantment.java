@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
-import static com.pha.trainees.enchantments.KineticEnchantmentCategory.KINETIC_WEAPON;
+import static com.pha.trainees.enchantments.EnchantmentCategories.KINETIC_WEAPON;
 
 public class ExceededEnchantment extends Enchantment {
     // 每级增加的最大动能值

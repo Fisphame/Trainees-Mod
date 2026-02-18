@@ -1,5 +1,6 @@
 package com.pha.trainees.blockentity;
 
+import com.pha.trainees.block.KunAltarBlock;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.util.game.KunAltarType;
@@ -101,7 +102,7 @@ public class KunAltarBlockEntity extends ItemHandlerBlockEntity implements Machi
 
     // 切换祭坛类型
     public void toggleAltarType() {
-        altarType = altarType.next();
+        setAltarType(altarType.next());
 
         // 播放切换音效
         if (level != null && !level.isClientSide()) {
@@ -128,8 +129,10 @@ public class KunAltarBlockEntity extends ItemHandlerBlockEntity implements Machi
     public void setAltarType(KunAltarType type) {
         this.altarType = type;
         setChanged();
-        if (level != null) {
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        if (level != null && !level.isClientSide()) {
+            BlockState state = level.getBlockState(worldPosition);
+            // 更新方块状态中的 TYPE 属性，flag 为 3 表示通知客户端并更新形状
+            level.setBlock(worldPosition, state.setValue(KunAltarBlock.TYPE, type), 3);
         }
     }
 
@@ -137,19 +140,33 @@ public class KunAltarBlockEntity extends ItemHandlerBlockEntity implements Machi
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.putString("AltarType", altarType.name());
+        tag.putString("AltarType", altarType.getSerializedName());
     }
+
 
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
+        KunAltarType oldType = this.altarType;
         if (tag.contains("AltarType")) {
-            try {
-                altarType = KunAltarType.valueOf(tag.getString("AltarType"));
-            } catch (IllegalArgumentException e) {
-                altarType = KunAltarType.COMPLETE;
+            String typeName = tag.getString("AltarType");
+            // 解析类型（兼容新旧格式）
+            altarType = parseAltarType(typeName);
+        }
+        // 如果类型变化且服务端，更新 blockstate
+        if (level != null && !level.isClientSide() && oldType != altarType) {
+            BlockState state = level.getBlockState(worldPosition);
+            level.setBlock(worldPosition, state.setValue(KunAltarBlock.TYPE, altarType), 3);
+        }
+    }
+
+    private KunAltarType parseAltarType(String name) {
+        for (KunAltarType t : KunAltarType.values()) {
+            if (t.getSerializedName().equals(name) || t.name().equals(name)) {
+                return t;
             }
         }
+        return KunAltarType.COMPLETE; // 默认
     }
 
     @Override
