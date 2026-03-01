@@ -1,0 +1,19 @@
+{
+    "type": "trainees:trainer_altar",
+    "input1": {
+        "item": "minecraft:stone"
+    },
+    "input2": {
+        "item": "minecraft:stone"
+    },
+    "input3": {
+        "item": "minecraft:stone"
+    },
+    "input4": {
+        "item": "minecraft:stone"
+    },
+    "result": {
+        "item": "minecraft:diamond",
+        "count": 1
+    }
+}

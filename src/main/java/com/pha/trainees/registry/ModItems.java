@@ -329,7 +329,7 @@ public class ModItems {
     //提升4倍
 
     //只因阔斧锤
-    public static final RegistryObject<Item> KUN_ACXEMACE = ITEMS.register("kun_axemace" ,
+    public static final RegistryObject<Item> KUN_AXEMACE = ITEMS.register("kun_axemace" ,
             ()-> new AxeMaceItem(
                     Tiers.IRON,
                     53,

@@ -1492,17 +1492,16 @@ public class Tools {
             entity.setXRot(newPitch);
         }
 
-        public static void spawnItemEntity(Level level, BlockPos pos, ItemStack itemStack){
-            spawnItemEntity(level, pos, itemStack, 0.1);
+
+        public static void spawnItemEntity(Level level, Vec3 pos, ItemStack itemStack){
+            ItemEntity itemEntity = new ItemEntity(level, pos.x, pos.y, pos.z, itemStack);
+            spawnItemEntity(level, itemEntity);
         }
-        public static void spawnItemEntity(Level level, BlockPos pos, ItemStack itemStack, double spread){
+        public static void spawnItemEntity(Level level, BlockPos pos, ItemStack itemStack){
             ItemEntity itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), itemStack);
-            spawnItemEntity(level, itemEntity, spread);
+            spawnItemEntity(level, itemEntity);
         }
         public static void spawnItemEntity(Level level, ItemEntity itemEntity){
-            spawnItemEntity(level, itemEntity, 0.1);
-        }
-        public static void spawnItemEntity(Level level, ItemEntity itemEntity, double spread){
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);
         }

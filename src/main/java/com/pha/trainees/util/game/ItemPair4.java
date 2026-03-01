@@ -2,71 +2,72 @@ package com.pha.trainees.util.game;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class ItemPair4 {
-    private static Item item1;
-    private static Item item2;
-    private static Item item3;
-    private static Item item4;
-    private static ItemStack result;
+    private final Item item1;
+    private final Item item2;
+    private final Item item3;
+    private final Item item4;
+    private final ItemStack result;
 
-    public ItemPair4(Item item1, Item item2, Item item3, Item item4, ItemStack re){
-        ItemPair4.item1 = item1;
-        ItemPair4.item2 = item2;
-        ItemPair4.item3 = item3;
-        ItemPair4.item4 = item4;
-        ItemPair4.result = re;
+    public ItemPair4(Item item1, Item item2, Item item3, Item item4, ItemStack result) {
+        this.item1 = item1;
+        this.item2 = item2;
+        this.item3 = item3;
+        this.item4 = item4;
+        this.result = result;
     }
 
-
-    @Override
-    public String toString(){
-        return String.format("%s & %s & %s & %s", item1.toString(), item2.toString(), item3.toString(), item4.toString());
+    // 获取规范化列表（用于无序比较）
+    private List<Item> normalized() {
+        List<Item> list = Arrays.asList(item1, item2, item3, item4);
+        list.sort(Comparator.comparing(Item::getDescriptionId)); // 按注册名排序
+        return list;
     }
 
-    // 获取规范化表示：排序后的列表，null放在最后
-    public List<Item> normalized() {
-        List<Item> items = Arrays.asList(item1, item2, item3, item4);
-//        items.sort(Comparator.nullsLast(Comparator.comparingInt(System::identityHashCode)));
-        return items;
-    }
-
-    // 判断输入是否匹配此物品对（忽略顺序）
+    // 判断四个输入物品是否匹配此配方（无序）
     public boolean matches(Item input1, Item input2, Item input3, Item input4) {
-        // 规范化输入
-        List<Item> myItems = normalized();
-        List<Item> inputItems = Arrays.asList(input1, input2, input3, input4);
-        return myItems.equals(inputItems);
-//
-//
-//        inputItems.sort(Comparator.nullsLast(Comparator.comparingInt(System::identityHashCode)));
-//
-//
-//        // 逐个比较
-//        for (int i = 0; i < 4; i++) {
-//            if (inputItems.get(i) != myItems.get(i)) {
-//                return false;
-//            }
-//        }
+        if (input1 == null || input2 == null || input3 == null || input4 == null) return false;
+        List<Item> inputList = Arrays.asList(input1, input2, input3, input4);
+        inputList.sort(Comparator.comparing(Item::getDescriptionId));
+        return normalized().equals(inputList);
     }
 
-    public Item getItem1(){
+    // Getters
+    public Item getItem1() {
         return item1;
     }
-    public Item getItem2(){
+    public Item getItem2() {
         return item2;
     }
-    public Item getItem3(){
+    public Item getItem3() {
         return item3;
     }
-    public Item getItem4(){
+    public Item getItem4() {
         return item4;
     }
-    public ItemStack getResultItem(){
-        return result;
+    public ItemStack getResultItem() {
+        return result.copy();
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s & %s & %s & %s -> %s",
+                item1, item2, item3, item4, result);
+    }
+
+    // 用于配方列表比较（如果需要）
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ItemPair4 that)) return false;
+        return normalized().equals(that.normalized()) &&
+                ItemStack.matches(result, that.result);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(normalized(), result);
+    }
 }

@@ -39,8 +39,8 @@ public class Main {
         HiddenItem.ITEMS.register(bus);
         ModCreativeModeTabs.CREATIVE_MODE_TABS.register(bus);
         ModMenuTypes.MENUS.register(bus);
-        ModRecipeTypes.RECIPE_SERIALIZERS.register(bus);
-        ModRecipeTypes.RECIPE_TYPES.register(bus);
+        ModRecipes.SERIALIZERS.register(bus);
+        ModRecipes.TYPES.register(bus);
         ModFluid.FLUID_TYPES.register(bus);
         ModFluid.FLUIDS.register(bus);
         ModCommand.register();

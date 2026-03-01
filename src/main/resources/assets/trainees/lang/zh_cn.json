@@ -327,5 +327,7 @@
   "container.trainees.purification_station": "提纯台",
   "container.trainees.purification_station.input_slot": "材料",
   "container.trainees.purification_station.fuel_slot": "升级/提纯物……",
-  "button.trainees.purify": "提升"
+  "button.trainees.purify": "提升",
+  
+  "jei.trainees.trainer_altar": "土申祭坛"
 }

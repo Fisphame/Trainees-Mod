@@ -229,12 +229,15 @@ public class ActiveStructureManager extends SavedData {
                 continue;
             }
 
+            IActivationHandler handler = pattern.getActivationHandler();
+            int logicInterval = handler.getLogicTickInterval();
+            int effectInterval = handler.getEffectTickInterval();
             // 检查该结构的所有激活实例
             List<ActiveStructureData> toRemove = new ArrayList<>();
 
             for (ActiveStructureData data : structureSet) {
                 try {
-                    // 1. 检查结构是否仍然完整
+                    // 检查结构是否仍然完整
                     BlockPos originPos = calculateOriginFromMatch(data.matchPos, pattern);
 //                    MultiblockPattern.MatchResult match = pattern.check(level, originPos);
                     MultiblockPattern.SafeMatchResult safeMatch = pattern.checkSafe(level, originPos);
@@ -247,24 +250,18 @@ public class ActiveStructureManager extends SavedData {
                         continue;
                     }
 
-//                    if (match == null) {
-//                        // 结构不完整，标记为需要移除
-//                        toRemove.add(data);
-//                        Main.LOGGER.info("Structure {} broken at {}, removing active state",
-//                                structureId, data.matchPos);
-//                        continue;
-//                    }
-
-                    // 2. 更新激活时间
-                    data.lastTick = currentTick;
-
-                    // 3. 触发粒子效果（根据间隔）
-                    int particleInterval = pattern.getActivationHandler().getParticleTickInterval();
-                    if (particleInterval > 0 && currentTick - data.lastParticleTick >= particleInterval) {
-                        pattern.getActivationHandler().onActiveTick(level, data.matchPos, currentTime - data.activationTime);
-                        data.lastParticleTick = currentTick;
-                        setDirty();
+                    // 更新激活时间
+                    // 逻辑 tick
+                    if (logicInterval > 0 && currentTick - data.lastLogicTick >= logicInterval) {
+                        handler.onLogicTick(level, data.matchPos, currentTick - data.activationTime);
+                        data.lastLogicTick = currentTick;
                     }
+                    // 效果 tick
+                    if (effectInterval > 0 && currentTick - data.lastEffectTick >= effectInterval) {
+                        handler.onEffectTick(level, data.matchPos, currentTick - data.activationTime);
+                        data.lastEffectTick = currentTick;
+                    }
+                    setDirty();
 
                 } catch (Exception e) {
                     Main.LOGGER.error("Error updating active structure {} at {}", structureId, data.matchPos, e);
@@ -479,15 +476,15 @@ public class ActiveStructureManager extends SavedData {
         public final String structureId;
         public final BlockPos matchPos;
         public final long activationTime;
-        public long lastParticleTick;
-        public long lastTick;
+        public long lastLogicTick;   // 上次执行逻辑 tick 时的游戏时间
+        public long lastEffectTick;  // 上次执行效果 tick 时的游戏时间
 
-        public ActiveStructureData(String structureId, BlockPos matchPos, long activationTime, long lastTick) {
+        public ActiveStructureData(String structureId, BlockPos matchPos, long activationTime, long currentTick) {
             this.structureId = structureId;
             this.matchPos = matchPos;
             this.activationTime = activationTime;
-            this.lastParticleTick = lastTick;
-            this.lastTick = lastTick;
+            this.lastLogicTick = currentTick;
+            this.lastEffectTick = currentTick;
         }
 
         public CompoundTag serializeNBT() {
@@ -495,20 +492,19 @@ public class ActiveStructureManager extends SavedData {
             tag.putString("StructureId", structureId);
             tag.put("MatchPos", NbtUtils.writeBlockPos(matchPos));
             tag.putLong("ActivationTime", activationTime);
-            tag.putLong("LastParticleTick", lastParticleTick);
-            tag.putLong("LastTick", lastTick);
+            tag.putLong("LastLogicTick", lastLogicTick);
+            tag.putLong("LastEffectTick", lastEffectTick);
             return tag;
         }
 
         public static ActiveStructureData deserializeNBT(CompoundTag tag) {
             String structureId = tag.getString("StructureId");
             BlockPos matchPos = NbtUtils.readBlockPos(tag.getCompound("MatchPos"));
-//                    .orElse(BlockPos.ZERO);
             long activationTime = tag.getLong("ActivationTime");
-            long lastTick = tag.getLong("LastTick");
-
-            ActiveStructureData data = new ActiveStructureData(structureId, matchPos, activationTime, lastTick);
-            data.lastParticleTick = tag.getLong("LastParticleTick");
+            long lastLogicTick = tag.getLong("LastLogicTick");
+            long lastEffectTick = tag.getLong("LastEffectTick");
+            ActiveStructureData data = new ActiveStructureData(structureId, matchPos, activationTime, lastLogicTick);
+            data.lastEffectTick = lastEffectTick;
             return data;
         }
     }

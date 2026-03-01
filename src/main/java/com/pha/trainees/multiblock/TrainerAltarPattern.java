@@ -3,9 +3,10 @@ package com.pha.trainees.multiblock;
 import com.pha.trainees.Main;
 import com.pha.trainees.block.KunAltarBlock;
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
+import com.pha.trainees.recipe.TrainerAltarRecipe;
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.registry.ModRecipes;
 import com.pha.trainees.util.game.ItemPair4;
-import com.pha.trainees.util.game.ItemPair4Manager;
 import com.pha.trainees.util.game.KunAltarType;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.*;
@@ -16,9 +17,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Trainer Altar 多方块结构
@@ -27,13 +33,7 @@ public class TrainerAltarPattern {
     public static final String STRUCTURE_ID = "trainees:trainer_altar";
 
     public static ActiveStructureManager manager;
-    public static final ItemPair4Manager pair4Manager = new ItemPair4Manager();
     // 1 - north  2 - east  3 - south  4 - west
-    public static KunAltarBlockEntity altarBlockEntity1;
-    public static KunAltarBlockEntity altarBlockEntity2;
-    public static KunAltarBlockEntity altarBlockEntity3;
-    public static KunAltarBlockEntity altarBlockEntity4;
-
 
     public static void register() {
         // 创建激活处理器
@@ -137,13 +137,6 @@ public class TrainerAltarPattern {
     private static class TrainerAltarActivationHandler implements IActivationHandler {
 
         @Override
-        public boolean preActivateCheck(Level level, BlockPos matchPos) {
-            // 这里可以添加额外的激活前检查
-            // 例如：检查玩家是否持有正确物品、检查冷却时间等
-            return true;
-        }
-
-        @Override
         public void onActivate(Level level, BlockPos matchPos) {
             Main.LOGGER.info("Trainer Altar activated at {}", matchPos);
             double x = matchPos.getX(); double y = matchPos.getY(); double z = matchPos.getZ();
@@ -163,8 +156,6 @@ public class TrainerAltarPattern {
 
 
             saveActivationData(level, matchPos);
-            setAltarBlockEntities(level, matchPos);
-            TrainerAltarRecipes.registerRecipes(pair4Manager);
         }
 
         @Override
@@ -180,34 +171,77 @@ public class TrainerAltarPattern {
         }
 
         @Override
-        public void onActiveTick(Level level, BlockPos matchPos, long activeTime) {
-            double x = matchPos.getX(); double y = matchPos.getY(); double z = matchPos.getZ();
+        public void onLogicTick(Level level, BlockPos matchPos, long activeTime) {
+            if (level.isClientSide) return;
             Vec3 center = Tools.BlockCourse.getCenter(matchPos);
             double cx = center.x; double cy = center.y; double cz = center.z;
-            Tools.Particle.send(
-                    level, ParticleTypes.SOUL_FIRE_FLAME, cx, cy, cz, 5, 3, 1, 3, 0.01
-            );
-            Tools.Particle.send(
-                    level, ParticleTypes.FLAME, cx, cy, cz, 5, 3, 1, 3, 0.01
-            );
-            ItemPair4 nowPair = getStoredItem();
 
-//            Main.LOGGER.info(nowPair.toString());
-//            ItemPair4 pair = pair4Manager.findMatchingPair(nowPair);
-//            if (pair != null) {
-//                ItemEntity itemEntity = new ItemEntity(level, cx, y + 2.0, cz, pair.getResultItem());
-//                Tools.EntityWay.spawnItemEntity(level, itemEntity);
-//                clearStoredItem();
-//            }
-//            else {
-//                Main.LOGGER.info("fuck pair is null fky");
-//            }
+            BlockPos altar1Pos = matchPos.offset(-3, -1, 0);  // 北
+            BlockPos altar2Pos = matchPos.offset(3, -1, 0);   // 南
+            BlockPos altar3Pos = matchPos.offset(0, -1, -3);  // 西
+            BlockPos altar4Pos = matchPos.offset(0, -1, 3);   // 东
 
+            if (!(level.getBlockEntity(altar1Pos) instanceof KunAltarBlockEntity altar1)) return;
+            if (!(level.getBlockEntity(altar2Pos) instanceof KunAltarBlockEntity altar2)) return;
+            if (!(level.getBlockEntity(altar3Pos) instanceof KunAltarBlockEntity altar3)) return;
+            if (!(level.getBlockEntity(altar4Pos) instanceof KunAltarBlockEntity altar4)) return;
+
+            ItemStack stack1 = altar1.getStoredItem();
+            ItemStack stack2 = altar2.getStoredItem();
+            ItemStack stack3 = altar3.getStoredItem();
+            ItemStack stack4 = altar4.getStoredItem();
+
+            if (stack1.isEmpty() || stack2.isEmpty() || stack3.isEmpty() || stack4.isEmpty()) {
+                return;
+            }
+
+            RecipeManager recipeManager = Objects.requireNonNull(level.getServer()).getRecipeManager();
+            List<TrainerAltarRecipe> recipes = recipeManager.getAllRecipesFor(ModRecipes.TRAINER_ALTAR_TYPE.get())
+                    .stream()
+                    .toList();
+
+            // 遍历配方
+            for (TrainerAltarRecipe recipe : recipes) {
+                if (recipe.matches(stack1, stack2, stack3, stack4)) {
+                    // 清除祭坛中的物品
+                    altar1.clearStoredItem();
+                    altar2.clearStoredItem();
+                    altar3.clearStoredItem();
+                    altar4.clearStoredItem();
+
+                    // 生成结果物品实体（结构中心上方2格）
+                    ItemStack result = recipe.getResultItem().copy();
+                    Tools.EntityWay.spawnItemEntity(level, new Vec3(center.x, center.y + 2.0, center.z), result);
+
+                    level.playSound(null, matchPos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    Tools.Particle.send(level, ParticleTypes.FLAME, cx, cy, cz, 25, 0.5, 0.5, 0.5, 0.1);
+
+                    break;
+                }
+            }
         }
 
         @Override
-        public int getParticleTickInterval() {
-            return 40;
+        public void onEffectTick(Level level, BlockPos matchPos, long activeTime) {
+            if (level.isClientSide) return;
+            Vec3 pos = Tools.BlockCourse.getCenter(matchPos);
+            double x = pos.x; double y = pos.y; double z = pos.z;
+            Tools.Particle.send(
+                    level, ParticleTypes.SOUL_FIRE_FLAME, x, y, z, 5, 3, 1, 3, 0.01
+            );
+            Tools.Particle.send(
+                    level, ParticleTypes.FLAME, x, y, z, 5, 3, 1, 3, 0.01
+            );
+        }
+
+        @Override
+        public int getLogicTickInterval() {
+            return 1; // 每 tick 检测合成
+        }
+
+        @Override
+        public int getEffectTickInterval() {
+            return 40; // 每 40 tick 显示一次粒子
         }
 
         @Override
@@ -241,86 +275,6 @@ public class TrainerAltarPattern {
                 // 设置方块实体的激活状态
             }
         }
-    }
-
-//    /**
-//     * 实用方法：从激活位置获取所有结构方块位置
-//     */
-//    public static void forEachStructureBlock(Level level, BlockPos corePos,
-//                                             BiConsumer<BlockPos, BlockState> consumer) {
-//        // 计算结构原点
-//        BlockPos originPos = corePos.offset(-2, -1, -2);
-//
-//        // 遍历所有结构位置
-//        BlockPos[] positions = {
-//                // 基础方块
-//                originPos.offset(2, 0, 2),
-//                originPos.offset(2, 2, 2),
-//                // 核心方块
-//                originPos.offset(2, 1, 2),
-//                // KunAltar 方块
-//                originPos.offset(0, 0, 2),
-//                originPos.offset(4, 0, 2),
-//                originPos.offset(2, 0, 0),
-//                originPos.offset(2, 0, 4)
-//        };
-//
-//        for (BlockPos pos : positions) {
-//            BlockState state = level.getBlockState(pos);
-//            consumer.accept(pos, state);
-//        }
-//    }
-
-    public static void setAltarBlockEntities(Level level, BlockPos corePos) {
-        if (level.getBlockEntity(corePos.offset(0, -1, -3)) instanceof KunAltarBlockEntity blockEntity){
-            altarBlockEntity1 = blockEntity;
-        }
-        if (level.getBlockEntity(corePos.offset(3, -1, 0)) instanceof KunAltarBlockEntity blockEntity){
-            altarBlockEntity2 = blockEntity;
-        }
-        if (level.getBlockEntity(corePos.offset(0, -1, 3)) instanceof KunAltarBlockEntity blockEntity){
-            altarBlockEntity3 = blockEntity;
-        }
-        if (level.getBlockEntity(corePos.offset(-3, -1, 0)) instanceof KunAltarBlockEntity blockEntity){
-            altarBlockEntity4 = blockEntity;
-        }
-    }
-
-    public static ItemPair4 getStoredItem() {
-        return new ItemPair4(
-                altarBlockEntity1.getStoredItem().getItem(),
-                altarBlockEntity2.getStoredItem().getItem(),
-                altarBlockEntity3.getStoredItem().getItem(),
-                altarBlockEntity4.getStoredItem().getItem(),
-                null
-        );
-    }
-
-    public void setStoredItem(ItemPair4 itemPair4) {
-        altarBlockEntity1.setStoredItem(new ItemStack(itemPair4.getItem1(), 1));
-        altarBlockEntity2.setStoredItem(new ItemStack(itemPair4.getItem2(), 1));
-        altarBlockEntity3.setStoredItem(new ItemStack(itemPair4.getItem3(), 1));
-        altarBlockEntity4.setStoredItem(new ItemStack(itemPair4.getItem4(), 1));
-    }
-
-    public static void clearStoredItem() {
-        altarBlockEntity1.clearStoredItem();
-        altarBlockEntity2.clearStoredItem();
-        altarBlockEntity3.clearStoredItem();
-        altarBlockEntity4.clearStoredItem();
-    }
-
-    public boolean hasStoredItem() {
-        return altarBlockEntity1.hasStoredItem() && altarBlockEntity2.hasStoredItem()
-                && altarBlockEntity3.hasStoredItem() && altarBlockEntity4.hasStoredItem();
-    }
-
-    public void dropStoredItem(Level level) {
-        if (level == null || level.isClientSide()) return;
-        altarBlockEntity1.dropStoredItem();
-        altarBlockEntity2.dropStoredItem();
-        altarBlockEntity3.dropStoredItem();
-        altarBlockEntity4.dropStoredItem();
     }
 }
 
