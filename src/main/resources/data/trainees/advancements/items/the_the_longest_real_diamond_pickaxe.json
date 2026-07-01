@@ -9,7 +9,7 @@
     "description": {
       "translate": "advancements.trainees.the_the_longest_real_diamond_pickaxe.description"
     },
-    "frame": "challenge",
+    "frame": "goal",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false

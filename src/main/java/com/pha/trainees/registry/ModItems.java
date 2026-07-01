@@ -3,7 +3,7 @@ package com.pha.trainees.registry;
 import com.pha.trainees.Main;
 import com.pha.trainees.item.*;
 import com.pha.trainees.item.materials.TrainMaterial;
-import com.pha.trainees.util.game.ModTiers;
+import com.pha.trainees.util.game.enums.ModTiers;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
@@ -162,6 +162,12 @@ public class ModItems {
     //反应炉
     public static final RegistryObject<Item> REACTING_FURNACE_BLOCK_ITEM = ITEMS.register("reacting_furnace",
             () -> new BlockItem(ModBlocks.REACTING_FURNACE.get(),
+                    new Item.Properties()
+            )
+    );
+    //
+    public static final RegistryObject<Item> REACTION_MACHINE_ITEM = ITEMS.register("reaction_machine",
+            () -> new BlockItem(ModBlocks.REACTION_MACHINE.get(),
                     new Item.Properties()
             )
     );
@@ -498,11 +504,14 @@ public class ModItems {
 
     //石棍
     public static final RegistryObject<Item> STONE_STICK = ITEMS.register("stone_stick",
-            ()-> new StoneStickItem(new Item.Properties())
+            () -> new StoneStickItem(new Item.Properties())
     );
+    //石棍T
+    public static final RegistryObject<Item> STONE_STICK_T = ITEMS.register("stone_stick_t",
+            () -> new StoneStickTItem(new Item.Properties()));
     //只因粒
     public static final RegistryObject<Item> KUN_NUGGET = ITEMS.register("kun_nugget",
-            ()-> new KunCourseItem.KunNuggetItem(new Item.Properties())
+            () -> new KunCourseItem.KunNuggetItem(new Item.Properties())
     );
     //两锭半
     public static final RegistryObject<Item> TWO_HALF_INGOT = ITEMS.register("two_half_ingot",

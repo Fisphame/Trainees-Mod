@@ -12,6 +12,7 @@ public class RenderersRegisterEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.CALLED_SWORD.get(), Renderers.CalledSwordRenderer::new);
+        event.registerEntityRenderer(ModEntities.PARTICLE_ENTITY.get(), Renderers.PatrticleEntityRenderer::new);
         event.registerEntityRenderer(ModEntities.KUN_TRAINEES.get(), Renderers.KunTraineesRenderer::new);
         event.registerEntityRenderer(ModEntities.KUN_ANTI.get(), Renderers.KunAntiRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_CHICKEN.get(), Renderers.GoldChickenRenderer::new);

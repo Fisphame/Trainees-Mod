@@ -3,7 +3,7 @@ package com.pha.trainees.screen;
 import com.pha.trainees.blockentity.PurificationStationBlockEntity;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
-import com.pha.trainees.registry.ModMenuTypes;
+import com.pha.trainees.registry.ModMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -42,7 +42,7 @@ public class PurificationStationMenu extends AbstractContainerMenu {
     }
 
     public PurificationStationMenu(int id, Inventory playerInventory, PurificationStationBlockEntity entity) {
-        super(ModMenuTypes.PURIFICATION_STATION_MENU.get(), id);
+        super(ModMenus.PURIFICATION_STATION_MENU.get(), id);
         this.blockEntity = entity;
 
         // 添加玩家物品栏

@@ -1,12 +1,18 @@
 package com.pha.trainees;
 
 import com.mojang.logging.LogUtils;
+import com.pha.trainees.api.DeepSeekClient;
 import com.pha.trainees.event.*;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.util.game.chemistry.ChemicalReaction;
 import com.pha.trainees.util.game.chemistry.ReactionConditions;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -18,10 +24,14 @@ public class Main {
 
     public static final String MODID = "trainees";
     public static final Logger LOGGER = LogUtils.getLogger();
+    private static DeepSeekClient deepSeekClient;
+
+
 
     public Main() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus ebus = MinecraftForge.EVENT_BUS;
+        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.COMMON, ModConfig.COMMON_SPEC, "trainees-common.toml");
 
         ModBlocks.BLOCKS.register(bus);
         ModBlocks.ModBlockEntities.BLOCK_ENTITIES.register(bus);
@@ -38,17 +48,20 @@ public class Main {
         HiddenItem.BLOCKS.register(bus);
         HiddenItem.ITEMS.register(bus);
         ModCreativeModeTabs.CREATIVE_MODE_TABS.register(bus);
-        ModMenuTypes.MENUS.register(bus);
+        ModMenus.MENUS.register(bus);
         ModRecipes.SERIALIZERS.register(bus);
         ModRecipes.TYPES.register(bus);
-        ModFluid.FLUID_TYPES.register(bus);
-        ModFluid.FLUIDS.register(bus);
+        ModFluids.FLUID_TYPES.register(bus);
+        ModFluids.FLUIDS.register(bus);
         ModCommand.register();
+        ebus.register(ModCommand.AskCommand.class);  // 注册命令
+//        bus.addListener(this::onClientSetup);
 
         bus.register(new Register());
         bus.addListener(this::commonSetup);
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
+        ebus.register(this);
     }
 
     private void commonSetup(final @NotNull FMLCommonSetupEvent event) {
@@ -75,5 +88,22 @@ public class Main {
         });
 
         Main.LOGGER.info("Chemistry System: commonSetup completed");
+    }
+
+    @SubscribeEvent
+    public void onServerStarted(ServerStartedEvent event) {
+        // 服务器启动完成后，从配置读取 API Key 并初始化客户端
+        String apiKey = ModConfig.COMMON.deepSeekApiKey.get();
+        if (apiKey != null && !apiKey.isEmpty()) {
+            deepSeekClient = new DeepSeekClient(apiKey);
+            LOGGER.info("DeepSeek Client initialized.");
+        } else {
+            LOGGER.warn("DeepSeek API Key not set! Please configure it in config/trainees-common.toml");
+        }
+    }
+
+    // 提供 getter 供命令使用
+    public static DeepSeekClient getDeepSeekClient() {
+        return deepSeekClient;
     }
 }

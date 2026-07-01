@@ -3,8 +3,9 @@ package com.pha.trainees.item;
 import com.pha.trainees.Main;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
-import com.pha.trainees.util.game.AchievementManager;
-import com.pha.trainees.util.game.Booleanf;
+import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.types.Booleanf;
+import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.MultiblockStructure;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -19,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public class StoneStickItem extends Item {
+public class StoneStickItem extends Item implements HoverText {
     public StoneStickItem(Properties p_41383_) {
         super(p_41383_);
     }
@@ -49,12 +50,9 @@ public class StoneStickItem extends Item {
 
         if (activated.bool()) {
             Main.LOGGER.info("Trainer Altar activated success");
-            player.displayClientMessage(
-                    Component.literal("--[ - ]--").withStyle(ChatFormatting.GREEN),
-                    true
-            );
+            player.displayClientMessage(SuccessC, true);
             if (player instanceof ServerPlayer serverPlayer) {
-                AchievementManager.grantSpecificAchievement(
+                Tools.Achievement.grantSpecificAchievement(
                         serverPlayer,
                         "trainees:structure/altar"  // altar.json
                 );
@@ -65,11 +63,11 @@ public class StoneStickItem extends Item {
             player.displayClientMessage(
                     Component.literal(
                             switch (activated.num()) {
-                                case 0 -> "--x--";
-                                case 1 -> "--?--";
-                                case 2 -> "···";
-                                case 3 -> "-[-x-]-";
-                                case 4 -> "--[ - ]--";
+                                case 0 -> Fail;
+                                case 1 -> Lose;
+                                case 2 -> Cooldown;
+                                case 3 -> Fail2;
+                                case 4 -> Success;
                                 default -> "Unexpected";
                             }
                     ).withStyle(

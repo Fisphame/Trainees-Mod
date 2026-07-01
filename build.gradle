@@ -28,6 +28,11 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
+            // 添加以下两行以缓解模块化冲突
+            jvmArgs '--add-modules=ALL-DEFAULT'
+            jvmArgs '--illegal-access=permit'
+
+
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -98,6 +103,12 @@ dependencies {
     compileOnly(fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}"))
     runtimeOnly(fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}"))
+
+    // OkHttp (HTTP 客户端)
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // Gson (JSON 处理)
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -137,31 +148,44 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+//
+//    // 关键：将运行时依赖（OkHttp, Gson 等）打包进 mod JAR
+//    from {
+//        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//    } {
+//        // 排除签名文件，避免安全警告
+//        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+//        // 关键：排除模块描述符，防止模块系统冲突
+//        exclude 'module-info.class'
+//    }
+//    // 处理重复文件（如多个依赖中的相同配置文件）
+//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
 
     finalizedBy 'reobfJar'
 }
 
-// 创建开发版本JAR（自动包含反混淆的类）
-tasks.register('devJar', Jar) {
-    archiveClassifier = 'dev'
-    from sourceSets.main.output
-    includeEmptyDirs = false
-
-    manifest {
-        attributes([
-                'FMLModType'            : 'LIBRARY',
-                'Specification-Title'   : 'trainees',
-                'Specification-Vendor'  : 'pha',
-                'Specification-Version' : '1',
-                'Implementation-Title'  : project.name,
-                'Implementation-Version': project.version,
-                'Implementation-Vendor' : 'pha',
-                'Built-By'              : System.getProperty('user.name'),
-                'Build-Timestamp'       : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                'Build-Jdk'             : System.getProperty('java.version'),
-        ])
-    }
-}
+//// 创建开发版本JAR（自动包含反混淆的类）
+//tasks.register('devJar', Jar) {
+//    archiveClassifier = 'dev'
+//    from sourceSets.main.output
+//    includeEmptyDirs = false
+//
+//    manifest {
+//        attributes([
+//                'FMLModType'            : 'LIBRARY',
+//                'Specification-Title'   : 'trainees',
+//                'Specification-Vendor'  : 'pha',
+//                'Specification-Version' : '1',
+//                'Implementation-Title'  : project.name,
+//                'Implementation-Version': project.version,
+//                'Implementation-Vendor' : 'pha',
+//                'Built-By'              : System.getProperty('user.name'),
+//                'Build-Timestamp'       : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+//                'Build-Jdk'             : System.getProperty('java.version'),
+//        ])
+//    }
+//}
 
 // 创建源码JAR（可选，但推荐）
 tasks.register('sourcesJar', Jar) {
@@ -172,12 +196,12 @@ tasks.register('sourcesJar', Jar) {
 
 // ========== 构建配置 ==========
 // 确保build任务包含开发版本
-tasks.build.dependsOn devJar, sourcesJar
-
+//tasks.build.dependsOn devJar, sourcesJar
+tasks.build.dependsOn sourcesJar
 // 将所有生成的JAR添加到artifacts
 artifacts {
     archives jar
-    archives devJar
+//    archives devJar
     archives sourcesJar
 }
 

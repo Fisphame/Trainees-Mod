@@ -10,7 +10,7 @@
       "item": "trainees:auriversite_ingot"
     },
     "S": {
-      "item": "trainees:stone_stick"
+      "tag": "trainees:stone_stick"
     }
   },
   "result": {

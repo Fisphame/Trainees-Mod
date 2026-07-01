@@ -3,7 +3,7 @@ package com.pha.trainees.client;
 import com.mojang.blaze3d.platform.Window;
 import com.pha.trainees.item.AuriversiteRapierItem;
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.physics.KineticEnergySystem;
+import com.pha.trainees.util.game.physics.KineticEnergySystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;

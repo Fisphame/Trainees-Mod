@@ -21,7 +21,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -32,7 +32,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -48,7 +48,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -59,7 +59,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -70,7 +70,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -81,7 +81,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -92,7 +92,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -103,7 +103,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -114,7 +114,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 
@@ -125,7 +125,7 @@ public class PowderAntiCourseItem {
 
         @Override
         public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-            return on(stack, entity);
+            return levelOn(stack, entity);
         }
     }
 

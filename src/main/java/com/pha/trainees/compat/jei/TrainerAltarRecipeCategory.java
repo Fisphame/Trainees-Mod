@@ -21,16 +21,39 @@ public class TrainerAltarRecipeCategory implements IRecipeCategory<TrainerAltarR
     public static final ResourceLocation UID = new ResourceLocation(Main.MODID, "trainer_altar");
     public static final RecipeType<TrainerAltarRecipe> TYPE = new RecipeType<>(UID, TrainerAltarRecipe.class);
 
-    // 背景图片路径：assets/trainees/textures/gui/jei_trainer_altar.png
-    private static final ResourceLocation TEXTURE =
-            new ResourceLocation(Main.MODID, "textures/gui/jei_trainer_altar.png");
+    // ===== 可配置参数 =====
+    private static final int BG_WIDTH = 136;          // 背景图宽度（像素）
+    private static final int BG_HEIGHT = 68;         // 背景图高度（像素）
+    private static final int GAP = 6;                // 槽位边缘之间的绝对间隔（像素）
+    private static final int SLOT_SIZE = 20;           // 物品槽边长（固定20像素）
+    // =====================
+
+    // 背景中心坐标（整数除法取整，中心允许偏移0.5像素，不影响槽位放置）
+    private static final int CENTER_X = BG_WIDTH / 2;
+    private static final int CENTER_Y = BG_HEIGHT / 2;
+
+    // 输出槽左上角坐标（槽中心与背景中心重合）
+    private static final int OUTPUT_X = CENTER_X - SLOT_SIZE / 2;
+    private static final int OUTPUT_Y = CENTER_Y - SLOT_SIZE / 2;
+
+    // 四个输入槽左上角坐标（顺时针：左、上、右、下）
+    private static final int LEFT_X   = OUTPUT_X - SLOT_SIZE - GAP;
+    private static final int LEFT_Y   = OUTPUT_Y;
+    private static final int TOP_X    = OUTPUT_X;
+    private static final int TOP_Y    = OUTPUT_Y - SLOT_SIZE - GAP;
+    private static final int RIGHT_X  = OUTPUT_X + SLOT_SIZE + GAP;
+    private static final int RIGHT_Y  = OUTPUT_Y;
+    private static final int BOTTOM_X = OUTPUT_X;
+    private static final int BOTTOM_Y = OUTPUT_Y + SLOT_SIZE + GAP;
+
     private final IDrawable background;
     private final IDrawable icon;
 
     public TrainerAltarRecipeCategory(IGuiHelper helper) {
-        // 背景图尺寸为 116x54，从左上角(0,0)开始绘制整个图片
-        this.background = helper.createDrawable(TEXTURE, 0, 0, 116, 54);
-        // 图标使用多方块核心方块
+        // 背景图路径不变，尺寸需与 BG_WIDTH, BG_HEIGHT 一致
+        // 背景图片路径：assets/trainees/textures/gui/jei_trainer_altar.png
+        ResourceLocation texture = new ResourceLocation(Main.MODID, "textures/gui/jei_trainer_altar.png");
+        this.background = helper.createDrawable(texture, 0, 0, BG_WIDTH, BG_HEIGHT);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.ALTAR_CORE_BLOCK.get()));
     }
 
@@ -55,23 +78,18 @@ public class TrainerAltarRecipeCategory implements IRecipeCategory<TrainerAltarR
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, TrainerAltarRecipe recipe, @NotNull IFocusGroup focuses) {
-        // 输入槽：四个田字形槽位，左上角坐标依次为 (10,7), (30,7), (10,27), (30,27)
-        // 槽位宽高均为20像素，但JEI的槽位渲染是自动的，只需指定左上角坐标即可
-        builder.addSlot(RecipeIngredientRole.INPUT, 10, 7)
+    public void setRecipe(IRecipeLayoutBuilder builder, TrainerAltarRecipe recipe, IFocusGroup focuses) {
+        builder.addSlot(RecipeIngredientRole.INPUT, LEFT_X, LEFT_Y)
                 .addIngredients(recipe.getInput1());
-
-        builder.addSlot(RecipeIngredientRole.INPUT, 30, 7)
+        builder.addSlot(RecipeIngredientRole.INPUT, TOP_X, TOP_Y)
                 .addIngredients(recipe.getInput2());
-
-        builder.addSlot(RecipeIngredientRole.INPUT, 10, 27)
+        builder.addSlot(RecipeIngredientRole.INPUT, RIGHT_X, RIGHT_Y)
                 .addIngredients(recipe.getInput3());
-
-        builder.addSlot(RecipeIngredientRole.INPUT, 30, 27)
+        builder.addSlot(RecipeIngredientRole.INPUT, BOTTOM_X, BOTTOM_Y)
                 .addIngredients(recipe.getInput4());
 
-        // 输出槽：左上角坐标 (86,17)，宽20像素
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 86, 17)
+        // 输出槽（中心）
+        builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_X, OUTPUT_Y)
                 .addItemStack(recipe.getResultItem());
     }
 }

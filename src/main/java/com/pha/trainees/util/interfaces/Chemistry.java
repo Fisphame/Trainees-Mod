@@ -9,7 +9,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
 
 public interface Chemistry {
-    default boolean on(ItemStack stack, @NotNull ItemEntity entity) {
+    default boolean levelOn(ItemStack stack, @NotNull ItemEntity entity) {
         if (!entity.level().isClientSide) {
             return ReactionSystem.ReactionRegistry.triggerReactions(stack, entity);
         }

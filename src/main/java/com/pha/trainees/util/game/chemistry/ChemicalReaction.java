@@ -3,7 +3,7 @@ package com.pha.trainees.util.game.chemistry;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.registry.ModEntities;
-import com.pha.trainees.util.game.NumedItemEntities;
+import com.pha.trainees.util.types.NumedItemEntities;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;

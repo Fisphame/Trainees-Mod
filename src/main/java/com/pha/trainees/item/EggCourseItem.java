@@ -75,7 +75,7 @@ public class EggCourseItem {
     public static class GoldEggItem extends BaseEggItem {
 
         public GoldEggItem(Properties properties) {
-            super(properties, 2, "gold_egg_item");
+            super(properties, 3, "gold_egg_item");
         }
     }
 

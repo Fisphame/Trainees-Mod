@@ -5,6 +5,7 @@ import com.pha.trainees.block.*;
 import com.pha.trainees.blockentity.AbsorbBlockEntity;
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.blockentity.PurificationStationBlockEntity;
+import com.pha.trainees.blockentity.ReactionMachineBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,6 +41,14 @@ public class ModBlocks {
                         () -> BlockEntityType.Builder.of(
                                 PurificationStationBlockEntity::new,
                                 ModBlocks.PURIFICATION_STATION.get()
+                        ).build(null)
+                );
+
+        public static final RegistryObject<BlockEntityType<ReactionMachineBlockEntity>> REACTION_MACHINE =
+                BLOCK_ENTITIES.register("reaction_machine",
+                        () -> BlockEntityType.Builder.of(
+                                ReactionMachineBlockEntity::new,
+                                ModBlocks.REACTION_MACHINE.get()
                         ).build(null)
                 );
     }
@@ -315,6 +324,17 @@ public class ModBlocks {
                     BlockBehaviour.Properties.of()
                             .strength(3.0f, 6.0f)
                             .sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops()
+            )
+    );
+
+    // 化学机械
+    public static final RegistryObject<Block> REACTION_MACHINE = BLOCKS.register("reaction_machine",
+            () -> new ReactionMachineBlock(
+                    BlockBehaviour.Properties.of().
+                            strength(4.0f, 32.0f)
+                            .sound(SoundType.STONE)
+                            .mapColor(MapColor.STONE)
                             .requiresCorrectToolForDrops()
             )
     );

@@ -3,7 +3,7 @@ package com.pha.trainees.blockentity;
 import com.pha.trainees.block.KunAltarBlock;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
-import com.pha.trainees.util.game.KunAltarType;
+import com.pha.trainees.util.game.enums.KunAltarType;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.interfaces.Machine;
 import net.minecraft.core.BlockPos;

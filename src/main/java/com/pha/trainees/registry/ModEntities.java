@@ -26,6 +26,17 @@ public class ModEntities {
                             .build("called_sword") // 内部名称
             );
 
+    public static final RegistryObject<EntityType<ParticleEntity>> PARTICLE_ENTITY =
+            ENTITIES.register("particle_entity",
+                    () -> EntityType.Builder.of(
+                                    ParticleEntity::new, // 实体工厂方法
+                                    MobCategory.MISC // 实体分类（不属于生物）
+                            )
+                            .sized(0.1F, 0.1F) // 碰撞箱大小（宽1.0，高1.0）
+                            .clientTrackingRange(4) // 客户端跟踪范围（4区块）
+                            .build("particle_entity") // 内部名称
+            );
+
     //    public static final RegistryObject<EntityType<BasketballEntity>> BASKETBALL =
 //            ENTITIES.register("kun_basketball",
 //                    () -> EntityType.Builder.<BasketballEntity>of(

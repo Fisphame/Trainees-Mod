@@ -1,6 +1,7 @@
 package com.pha.trainees.util.interfaces;
 
 import com.pha.trainees.Main;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
@@ -17,11 +18,47 @@ public interface HoverText {
             "tooltip.trainees.id.2"
             "tooltip.trainees.item.press_shift"
         */
-    default void addHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag flag,
-                              String id) {
+    String Success = "--[ - ]--";
+    String Fail = "--x--";
+    String Fail2 = "-[-x-]-";
+    String Fail3 = "--[-x-]--";
+    String Cooldown = "···";
+    String Up = "--[ ↑ ]--";
+    String Down = "--[ ↓ ]--";
+    String Lose = "--?--";
+    String Warn = "--- ! ---";
+    MutableComponent SuccessC = Component.literal(Success).withStyle(ChatFormatting.GREEN);
+    MutableComponent FailC = Component.literal(Fail).withStyle(ChatFormatting.RED);
+    MutableComponent Fail2C = Component.literal(Fail2).withStyle(ChatFormatting.RED);
+    MutableComponent Fail3C = Component.literal(Fail3).withStyle(ChatFormatting.RED);
+    MutableComponent CooldownC = Component.literal(Cooldown);
+    MutableComponent UpC = Component.literal(Up);
+    MutableComponent DownC = Component.literal(Down);
+    MutableComponent LoseC = Component.literal(Lose).withStyle(ChatFormatting.RED);
+    MutableComponent WarnC = Component.literal(Warn);
+
+
+    default void addHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+                              TooltipFlag flag, String id) {
         if (flag.isAdvanced()) {
             tooltipComponents.add(getTooltip(id));
             tooltipComponents.add(getTooltip(id, 2));
+        } else {
+            tooltipComponents.add(getDefault());
+        }
+    }
+    default void addChemicalFormula(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+                                    TooltipFlag flag, String id) {
+        if (flag.isAdvanced()) {
+            tooltipComponents.add(getTooltip(id).withStyle(ChatFormatting.GRAY));
+        } else {
+            tooltipComponents.add(getDefault());
+        }
+    }
+    default void addChemicalMolarMass(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+                                      TooltipFlag flag, double moss) {
+        if (flag.isAdvanced()) {
+            tooltipComponents.add(Component.literal(String.valueOf(moss)).withStyle(ChatFormatting.GRAY));
         } else {
             tooltipComponents.add(getDefault());
         }

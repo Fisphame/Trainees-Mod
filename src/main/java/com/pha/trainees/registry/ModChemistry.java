@@ -2,8 +2,6 @@ package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.block.CheJibpBlock;
-import com.pha.trainees.block.ChemistryBlock;
-import com.pha.trainees.item.ChemistryItem;
 import com.pha.trainees.util.game.chemistry.ChemicalEquation;
 import com.pha.trainees.util.game.chemistry.ReactionConditions;
 import net.minecraft.world.item.*;
@@ -17,6 +15,9 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import static com.pha.trainees.item.ChemicalItem.*;
+import static com.pha.trainees.block.ChemistryBlock.*;
+
 public class ModChemistry {
     public static class ModChemistryBlocks {
 
@@ -25,7 +26,7 @@ public class ModChemistry {
 
         //氢氧化鸡方块
         public static final RegistryObject<Block> CHE_JIOH_BLOCK = BLOCKS.register("che_jioh_block",
-                () -> new ChemistryBlock.JiOHBlock(
+                () -> new JiOHBlock(
                         BlockBehaviour.Properties.of()
                                 .strength(2f,6f)
                                 .sound(SoundType.BONE_BLOCK)
@@ -34,7 +35,7 @@ public class ModChemistry {
 
         // 氧化鸡方块
         public static final RegistryObject<Block> CHE_JI2O_BLOCK = BLOCKS.register("che_ji2o_block",
-                () -> new ChemistryBlock.Ji2OBlock(
+                () -> new Ji2OBlock(
                         BlockBehaviour.Properties.of()
                                 .strength(2f, 6f)
                                 .sound(SoundType.BONE_BLOCK)
@@ -43,7 +44,7 @@ public class ModChemistry {
 
         // 涂蜡的氧化鸡方块
         public static final RegistryObject<Block> CHE_WAXED_JI2O_BLOCK = BLOCKS.register("che_waxed_ji2o_block",
-                () -> new ChemistryBlock.WaxedJi2OBlock(
+                () -> new WaxedJi2OBlock(
                         BlockBehaviour.Properties.of()
                                 .strength(2f, 6f)
                                 .sound(SoundType.BONE_BLOCK)
@@ -52,7 +53,7 @@ public class ModChemistry {
 
         // 欲焰鸡方块
         public static final RegistryObject<Block> CHE_JI2O2_BLOCK = BLOCKS.register("che_ji2o2_block",
-                () -> new ChemistryBlock.Ji2O2Block(
+                () -> new Ji2O2Block(
                         BlockBehaviour.Properties.of()
                                 .strength(2f, 6f)
                                 .sound(SoundType.BONE_BLOCK)
@@ -78,7 +79,7 @@ public class ModChemistry {
         );
 
         public static final RegistryObject<LiquidBlock> CHE_HBP_BLOCK = BLOCKS.register("che_hbp_block",
-                () -> new LiquidBlock(ModFluid.SOURCE_CHE_HBP,
+                () -> new LiquidBlock(ModFluids.SOURCE_CHE_HBP,
                         BlockBehaviour.Properties.of()
                                 .mapColor(MapColor.WATER)
                                 .replaceable()
@@ -108,27 +109,27 @@ public class ModChemistry {
 
         //氢氧化鸡方块
         public static final RegistryObject<Item> CHE_JIOH_BLOCK_ITEM = ITEMS.register("che_jioh_block",
-                () -> new BlockItem(ModChemistryBlocks.CHE_JIOH_BLOCK.get(),
+                () -> new JiOH_B(ModChemistryBlocks.CHE_JIOH_BLOCK.get(),
                         new Item.Properties()
                 ));
         // 氧化鸡方块
         public static final RegistryObject<Item> CHE_JI2O_BLOCK_ITEM = ITEMS.register("che_ji2o_block",
-                () -> new BlockItem(ModChemistryBlocks.CHE_JI2O_BLOCK.get(),
+                () -> new Ji2O_B(ModChemistryBlocks.CHE_JI2O_BLOCK.get(),
                         new Item.Properties()
                 ));
         // 涂蜡的氧化鸡方块
         public static final RegistryObject<Item> CHE_WAXED_JI2O_BLOCK_ITEM = ITEMS.register("che_waxed_ji2o_block",
-                () -> new BlockItem(ModChemistryBlocks.CHE_WAXED_JI2O_BLOCK.get(),
+                () -> new Waxed_Ji2O_B(ModChemistryBlocks.CHE_WAXED_JI2O_BLOCK.get(),
                         new Item.Properties()
                 ));
         // 欲焰鸡方块
         public static final RegistryObject<Item> CHE_JI2O2_BLOCK_ITEM = ITEMS.register("che_ji2o2_block",
-                () -> new BlockItem(ModChemistryBlocks.CHE_JI2O2_BLOCK.get(),
+                () -> new Ji2O2_B(ModChemistryBlocks.CHE_JI2O2_BLOCK.get(),
                         new Item.Properties()
                 ));
         //反相素方块
         public static final RegistryObject<Item> CHE_JIBP_BLOCK_ITEM = ITEMS.register("che_jibp_block",
-                () -> new BlockItem(ModChemistryBlocks.CHE_JIBP_BLOCK.get(),
+                () -> new JiBp_B(ModChemistryBlocks.CHE_JIBP_BLOCK.get(),
                         new Item.Properties()
                                 .rarity(Rarity.UNCOMMON)
                 ));
@@ -143,7 +144,7 @@ public class ModChemistry {
 
         //化学书
         public static final RegistryObject<Item> CHEMISTRY_BOOK = ITEMS.register("chemistry_book",
-                () -> new ChemistryItem.ChemistryBookItem(
+                () -> new ChemistryBookItem(
                         new Item.Properties()
                                 .stacksTo(1)
                                 .rarity(Rarity.UNCOMMON)
@@ -180,68 +181,68 @@ public class ModChemistry {
                 ));
         // 氧化鸡锭
         public static final RegistryObject<Item> CHE_JI2O_INGOT = ITEMS.register("che_ji2o_ingot",
-                () -> new ChemistryItem.Ji2O(new Item.Properties()
+                () -> new Ji2O(new Item.Properties()
                 ));
         // 氧化鸡粒
         public static final RegistryObject<Item> CHE_JI2O_NUGGET = ITEMS.register("che_ji2o_nugget",
-                () -> new ChemistryItem.Ji2O(new Item.Properties()
+                () -> new Ji2O(new Item.Properties()
                 ));
         // 过氧化鸡锭
         public static final RegistryObject<Item> CHE_JI2O2_INGOT = ITEMS.register("che_ji2o2_ingot",
-                () -> new ChemistryItem.Ji2O2(new Item.Properties()
+                () -> new Ji2O2(new Item.Properties()
                 ));
         // 过氧化鸡粒
         public static final RegistryObject<Item> CHE_JI2O2_NUGGET = ITEMS.register("che_ji2o2_nugget",
-                () -> new ChemistryItem.Ji2O2(new Item.Properties()
+                () -> new Ji2O2(new Item.Properties()
                 ));
         // 二氧化黑固体
         public static final RegistryObject<Item> CHE_BPO2_SOLID = ITEMS.register("che_bpo2_solid",
-                () -> new ChemistryItem.BpO2(new Item.Properties()
+                () -> new BpO2(new Item.Properties()
                 ));
         // 三氧化黑固体
         public static final RegistryObject<Item> CHE_BPO3_SOLID = ITEMS.register("che_bpo3_solid",
-                () -> new ChemistryItem.BpO3(new Item.Properties()
+                () -> new BpO3(new Item.Properties()
                 ));
         // 黑化氢粉末
         public static final RegistryObject<Item> CHE_HBP_POWDER = ITEMS.register("che_hbp_powder",
-                () -> new ChemistryItem.HBp(new Item.Properties()
+                () -> new HBp(new Item.Properties()
                 ));
         // 次黑酸粉末
         public static final RegistryObject<Item> CHE_HBPO_POWDER = ITEMS.register("che_hbpo_powder",
-                () -> new ChemistryItem.HBpO(new Item.Properties()
+                () -> new HBpO(new Item.Properties()
                 ));
         // 黑酸粉末
         public static final RegistryObject<Item> CHE_HBPO_3_POWDER = ITEMS.register("che_hbpo3_powder",
-                () -> new ChemistryItem.HBpO3(new Item.Properties()
+                () -> new HBpO3(new Item.Properties()
                 ));
         // 高黑酸粉末
         public static final RegistryObject<Item> CHE_HBPO_4_POWDER = ITEMS.register("che_hbpo4_powder",
-                () -> new ChemistryItem.HBpO4(new Item.Properties()
+                () -> new HBpO4(new Item.Properties()
                 ));
         // 氢氧化鸡锭
         public static final RegistryObject<Item> CHE_JIOH_INGOT = ITEMS.register("che_jioh_ingot",
-                () -> new ChemistryItem.JiOH(new Item.Properties()
+                () -> new JiOH(new Item.Properties()
                 ));
         // 氢氧化鸡粒
         public static final RegistryObject<Item> CHE_JIOH_NUGGET = ITEMS.register("che_jioh_nugget",
-                () -> new ChemistryItem.JiOH(new Item.Properties()
+                () -> new JiOH(new Item.Properties()
                 ));
         // 反相素
         public static final RegistryObject<Item> CHE_JIBP_PIECE = ITEMS.register("che_jibp_piece",
-                () -> new ChemistryItem.JiBp(new Item.Properties()
+                () -> new JiBp(new Item.Properties()
                         .rarity(Rarity.UNCOMMON)
                 ));
         // 次黑酸鸡
         public static final RegistryObject<Item> CHE_JIBPO_CRYSTALLIZATION = ITEMS.register("che_jibpo_crystallization",
-                () -> new ChemistryItem.JiBpO(new Item.Properties()
+                () -> new JiBpO(new Item.Properties()
                 ));
         // 黑酸鸡
         public static final RegistryObject<Item> CHE_JIBPO_3_CRYSTALLIZATION = ITEMS.register("che_jibpo3_crystallization",
-                () -> new ChemistryItem.JiBpO3(new Item.Properties()
+                () -> new JiBpO3(new Item.Properties()
                 ));
         // 黑酸鸡
         public static final RegistryObject<Item> CHE_JIBPO_4_CRYSTALLIZATION = ITEMS.register("che_jibpo4_crystallization",
-                () -> new ChemistryItem.JiBpO4(new Item.Properties()
+                () -> new JiBpO4(new Item.Properties()
                 ));
 
     }
@@ -292,5 +293,14 @@ public class ModChemistry {
 //                        .addTag("hydrolysis")
 //                        .addTag("redox")
                         .build();
+
+//        MachineChemicalEquation example = new MachineChemicalEquation.Builder("ji_water_reaction_machine")
+//                .addReactant(2, ModItems.TWO_HALF_INGOT.get())
+//                .addProduct(2, ModChemistryItems.CHE_JIOH_INGOT.get())
+//                .addCondition(new CatalystCondition(List.of(new ItemStack(SomeItem.ITEM)), 0.1)) // 消耗概率10%
+//                .withSequence(1)
+//                .withDuration(100) // 100 ticks = 5秒
+//                .addTag("machine")
+//                .build();
     }
 }

@@ -1,7 +1,7 @@
 package com.pha.trainees.util.game.structure;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.util.game.Booleanf;
+import com.pha.trainees.util.types.Booleanf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;

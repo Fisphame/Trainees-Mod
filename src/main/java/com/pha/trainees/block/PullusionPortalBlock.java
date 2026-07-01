@@ -2,8 +2,8 @@ package com.pha.trainees.block;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModDimensions;
-import com.pha.trainees.util.game.Teleporter;
-import com.pha.trainees.util.math.MAth;
+import com.pha.trainees.util.types.Teleporter;
+import com.pha.trainees.util.math.MathT;
 import com.pha.trainees.util.math.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -164,7 +164,7 @@ public class PullusionPortalBlock extends Block {
     }
 
     public static Boolean isAllowed(BlockPos pos) {
-        return MAth.isInInterval(pos.getX(), pairX) && MAth.isInInterval(pos.getY(), pairY) && MAth.isInInterval(pos.getZ(), pairZ)
+        return MathT.isInInterval(pos.getX(), pairX) && MathT.isInInterval(pos.getY(), pairY) && MathT.isInInterval(pos.getZ(), pairZ)
                 && !visited.contains(pos);
     }
 

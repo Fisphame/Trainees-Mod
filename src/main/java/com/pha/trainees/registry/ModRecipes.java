@@ -2,22 +2,16 @@ package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.recipe.TrainerAltarRecipe;
-import com.pha.trainees.util.game.ItemPair4;
+import com.pha.trainees.util.game.chemistry.CatalystCondition;
+import com.pha.trainees.util.game.chemistry.MachineChemicalEquation;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-
-import static com.pha.trainees.registry.ModItems.*;
-import static com.pha.trainees.registry.ModChemistry.ModChemistryItems.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,8 +64,8 @@ public class ModRecipes {
 //                i1, i2, i3, i4, result
 //        );
 //    }
-//
-//
+
+
 //    public static final Lazy<List<ItemPair4>> TRAINER_ALTAR_RECIPES = Lazy.of(() -> {
 //        List<ItemPair4> list = new ArrayList<>();
 //        // 仅祭坛合成
@@ -111,5 +105,36 @@ public class ModRecipes {
 //    }
 
 
+    public static class ModMachineRecipes {
+        private static final List<MachineChemicalEquation> RECIPES = new ArrayList<>();
 
+        static {
+            // 示例配方：Ji + Bp -> JiBp
+            MachineChemicalEquation jiBp = new MachineChemicalEquation.Builder("ji_bp_reaction")
+                    .withName("黑化鸡合成")
+                    .addReactant(1, ModItems.TWO_HALF_INGOT.get())
+                    .addReactant(1, ModItems.POWDER_ANTI.get())
+                    .addProduct(1, ModChemistry.ModChemistryItems.CHE_JIBP_PIECE.get())
+                    .withDuration(40) // 2秒
+                    .addTag("machine")
+                    .build();
+            RECIPES.add(jiBp);
+
+            // 示例带催化剂的配方
+            MachineChemicalEquation jiWater = new MachineChemicalEquation.Builder("ji_water_reaction")
+                    .withName("鸡与水反应")
+                    .addReactant(2, ModItems.TWO_HALF_INGOT.get())
+                    .addProduct(2, ModChemistry.ModChemistryItems.CHE_JIOH_INGOT.get())
+//                    .addCondition(new CatalystCondition(List.of(new ItemStack(ModItems.CATALYST.get())), 0.5)) // 50%概率消耗
+                    .withDuration(100) // 5秒
+                    .addTag("machine")
+                    .build();
+            RECIPES.add(jiWater);
+        }
+
+        public static List<MachineChemicalEquation> getAllRecipes() {
+            return RECIPES;
+        }
+
+    }
 }

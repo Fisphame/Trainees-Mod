@@ -1,11 +1,9 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.item.ChemistryItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;

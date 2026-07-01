@@ -1,7 +1,7 @@
 package com.pha.trainees.entity;
 
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.math.MAth;
+import com.pha.trainees.util.math.MathT;
 import com.pha.trainees.util.math.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
@@ -67,7 +67,7 @@ public class GasEntities {
                     BlockPos fireSourcePos = checkForFireSource();
                     // 随机采样检查（更高效）
                     if (fireSourcePos != null) {
-                        if(MAth.isInInterval(currentConcentration, EXPLOSION_CONCENTRATION_THRESHOLD)){
+                        if(MathT.isInInterval(currentConcentration, EXPLOSION_CONCENTRATION_THRESHOLD)){
                             Tools.DoTnt_center(level(), fireSourcePos, currentConcentration * 5f + 4.0f);
                         }
                         else {

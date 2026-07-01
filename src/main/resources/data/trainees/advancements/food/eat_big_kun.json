@@ -9,7 +9,7 @@
     "description": {
       "translate": "advancements.trainees.eat_big_kun.description"
     },
-    "frame": "challenge",
+    "frame": "goal",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false

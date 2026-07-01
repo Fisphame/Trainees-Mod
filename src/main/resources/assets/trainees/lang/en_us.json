@@ -120,6 +120,7 @@
   "item.trainees.auriversite_ingot": "Auriversite Ingot",
   "item.trainees.auriversite_rapier": "Auriversite Rapier",
   "item.trainees.stone_stick": "Stone Stick",
+  "item.trainees.stone_stick_t": "Stone Stick T",
   "item.trainees.polyester": "Polyester",
   "item.trainees.elastomeric_material": "Elastomeric Material",
   "item.trainees.elastomeric_core": "Elastomeric Core",
@@ -188,6 +189,10 @@
   "tooltip.trainees.auriversite_rapier.state": "Kinetic System: ",
   "tooltip.trainees.auriversite_rapier.on": "On",
   "tooltip.trainees.auriversite_rapier.off": "Off",
+  "hint.invalid_drop_pos_out_of_range_or_block_unavailable": "Invalid drop-pos: out of range or block is unavailable",
+  "hint.target_block_must_absorb_block_or_air_above": "Target block must be Absorb Block or Air above",
+  "hint.altar_invalid_setting_canceled": "Altar is invalid, setting canceled",
+  "hint.enter_drop_pos_setting_right_click_block_set_pos": "Enter drop-pos setting: right-click block to set drop-pos",
   
   "enchantment.trainees.ten_thousand_sword": "Wanjian Guizong",
   "enchantment.trainees.sprint": "Sprint",
@@ -321,5 +326,7 @@
   "container.trainees.purification_station": "Purification Station",
   "container.trainees.purification_station.input_slot": "Material",
   "container.trainees.purification_station.fuel_slot": "Upgrade/Refining Agent...",
-  "button.trainees.purify": "Purify"
+  "button.trainees.purify": "Purify",
+  
+  "jei.trainees.trainer_altar": "Kun Altar"
 }

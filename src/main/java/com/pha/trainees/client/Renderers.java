@@ -21,6 +21,17 @@ public class Renderers {
         }
     }
 
+    public static class PatrticleEntityRenderer extends EntityRenderer<ParticleEntity> {
+        public PatrticleEntityRenderer(EntityRendererProvider.Context context) {
+            super(context);
+        }
+
+        @Override
+        public ResourceLocation getTextureLocation(ParticleEntity entity) {
+            return new ResourceLocation(Main.MODID, "textures/entity/particle_entity.png");
+        }
+    }
+
     public static class KunTraineesRenderer extends MobRenderer<KunTraineesEntity, ChickenModel<KunTraineesEntity>> {
         public KunTraineesRenderer(EntityRendererProvider.Context context) {
             super(context, new ChickenModel<>(context.bakeLayer(ModelLayers.CHICKEN)), 0.3F);

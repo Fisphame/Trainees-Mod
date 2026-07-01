@@ -61,10 +61,14 @@ public class ActiveStructureManager extends SavedData {
         return INSTANCE;
     }
 
+    public boolean addActiveStructure(Level level, String structureId, BlockPos matchPos) {
+        return addActiveStructure(level, structureId, matchPos, null);
+    }
+
     /**
      * 添加激活的结构
      */
-    public boolean addActiveStructure(Level level, String structureId, BlockPos matchPos) {
+    public boolean addActiveStructure(Level level, String structureId, BlockPos matchPos, BlockPos dropPos) {
         ResourceLocation dimension = level.dimension().location();
 
         // 检查是否已经激活
@@ -85,7 +89,8 @@ public class ActiveStructureManager extends SavedData {
                 structureId,
                 matchPos,
                 System.currentTimeMillis(),
-                level.getGameTime()
+                level.getGameTime(),
+                dropPos
         );
 
         // 存储数据
@@ -469,6 +474,37 @@ public class ActiveStructureManager extends SavedData {
         return manager;
     }
 
+    public boolean setDropPos(Level level, BlockPos matchPos, BlockPos newDropPos) {
+        ResourceLocation dimension = level.dimension().location();
+        Map<String, Set<ActiveStructureData>> dimensionMap = activeStructures.get(dimension);
+        if (dimensionMap == null) return false;
+        for (Set<ActiveStructureData> set : dimensionMap.values()) {
+            for (ActiveStructureData data : set) {
+                if (data.matchPos.equals(matchPos)) {
+                    data.dropPos = newDropPos;
+                    setDirty();
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // 获取 dropPos 的方法
+    public BlockPos getDropPos(Level level, BlockPos matchPos) {
+        ResourceLocation dimension = level.dimension().location();
+        Map<String, Set<ActiveStructureData>> dimensionMap = activeStructures.get(dimension);
+        if (dimensionMap == null) return null;
+        for (Set<ActiveStructureData> set : dimensionMap.values()) {
+            for (ActiveStructureData data : set) {
+                if (data.matchPos.equals(matchPos)) {
+                    return data.dropPos;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * 激活结构数据类
      */
@@ -476,15 +512,17 @@ public class ActiveStructureManager extends SavedData {
         public final String structureId;
         public final BlockPos matchPos;
         public final long activationTime;
-        public long lastLogicTick;   // 上次执行逻辑 tick 时的游戏时间
-        public long lastEffectTick;  // 上次执行效果 tick 时的游戏时间
+        public long lastLogicTick;
+        public long lastEffectTick;
+        public BlockPos dropPos; // 新增：物品掉落位置
 
-        public ActiveStructureData(String structureId, BlockPos matchPos, long activationTime, long currentTick) {
+        public ActiveStructureData(String structureId, BlockPos matchPos, long activationTime, long currentTick, BlockPos dropPos) {
             this.structureId = structureId;
             this.matchPos = matchPos;
             this.activationTime = activationTime;
             this.lastLogicTick = currentTick;
             this.lastEffectTick = currentTick;
+            this.dropPos = dropPos;
         }
 
         public CompoundTag serializeNBT() {
@@ -494,6 +532,9 @@ public class ActiveStructureManager extends SavedData {
             tag.putLong("ActivationTime", activationTime);
             tag.putLong("LastLogicTick", lastLogicTick);
             tag.putLong("LastEffectTick", lastEffectTick);
+            if (dropPos != null) {
+                tag.put("DropPos", NbtUtils.writeBlockPos(dropPos));
+            }
             return tag;
         }
 
@@ -503,7 +544,8 @@ public class ActiveStructureManager extends SavedData {
             long activationTime = tag.getLong("ActivationTime");
             long lastLogicTick = tag.getLong("LastLogicTick");
             long lastEffectTick = tag.getLong("LastEffectTick");
-            ActiveStructureData data = new ActiveStructureData(structureId, matchPos, activationTime, lastLogicTick);
+            BlockPos dropPos = tag.contains("DropPos") ? NbtUtils.readBlockPos(tag.getCompound("DropPos")) : null;
+            ActiveStructureData data = new ActiveStructureData(structureId, matchPos, activationTime, lastLogicTick, dropPos);
             data.lastEffectTick = lastEffectTick;
             return data;
         }

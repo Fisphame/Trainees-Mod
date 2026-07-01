@@ -38,10 +38,20 @@ public class Config
 
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
-    public static boolean logDirtBlock;
-    public static int magicNumber;
-    public static String magicNumberIntroduction;
-    public static Set<Item> items;
+    // 使用 Supplier 实现懒加载
+    public static boolean logDirtBlock() { return LOG_DIRT_BLOCK.get(); }
+    public static int magicNumber() { return MAGIC_NUMBER.get(); }
+    public static String magicNumberIntroduction() { return MAGIC_NUMBER_INTRODUCTION.get(); }
+    public static Set<Item> items() {
+        return ITEM_STRINGS.get().stream()
+                .map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName)))
+                .collect(Collectors.toSet());
+    }
+
+//    public static boolean logDirtBlock;
+//    public static int magicNumber;
+//    public static String magicNumberIntroduction;
+//    public static Set<Item> items;
 
     private static boolean validateItemName(final Object obj)
     {
@@ -51,13 +61,14 @@ public class Config
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event)
     {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
-
-        // convert the list of strings into a set of items
-        items = ITEM_STRINGS.get().stream()
-                .map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName)))
-                .collect(Collectors.toSet());
+//        logDirtBlock = LOG_DIRT_BLOCK.get();
+//        magicNumber = MAGIC_NUMBER.get();
+//        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
+//
+//        // convert the list of strings into a set of items
+//        items = ITEM_STRINGS.get().stream()
+//                .map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName)))
+//                .collect(Collectors.toSet());
+        Main.LOGGER.debug("Config loaded or reloaded");
     }
 }

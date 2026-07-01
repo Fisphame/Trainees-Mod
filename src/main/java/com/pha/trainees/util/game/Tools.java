@@ -1,16 +1,21 @@
 package com.pha.trainees.util.game;
 
+import com.pha.trainees.Main;
 import com.pha.trainees.enchantments.*;
+import com.pha.trainees.entity.ParticleEntity;
 import com.pha.trainees.item.AuriversiteRapierItem;
 import com.pha.trainees.item.KunCourseItem;
 import com.pha.trainees.item.ScytheCourseItem;
+import com.pha.trainees.util.types.NumedItemEntities;
 import com.pha.trainees.util.interfaces.KineticWeapon;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.util.math.LogarithmicFunc;
-import com.pha.trainees.util.math.MAth;
+import com.pha.trainees.util.math.MathT;
 import com.pha.trainees.util.math.Pair;
 import com.pha.trainees.util.math.QuadraticFuncVertexT;
-import com.pha.trainees.util.physics.KineticData;
+import com.pha.trainees.util.game.physics.KineticData;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.*;
@@ -19,6 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -116,7 +122,7 @@ public class Tools {
         if (probability >= 1.0) return true;
 
         // 应用偏置
-        double biased = Math.pow(probability, MAth.log(bias, 0.5));
+        double biased = Math.pow(probability, MathT.log(bias, 0.5));
         return random.nextDouble() < biased;
     }
 
@@ -208,18 +214,155 @@ public class Tools {
     }
 
     public static int getPowderMultiplier(Item item) {
-        if (item == ModItems.POWDER_ANTI.get()) return MAth.POW[0];
+        if (item == ModItems.POWDER_ANTI.get()) return MathT.POW[0];
         if (item == ModItems.POWDER_ANTI_4.get()) return 4;
-        if (item == ModItems.POWDER_ANTI_9.get()) return MAth.POW[1];
-        if (item == Something.PrankItems.POWDER_ANTI_92.get()) return MAth.POW[2];
-        if (item == Something.PrankItems.POWDER_ANTI_93.get()) return MAth.POW[3];
-        if (item == Something.PrankItems.POWDER_ANTI_94.get()) return MAth.POW[4];
-        if (item == Something.PrankItems.POWDER_ANTI_95.get()) return MAth.POW[5];
-        if (item == Something.PrankItems.POWDER_ANTI_96.get()) return MAth.POW[6];
-        if (item == Something.PrankItems.POWDER_ANTI_97.get()) return MAth.POW[7];
-        if (item == Something.PrankItems.POWDER_ANTI_98.get()) return MAth.POW[8];
+        if (item == ModItems.POWDER_ANTI_9.get()) return MathT.POW[1];
+        if (item == Something.PrankItems.POWDER_ANTI_92.get()) return MathT.POW[2];
+        if (item == Something.PrankItems.POWDER_ANTI_93.get()) return MathT.POW[3];
+        if (item == Something.PrankItems.POWDER_ANTI_94.get()) return MathT.POW[4];
+        if (item == Something.PrankItems.POWDER_ANTI_95.get()) return MathT.POW[5];
+        if (item == Something.PrankItems.POWDER_ANTI_96.get()) return MathT.POW[6];
+        if (item == Something.PrankItems.POWDER_ANTI_97.get()) return MathT.POW[7];
+        if (item == Something.PrankItems.POWDER_ANTI_98.get()) return MathT.POW[8];
 
         return 1;
+    }
+
+    public static class Chemistry {
+
+        /**
+         * 根据化学式计算摩尔质量，结果以 0.5 为单位四舍五入
+         * @param formula 化学式字符串
+         * @return 四舍五入到最近 0.5 的摩尔质量
+         */
+        public static double calculateMolarMassApproximation(String formula, Map<String, Double> elementMassMap) {
+            double exactMass = calculateMolarMass(formula, elementMassMap);
+            return Math.round(exactMass * 2) / 2.0;
+        }
+
+        /**
+         * 计算化学式的摩尔质量，结果保留三位小数（未四舍五入）
+         * @param formula 化学式字符串
+         * @param elementMassMap 元素名->摩尔质量映射
+         * @return 摩尔质量 (g/mol)
+         */
+        public static double calculateMolarMass(String formula, Map<String, Double> elementMassMap) {
+            int[] idx = new int[]{0};
+            double result = parseExpression(formula, idx, elementMassMap);
+            if (idx[0] < formula.length()) {
+                throw new IllegalArgumentException("Extra characters at end: " + formula.substring(idx[0]));
+            }
+            return result;
+        }
+
+        // expression ::= term ('.' term)*
+        private static double parseExpression(String s, int[] idx, Map<String, Double> map) {
+            double total = parseTerm(s, idx, map);
+            while (idx[0] < s.length() && (s.charAt(idx[0]) == '·' || s.charAt(idx[0]) == '.')) {
+                idx[0]++; // skip dot
+                int coeff = 1;
+                if (idx[0] < s.length() && isDigit(s.charAt(idx[0]))) {
+                    int start = idx[0];
+                    while (idx[0] < s.length() && isDigit(s.charAt(idx[0]))) idx[0]++;
+                    coeff = Integer.parseInt(s.substring(start, idx[0]));
+                }
+                total += coeff * parseTerm(s, idx, map);
+            }
+            return total;
+        }
+
+        // term ::= factor (factor)*
+        private static double parseTerm(String s, int[] idx, Map<String, Double> map) {
+            double total = parseFactor(s, idx, map);
+            while (idx[0] < s.length() && (isUpperLetter(s.charAt(idx[0])) || isLeftBracket(s.charAt(idx[0])))) {
+                total += parseFactor(s, idx, map);
+            }
+            return total;
+        }
+
+        // factor ::= element | '(' expression ')' | '[' expression ']' | '{' expression '}'
+        // followed by optional subscript
+        private static double parseFactor(String s, int[] idx, Map<String, Double> map) {
+            double value;
+            char c = s.charAt(idx[0]);
+            if (isLeftBracket(c)) {
+                char open = c;
+                idx[0]++; // skip open bracket
+                double inner = parseExpression(s, idx, map);
+                char expectedClose;
+                if (open == '(') expectedClose = ')';
+                else if (open == '[') expectedClose = ']';
+                else expectedClose = '}';
+                if (idx[0] >= s.length() || s.charAt(idx[0]) != expectedClose) {
+                    throw new IllegalArgumentException("Missing closing bracket " + expectedClose + " at position " + idx[0]);
+                }
+                idx[0]++; // skip close bracket
+                value = inner;
+            } else if (isUpperLetter(c)) {
+                int start = idx[0];
+                idx[0]++; // first uppercase
+                while (idx[0] < s.length() && isLowerLetter(s.charAt(idx[0]))) {
+                    idx[0]++;
+                }
+                String element = s.substring(start, idx[0]);
+                Double mass = map.get(element);
+                if (mass == null) {
+                    mass = 9999.0;
+                }
+                value = mass;
+            } else {
+                throw new IllegalArgumentException("Unexpected character: " + c + " at position " + idx[0]);
+            }
+            // parse subscript
+            int subscript = parseSubscript(s, idx);
+            return value * subscript;
+        }
+
+        private static int parseSubscript(String s, int[] idx) {
+            if (idx[0] >= s.length()) return 1;
+            int result = 0;
+            boolean found = false;
+            while (idx[0] < s.length()) {
+                char c = s.charAt(idx[0]);
+                if (isDigit(c)) {
+                    result = result * 10 + (c - '0');
+                    idx[0]++;
+                    found = true;
+                } else if (isSubscript(c)) {
+                    result = result * 10 + (c - 0x2080);
+                    idx[0]++;
+                    found = true;
+                } else {
+                    break;
+                }
+            }
+            return found ? result : 1;
+        }
+
+        // Character checks
+        private static boolean isDigit(char c) {
+            return c >= '0' && c <= '9';
+        }
+
+        private static boolean isSubscript(char c) {
+            return c >= '\u2080' && c <= '\u2089';
+        }
+
+        private static boolean isLeftBracket(char c) {
+            return c == '(' || c == '[' || c == '{';
+        }
+
+        private static boolean isRightBracket(char c) {
+            return c == ')' || c == ']' || c == '}';
+        }
+
+        private static boolean isUpperLetter(char c) {
+            return c >= 'A' && c <= 'Z';
+        }
+
+        private static boolean isLowerLetter(char c) {
+            return c >= 'a' && c <= 'z';
+        }
     }
 
     public static Boolean isJi(Item item) {
@@ -478,7 +621,7 @@ public class Tools {
          *  3. 不是刚被点燃
          */
         public static boolean isAboutToVanishFromFire(ItemEntity entity, int tick) {
-            return MAth.isInInterval(getAboutToVanishFromFire(entity), 0, tick, false, true);
+            return MathT.isInInterval(getAboutToVanishFromFire(entity), 0, tick, false, true);
         }
         public static boolean isAboutToVanishFromFire(ItemEntity entity) {
             return isAboutToVanishFromFire(entity, 10);
@@ -608,6 +751,8 @@ public class Tools {
 
                     double vx = Math.cos(angle) * speed;
                     double vz = Math.sin(angle) * speed;
+
+                    send(level, particleType, x, centerY, z, 1, 0.0, 0.0, 0.0, vx);
 
                     level.addParticle(particleType, x, centerY, z, vx, 0, vz);
                 }
@@ -958,6 +1103,21 @@ public class Tools {
                     color.getGreen() / 255.0f,
                     color.getBlue() / 255.0f
             );
+        }
+
+        public static void spawnArcParticle(Level level, SimpleParticleType particleType, Vec3 start, Vec3 end) {
+            if (level.isClientSide) return; // 仅在服务端生成实体
+
+            // 获取实体类型（你需要提前注册 ParticleEntity 的类型）
+            EntityType<ParticleEntity> type = ModEntities.PARTICLE_ENTITY.get(); // 根据你的注册方式调整
+
+            ParticleEntity entity = new ParticleEntity(type, level);
+            entity.setParticleType(particleType);
+            // 随机决定行走时间（1~3 秒，20 ticks/秒）
+            int duration = 20 + level.random.nextInt(20); // 40~80 ticks
+            entity.initArc(start, end, duration);
+
+            level.addFreshEntity(entity);
         }
     }
 
@@ -2093,4 +2253,59 @@ public class Tools {
         }
     }
 
+    public static class Achievement {
+
+        /**
+         * 授予特定进度给玩家
+         * @param player 玩家
+         * @param advancementId 进度ID，格式为 "modid:path/to/advancement"
+         */
+        public static void grantSpecificAchievement(ServerPlayer player, String advancementId) {
+            try {
+                MinecraftServer server = player.getServer();
+                if (server == null) return;
+                // 获取进度
+                Advancement advancement = server.getAdvancements().getAdvancement(new ResourceLocation(advancementId));
+
+                if (advancement == null) return;
+
+                // 获取进度进度
+                AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
+
+                // 检查是否已经完成
+                if (progress.isDone()) return;
+
+                // 授予进度
+                for (String criterion : progress.getRemainingCriteria()) {
+                    player.getAdvancements().award(advancement, criterion);
+                }
+
+            } catch (Exception e) {
+                Main.LOGGER.error("Error granting achievement: " + advancementId, e);
+            }
+        }
+
+        /**
+         * 检查玩家是否拥有特定进度
+         * @param player 玩家
+         * @param advancementId 进度ID
+         * @return 是否拥有该进度
+         */
+        public static boolean hasAdvancement(ServerPlayer player, String advancementId) {
+            try {
+                MinecraftServer server = player.getServer();
+                if (server == null) return false;
+                Advancement advancement = server.getAdvancements().getAdvancement(new ResourceLocation(advancementId));
+                if (advancement == null) return false;
+                AdvancementProgress progress = player.getAdvancements().getOrStartProgress(advancement);
+                return progress.isDone();
+            } catch (Exception e) {
+                Main.LOGGER.error("Error checking achievement: {}", advancementId, e);
+                return false;
+            }
+        }
+    }
+
+
 }
+

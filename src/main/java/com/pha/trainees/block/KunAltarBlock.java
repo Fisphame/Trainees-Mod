@@ -1,7 +1,7 @@
 package com.pha.trainees.block;
 
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
-import com.pha.trainees.util.game.KunAltarType;
+import com.pha.trainees.util.game.enums.KunAltarType;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.interfaces.Machine;
 import net.minecraft.core.BlockPos;

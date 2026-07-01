@@ -9,7 +9,7 @@
     "description": {
       "translate": "advancements.trainees.powder_anti_93.description"
     },
-    "frame": "challenge",
+    "frame": "goal",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": true

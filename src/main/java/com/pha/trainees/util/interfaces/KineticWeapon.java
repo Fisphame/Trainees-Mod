@@ -1,23 +1,18 @@
 package com.pha.trainees.util.interfaces;
 
-import com.pha.trainees.registry.ModSounds;
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.math.MAth;
-import com.pha.trainees.util.physics.KineticEnergySystem;
+import com.pha.trainees.util.math.MathT;
+import com.pha.trainees.util.game.physics.KineticEnergySystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.common.Mod;
 
 public interface KineticWeapon {
     /**
@@ -47,7 +42,7 @@ public interface KineticWeapon {
     default void applyParticle(ItemStack stack, LivingEntity target, LivingEntity attacker, float damage){
         if (KineticWeapon.isKineticUpdateEnabled(stack) && attacker instanceof Player player) {
             Tools.Particle.send(player.level(), ParticleTypes.LAVA, target.getX(), target.getY(), target.getZ(),
-                    MAth.inInterval((int) (damage * 3f), 10, 500), 0.1, 0.1, 0.1, 0.1);
+                    MathT.inInterval((int) (damage * 3f), 10, 500), 0.1, 0.1, 0.1, 0.1);
         }
     }
 

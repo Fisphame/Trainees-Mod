@@ -7,7 +7,7 @@
   ],
   "key": {
     "T": { "item": "trainees:two_half_ingot" },
-    "S": { "item": "trainees:stone_stick" }
+    "S": { "tag": "trainees:stone_stick" }
   },
   "result": {
     "item": "trainees:kun_scythe"

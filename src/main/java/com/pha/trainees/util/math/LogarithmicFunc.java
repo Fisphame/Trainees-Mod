@@ -7,6 +7,6 @@ public record LogarithmicFunc(double a) {
     }
 
     public double getY(double x) {
-        return MAth.log(x, a);
+        return MathT.log(x, a);
     }
 }

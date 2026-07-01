@@ -1,7 +1,7 @@
 package com.pha.trainees.util.interfaces;
 
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.math.MAth;
+import com.pha.trainees.util.math.MathT;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,8 +13,8 @@ import net.minecraft.world.phys.AABB;
 import java.util.List;
 
 public interface Scythe {
-    float[] SWEEP_RADIUS = {2f, 4f, MAth.MATH99};
-    float[] SWEEP_DAMAGE_MULTIPLIER = {2f, 6f, MAth.MATH99};
+    float[] SWEEP_RADIUS = {2f, 4f, MathT.MATH99};
+    float[] SWEEP_DAMAGE_MULTIPLIER = {2f, 6f, MathT.MATH99};
     int[] SWEEP_PARTICLE_NUM = {30, 60, 200};
     int[] SWEEP_PARTICLE_AREA = {2, 4, 6};
 

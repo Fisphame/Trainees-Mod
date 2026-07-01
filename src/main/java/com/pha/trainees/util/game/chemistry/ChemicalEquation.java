@@ -1,7 +1,7 @@
 package com.pha.trainees.util.game.chemistry;
 
-import com.pha.trainees.util.game.NumedItemEntities;
-import com.pha.trainees.util.math.MAth;
+import com.pha.trainees.util.types.NumedItemEntities;
+import com.pha.trainees.util.math.MathT;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -219,12 +219,12 @@ public class ChemicalEquation {
         // 使用欧几里得算法求最大公约数
         int gcd = coefficients[0];
         for (int i = 1; i < coefficients.length; i++) {
-            gcd = MAth.gcd(gcd, coefficients[i]);
+            gcd = MathT.gcd(gcd, coefficients[i]);
         }
 
         // 最小反应次数是每个反应物系数除以最大公约数后的最小公倍数
         // 但简化处理：我们只需要确保至少能满足最小整数倍
-        return MAth.lcmArray(coefficients);
+        return MathT.lcmArray(coefficients);
     }
 
 
