@@ -3,7 +3,7 @@ package com.pha.trainees.item;
 import com.pha.trainees.Main;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
-import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.IHoverText;
 import com.pha.trainees.util.types.Booleanf;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.MultiblockStructure;
@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public class StoneStickItem extends Item implements HoverText {
+public class StoneStickItem extends Item implements IHoverText {
     public StoneStickItem(Properties p_41383_) {
         super(p_41383_);
     }
@@ -38,12 +38,12 @@ public class StoneStickItem extends Item implements HoverText {
         // 重要：我们需要找到结构原点
         // 根据结构定义，原点在核心方块的下方一格 (0,0,0)
         // 所以检查位置应该是 (0,0,0) 的位置
-        BlockPos checkPos = pos.below();  // 核心在 (0,1,0)，原点是下方一格
+        // 核心在 (0,1,0)，原点是下方一格
 
         // 尝试激活结构 - 使用原点位置进行检查
         Booleanf activated = MultiblockStructure.tryActivateStructure(
                 level,
-                checkPos,  // 使用原点位置
+                pos,  // 使用原点位置
                 TrainerAltarPattern.STRUCTURE_ID,
                 player
         );

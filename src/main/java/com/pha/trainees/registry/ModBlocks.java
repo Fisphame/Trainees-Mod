@@ -5,7 +5,7 @@ import com.pha.trainees.block.*;
 import com.pha.trainees.blockentity.AbsorbBlockEntity;
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.blockentity.PurificationStationBlockEntity;
-import com.pha.trainees.blockentity.ReactionMachineBlockEntity;
+import com.pha.trainees.blockentity.SenderBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -44,13 +44,21 @@ public class ModBlocks {
                         ).build(null)
                 );
 
-        public static final RegistryObject<BlockEntityType<ReactionMachineBlockEntity>> REACTION_MACHINE =
-                BLOCK_ENTITIES.register("reaction_machine",
+        public static final RegistryObject<BlockEntityType<SenderBlockEntity>> SENDER_BLOCK_ENTITY =
+                BLOCK_ENTITIES.register("sender_block_entity",
                         () -> BlockEntityType.Builder.of(
-                                ReactionMachineBlockEntity::new,
-                                ModBlocks.REACTION_MACHINE.get()
+                                SenderBlockEntity::new,
+                                ModBlocks.SENDER_BLOCK.get()
                         ).build(null)
                 );
+
+//        public static final RegistryObject<BlockEntityType<ReactionMachineBlockEntity>> REACTION_MACHINE =
+//                BLOCK_ENTITIES.register("reaction_machine",
+//                        () -> BlockEntityType.Builder.of(
+//                                ReactionMachineBlockEntity::new,
+//                                ModBlocks.REACTION_MACHINE.get()
+//                        ).build(null)
+//                );
     }
 
     public static final DeferredRegister<Block> BLOCKS =
@@ -70,6 +78,14 @@ public class ModBlocks {
             () -> new TwoHalfIngotCourseBlock.WaxedTwoHalfIngotBlock(
                     BlockBehaviour.Properties.of()
                             .strength(2f,6f)
+                            .sound(SoundType.METAL)
+                            .requiresCorrectToolForDrops()
+            ));
+
+    public static final RegistryObject<Block> ANTI_TWO_HALF_INGOT_BLOCK = BLOCKS.register("anti_two_half_ingot_block",
+            () -> new TwoHalfIngotCourseBlock.AntiTwoHalfIngotBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(4f, 10f)
                             .sound(SoundType.METAL)
                             .requiresCorrectToolForDrops()
             ));
@@ -311,7 +327,7 @@ public class ModBlocks {
                     .strength(15.0f,1200f)
                     .sound(SoundType.NETHERITE_BLOCK)
                     .requiresCorrectToolForDrops()
-                    .lightLevel(state -> 7)
+                    .lightLevel(state -> 15)
                     .emissiveRendering((state,world,pos) -> true)
                     .mapColor(MapColor.COLOR_LIGHT_BLUE)
     ));
@@ -329,15 +345,15 @@ public class ModBlocks {
     );
 
     // 化学机械
-    public static final RegistryObject<Block> REACTION_MACHINE = BLOCKS.register("reaction_machine",
-            () -> new ReactionMachineBlock(
-                    BlockBehaviour.Properties.of().
-                            strength(4.0f, 32.0f)
-                            .sound(SoundType.STONE)
-                            .mapColor(MapColor.STONE)
-                            .requiresCorrectToolForDrops()
-            )
-    );
+//    public static final RegistryObject<Block> REACTION_MACHINE = BLOCKS.register("reaction_machine",
+//            () -> new ReactionMachineBlock(
+//                    BlockBehaviour.Properties.of().
+//                            strength(4.0f, 32.0f)
+//                            .sound(SoundType.STONE)
+//                            .mapColor(MapColor.STONE)
+//                            .requiresCorrectToolForDrops()
+//            )
+//    );
 
     //反相篮球
     public static final RegistryObject<Block> BASKETBALL_ANTI_BLOCK = BLOCKS.register("basketball_anti_block",
@@ -366,6 +382,8 @@ public class ModBlocks {
                             .sound(SoundType.NETHER_BRICKS)
                             .mapColor(MapColor.STONE)
                             .requiresCorrectToolForDrops()
+                            .lightLevel(state -> 0) // 确保不发光
+                            .noOcclusion() // 允许相邻方块渲染其背面，对透明方块很重要
             )
     );
 
@@ -376,23 +394,37 @@ public class ModBlocks {
                             .sound(SoundType.STONE)
                             .mapColor(MapColor.STONE)
                             .requiresCorrectToolForDrops()
+                            .lightLevel(state -> 0) // 确保不发光
+                            .noOcclusion() // 允许相邻方块渲染其背面，对透明方块很重要
             )
     );
-
-    public static final RegistryObject<Block> REACTING_FURNACE = BLOCKS.register("reacting_furnace",
-            () -> new ReactingFurnaceBlock(
-                    BlockBehaviour.Properties.of()
-                            .strength(1.0f, 2.0f)
-                            .sound(SoundType.STONE)
-                            .requiresCorrectToolForDrops()
-            ));
+//
+//    public static final RegistryObject<Block> REACTING_FURNACE = BLOCKS.register("reacting_furnace",
+//            () -> new ReactingFurnaceBlock(
+//                    BlockBehaviour.Properties.of()
+//                            .strength(1.0f, 2.0f)
+//                            .sound(SoundType.STONE)
+//                            .requiresCorrectToolForDrops()
+//            ));
 
     public static final RegistryObject<Block> ABSORB_BLOCK = BLOCKS.register("absorb_block",
             () -> new AbsorbBlock(
                     BlockBehaviour.Properties.of()
-                            .strength(1.5f, 4.5f)
+                            .strength(1.5f, 6.0f)
                             .sound(SoundType.STONE)
                             .mapColor(MapColor.STONE)
+                            .requiresCorrectToolForDrops()
+            )
+    );
+
+    // 方块注册
+    public static final RegistryObject<Block> SENDER_BLOCK = BLOCKS.register("sender_block",
+            () -> new SenderBlock(
+                    BlockBehaviour.Properties.of()
+                            .strength(1.5f, 6.0f)
+                            .sound(SoundType.STONE)
+                            .mapColor(MapColor.STONE)
+                            .requiresCorrectToolForDrops()
             )
     );
 

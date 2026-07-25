@@ -1,7 +1,7 @@
 package com.pha.trainees.item;
 
 
-import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.IHoverText;
 import com.pha.trainees.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -30,7 +30,7 @@ import net.minecraft.world.phys.HitResult;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BasketballAntiItem extends SplashPotionItem implements HoverText {
+public class BasketballAntiItem extends SplashPotionItem implements IHoverText {
 
     public BasketballAntiItem(Properties properties) {
         super(properties);

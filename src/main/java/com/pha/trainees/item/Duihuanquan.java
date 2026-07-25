@@ -1,6 +1,6 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.IHoverText;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import net.minecraft.core.BlockPos;
@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 
-public class Duihuanquan extends Item implements HoverText {
+public class Duihuanquan extends Item implements IHoverText {
     public Duihuanquan(Properties p_41383_){
         super(p_41383_);
     }

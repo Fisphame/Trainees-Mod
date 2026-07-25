@@ -5,11 +5,10 @@ import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.util.game.enums.AbsorbWorkModel;
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.interfaces.Machine;
-import com.pha.trainees.util.interfaces.Traversal;
+import com.pha.trainees.util.interfaces.IMachine;
+import com.pha.trainees.util.interfaces.ITraversal;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -24,13 +23,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Vector3f;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements Traversal, Machine {
+public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements ITraversal, IMachine {
     public AbsorbBlockEntity(BlockEntityType<?> p_155228_, BlockPos p_155229_, BlockState p_155230_) {
         super(p_155228_, p_155229_, p_155230_);
     }
@@ -175,7 +173,7 @@ public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements Travers
             int vz = uz + dz3[i];
             BlockPos vPos = new BlockPos(vx, vy, vz);
             BlockEntity entity = level.getBlockEntity(vPos);
-            if (entity instanceof Machine && entity instanceof ItemHandlerBlockEntity blockEntity) {
+            if (entity instanceof IMachine && entity instanceof ItemHandlerBlockEntity blockEntity) {
                 map.put(vPos, blockEntity);
             }
         }

@@ -1,6 +1,7 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.util.interfaces.IHoverText;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -11,7 +12,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 
 
-public class ModCreativeModeTabs{
+public class ModCreativeModeTabs implements IHoverText {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Main.MODID);
 

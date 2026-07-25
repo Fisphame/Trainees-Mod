@@ -3,7 +3,7 @@ package com.pha.trainees.compat.jei;
 import com.pha.trainees.Main;
 import com.pha.trainees.recipe.TrainerAltarRecipe;
 import com.pha.trainees.registry.ModBlocks;
-import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.IHoverText;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -17,7 +17,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class TrainerAltarRecipeCategory implements IRecipeCategory<TrainerAltarRecipe>, HoverText {
+@SuppressWarnings({"deprecation", "removal"})
+public class TrainerAltarRecipeCategory implements IRecipeCategory<TrainerAltarRecipe>, IHoverText {
     public static final ResourceLocation UID = new ResourceLocation(Main.MODID, "trainer_altar");
     public static final RecipeType<TrainerAltarRecipe> TYPE = new RecipeType<>(UID, TrainerAltarRecipe.class);
 

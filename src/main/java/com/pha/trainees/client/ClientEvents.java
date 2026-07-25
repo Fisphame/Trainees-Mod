@@ -1,14 +1,15 @@
 package com.pha.trainees.client;
 
 import com.pha.trainees.Main;
+
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModMenus;
 import com.pha.trainees.screen.PurificationStationScreen;
-import com.pha.trainees.screen.ReactionMachineScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -21,7 +22,7 @@ public class ClientEvents {
         // 注册GUI屏幕和流体渲染
         event.enqueueWork(() -> {
             MenuScreens.register(ModMenus.PURIFICATION_STATION_MENU.get(), PurificationStationScreen::new);
-            MenuScreens.register(ModMenus.REACTION_MACHINE.get(), ReactionMachineScreen::new);
+//            MenuScreens.register(ModMenus.REACTION_MACHINE.get(), ReactionMachineScreen::new);
 
 //            // 设置流体渲染为半透明
 //            ItemBlockRenderTypes.setRenderLayer(ModFluid.SOURCE_CHE_HBP.get(), RenderType.translucent());
@@ -46,5 +47,11 @@ public class ClientEvents {
             Main.LOGGER.info("Multiblock structure system initialized");
         });
 
+    }
+
+    @SubscribeEvent
+    public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
+        event.registerAboveAll("beaker_info", new BeakerHudOverlay());
+        event.registerAboveAll("analyzer_info", new AnalyzerHudOverlay());
     }
 }

@@ -1,8 +1,8 @@
 package com.pha.trainees.item;
 
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.interfaces.Chemistry;
-import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.IChemistry;
+import com.pha.trainees.util.interfaces.IHoverText;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.*;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class ChemicalItem {
 
-    public static class ChemistryBookItem extends BookItem implements HoverText {
+    public static class ChemistryBookItem extends BookItem implements IHoverText {
 
 
         public ChemistryBookItem(Properties properties) {
@@ -185,7 +185,7 @@ public class ChemicalItem {
         ELEMENT_MASS.put("Bp", 294.24);
     }
 
-    public static class BaseChemicalItem extends Item implements Chemistry, HoverText {
+    public static class BaseChemicalItem extends Item implements IChemistry, IHoverText {
         private final String id;
         private final String formula;
         private final double molarMass;
@@ -213,7 +213,7 @@ public class ChemicalItem {
         }
     }
 
-    public static class BaseChemicalBlockItem extends BlockItem implements Chemistry, HoverText {
+    public static class BaseChemicalBlockItem extends BlockItem implements IChemistry, IHoverText {
         private final String id;
         private final String formula;
         public BaseChemicalBlockItem(Block block, Properties properties, String id, String formula) {

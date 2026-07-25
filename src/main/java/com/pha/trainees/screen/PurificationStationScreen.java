@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+@SuppressWarnings({"deprecation", "removal"})
 public class PurificationStationScreen extends AbstractContainerScreen<PurificationStationMenu> {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(Main.MODID, "textures/gui/container/purification_station.png");

@@ -7,7 +7,7 @@ import com.pha.trainees.item.AuriversiteRapierItem;
 import com.pha.trainees.item.KunCourseItem;
 import com.pha.trainees.item.ScytheCourseItem;
 import com.pha.trainees.util.types.NumedItemEntities;
-import com.pha.trainees.util.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.IKineticWeapon;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.util.math.LogarithmicFunc;
 import com.pha.trainees.util.math.MathT;
@@ -64,6 +64,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 // 方法类
+@SuppressWarnings({"deprecation", "removal"})
 public class Tools {
 
 
@@ -214,16 +215,16 @@ public class Tools {
     }
 
     public static int getPowderMultiplier(Item item) {
-        if (item == ModItems.POWDER_ANTI.get()) return MathT.POW[0];
+        if (item == ModItems.POWDER_ANTI.get()) return MathT.POW_9[0];
         if (item == ModItems.POWDER_ANTI_4.get()) return 4;
-        if (item == ModItems.POWDER_ANTI_9.get()) return MathT.POW[1];
-        if (item == Something.PrankItems.POWDER_ANTI_92.get()) return MathT.POW[2];
-        if (item == Something.PrankItems.POWDER_ANTI_93.get()) return MathT.POW[3];
-        if (item == Something.PrankItems.POWDER_ANTI_94.get()) return MathT.POW[4];
-        if (item == Something.PrankItems.POWDER_ANTI_95.get()) return MathT.POW[5];
-        if (item == Something.PrankItems.POWDER_ANTI_96.get()) return MathT.POW[6];
-        if (item == Something.PrankItems.POWDER_ANTI_97.get()) return MathT.POW[7];
-        if (item == Something.PrankItems.POWDER_ANTI_98.get()) return MathT.POW[8];
+        if (item == ModItems.POWDER_ANTI_9.get()) return MathT.POW_9[1];
+        if (item == Something.PrankItems.POWDER_ANTI_92.get()) return MathT.POW_9[2];
+        if (item == Something.PrankItems.POWDER_ANTI_93.get()) return MathT.POW_9[3];
+        if (item == Something.PrankItems.POWDER_ANTI_94.get()) return MathT.POW_9[4];
+        if (item == Something.PrankItems.POWDER_ANTI_95.get()) return MathT.POW_9[5];
+        if (item == Something.PrankItems.POWDER_ANTI_96.get()) return MathT.POW_9[6];
+        if (item == Something.PrankItems.POWDER_ANTI_97.get()) return MathT.POW_9[7];
+        if (item == Something.PrankItems.POWDER_ANTI_98.get()) return MathT.POW_9[8];
 
         return 1;
     }
@@ -1119,6 +1120,21 @@ public class Tools {
 
             level.addFreshEntity(entity);
         }
+
+        public static void spawnArcParticle(Level level, SimpleParticleType particleType, Vec3 start, Vec3 end, int baseTime, int randomTime) {
+            if (level.isClientSide) return; // 仅在服务端生成实体
+
+            // 获取实体类型（你需要提前注册 ParticleEntity 的类型）
+            EntityType<ParticleEntity> type = ModEntities.PARTICLE_ENTITY.get(); // 根据你的注册方式调整
+
+            ParticleEntity entity = new ParticleEntity(type, level);
+            entity.setParticleType(particleType);
+            // 随机决定行走时间（1~3 秒，20 ticks/秒）
+            int duration = baseTime + level.random.nextInt(randomTime);
+            entity.initArc(start, end, duration);
+
+            level.addFreshEntity(entity);
+        }
     }
 
     public static class EntityWay {
@@ -1892,7 +1908,7 @@ public class Tools {
      * @return 应用附魔加成后的系数
      */
     public static float getModifiedLinearFactor(ItemStack stack, float baseFactor) {
-        if (!(stack.getItem() instanceof KineticWeapon)) {
+        if (!(stack.getItem() instanceof IKineticWeapon)) {
             return baseFactor;
         }
 
@@ -1913,7 +1929,7 @@ public class Tools {
          * @return 应用附魔加成后的系数
          */
         public static float getModifiedGravityFactor(ItemStack stack, float baseFactor) {
-            if (!(stack.getItem() instanceof KineticWeapon)) {
+            if (!(stack.getItem() instanceof IKineticWeapon)) {
                 return baseFactor;
             }
 
@@ -1934,7 +1950,7 @@ public class Tools {
          * @return 应用附魔加成后的衰减速率
          */
         public static float getModifiedDecayRate(ItemStack stack, float baseDecayRate) {
-            if (!(stack.getItem() instanceof KineticWeapon)) {
+            if (!(stack.getItem() instanceof IKineticWeapon)) {
                 return baseDecayRate;
             }
 
@@ -1955,7 +1971,7 @@ public class Tools {
          * @return 应用附魔加成后的系数
          */
         public static float getModifiedDamageFactor(ItemStack stack, float baseFactor) {
-            if (!(stack.getItem() instanceof KineticWeapon)) {
+            if (!(stack.getItem() instanceof IKineticWeapon)) {
                 return baseFactor;
             }
 
@@ -1976,7 +1992,7 @@ public class Tools {
          * @return 应用附魔加成后的最大动能值
          */
         public static float getModifiedMaxKineticEnergy(ItemStack stack, float baseMaxEnergy) {
-            if (!(stack.getItem() instanceof KineticWeapon)) {
+            if (!(stack.getItem() instanceof IKineticWeapon)) {
                 return baseMaxEnergy;
             }
 
@@ -1994,7 +2010,7 @@ public class Tools {
          * 获取物品上所有动能相关的附魔信息
          */
         public static String getKineticEnchantmentInfo(ItemStack stack) {
-            if (!(stack.getItem() instanceof KineticWeapon)) {
+            if (!(stack.getItem() instanceof IKineticWeapon)) {
                 return "无动能附魔";
             }
 

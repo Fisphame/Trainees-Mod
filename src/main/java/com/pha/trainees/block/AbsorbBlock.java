@@ -3,7 +3,7 @@ package com.pha.trainees.block;
 import com.pha.trainees.blockentity.AbsorbBlockEntity;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.interfaces.Machine;
+import com.pha.trainees.util.interfaces.IMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -23,7 +23,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AbsorbBlock extends BaseEntityBlock implements Machine {
+public class AbsorbBlock extends BaseEntityBlock implements IMachine {
     public AbsorbBlock(Properties properties) {
         super(properties);
     }

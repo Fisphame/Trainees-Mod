@@ -1,8 +1,8 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.util.interfaces.Chargeable;
-import com.pha.trainees.util.interfaces.HoverText;
-import com.pha.trainees.util.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.IChargeable;
+import com.pha.trainees.util.interfaces.IHoverText;
+import com.pha.trainees.util.interfaces.IKineticWeapon;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class AuriversiteRapierItem extends SwordItem implements Chargeable, KineticWeapon, HoverText {
+public class AuriversiteRapierItem extends SwordItem implements IChargeable, IKineticWeapon, IHoverText {
     public static final String TAG_KINETIC_UPDATE_ENABLED = "KineticUpdateEnabled";
 
     public AuriversiteRapierItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
@@ -39,7 +39,7 @@ public class AuriversiteRapierItem extends SwordItem implements Chargeable, Kine
         super.inventoryTick(stack, level, entity, slotId, isSelected);
 
         if (!level.isClientSide) {
-            if (KineticWeapon.isKineticUpdateEnabled(stack)) {
+            if (IKineticWeapon.isKineticUpdateEnabled(stack)) {
                 updateKineticEnergy(level, entity, stack, isSelected);
             }
         }
@@ -70,7 +70,7 @@ public class AuriversiteRapierItem extends SwordItem implements Chargeable, Kine
         super.appendHoverText(stack, level, tooltipComponents, flag);
 
         if (flag.isAdvanced()) {
-            boolean enabled = KineticWeapon.isKineticUpdateEnabled(stack);
+            boolean enabled = IKineticWeapon.isKineticUpdateEnabled(stack);
             String id = "auriversite_rapier";
             tooltipComponents.add(getTooltip(id));
             tooltipComponents.add(getTooltip(id, 2, 1));

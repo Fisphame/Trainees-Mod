@@ -1,7 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.util.interfaces.HoverText;
-import com.pha.trainees.util.interfaces.Scythe;
+import com.pha.trainees.util.interfaces.IHoverText;
+import com.pha.trainees.util.interfaces.IScythe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ScytheCourseItem{
-    public static abstract class BaseScytheItem extends SwordItem implements Scythe, HoverText {
+    public static abstract class BaseScytheItem extends SwordItem implements IScythe, IHoverText {
         private final int tier;
         private final String itemId;
 

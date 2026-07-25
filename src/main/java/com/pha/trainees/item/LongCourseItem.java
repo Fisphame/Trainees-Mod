@@ -1,7 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.util.interfaces.HoverText;
-import com.pha.trainees.util.interfaces.MineBlock;
+import com.pha.trainees.util.interfaces.IHoverText;
+import com.pha.trainees.util.interfaces.IMineBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +20,7 @@ public class LongCourseItem {
         }
     }
 
-    public static class RealPickaxeItem extends PickaxeItem implements MineBlock, HoverText {
+    public static class RealPickaxeItem extends PickaxeItem implements IMineBlock, IHoverText {
         public RealPickaxeItem(Tier p_42961_, int p_42962_, float p_42963_, Properties p_42964_) {
             super(p_42961_, p_42962_, p_42963_, p_42964_);
         }

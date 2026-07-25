@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@SuppressWarnings({"deprecation", "removal"})
 @JeiPlugin
 public class TraineesJeiPlugin implements IModPlugin {
     private static final ResourceLocation PLUGIN_UID = new ResourceLocation(Main.MODID, "jei_plugin");

@@ -2,15 +2,19 @@ package com.pha.trainees.item;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.block.AbsorbBlock;
+import com.pha.trainees.block.SenderBlock;
+import com.pha.trainees.blockentity.SenderBlockEntity;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.ActiveStructureManager;
-import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.IHoverText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -21,7 +25,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
-public class StoneStickTItem extends Item implements HoverText {
+public class StoneStickTItem extends Item implements IHoverText {
+
+    // ========== 持久数据键 ==========
+    private static final String CONFIG_KEY = Main.MODID + "_config";
+    private static final String MODE_KEY = "Mode";               // 0=输出, 1=输入
+    private static final String SETTING_MODE_KEY = "SettingMode";
+    private static final String SETTING_ALTAR_POS_KEY = "SettingAltarPos";
+
+    private static final int MODE_OUTPUT = 0;
+    private static final int MODE_INPUT = 1;
 
     public StoneStickTItem(Properties p_41383_) {
         super(p_41383_);
@@ -34,89 +47,175 @@ public class StoneStickTItem extends Item implements HoverText {
         }
         Player player = context.getPlayer();
         if (player == null) return InteractionResult.PASS;
+
         BlockPos clickedPos = context.getClickedPos();
         ItemStack itemStack = context.getItemInHand();
+        BlockState state = level.getBlockState(clickedPos);
+
+        // 获取玩家持久数据
+        CompoundTag persistentData = player.getPersistentData();
+        CompoundTag configData = persistentData.getCompound(CONFIG_KEY);
+
 
         Vector3f color = new Vector3f(0, 255, 0);
         DustParticleOptions options = new DustParticleOptions(color, 1.0f);
         Tools.Particle.sendSurfaces(level, options, clickedPos, 15, 0.25, 0.25, 0.25, 0.0);
 
-        // 获取玩家持久数据中用于配置的标签
-        String configKey = Main.MODID + "_config";
-        CompoundTag persistentData = player.getPersistentData();
-        CompoundTag configData = persistentData.getCompound(configKey);
+        // ========== 1. 切换模式（Shift + 右键） ==========
+        if (player.isShiftKeyDown()) {
+            int currentMode = configData.getInt(MODE_KEY);
+            int newMode = (currentMode == MODE_OUTPUT) ? MODE_INPUT : MODE_OUTPUT;
+            configData.putInt(MODE_KEY, newMode);
 
-        boolean settingMode = configData.getBoolean("SettingMode");
-        long settingAltarPosLong = configData.getLong("SettingAltarPos");
+            // 清除任何正在进行的设置状态
+            configData.remove(SETTING_MODE_KEY);
+            configData.remove(SETTING_ALTAR_POS_KEY);
+            persistentData.put(CONFIG_KEY, configData);
 
-        if (settingMode) {
-            // 玩家处于设置模式，处理掉落位置的选择
-            BlockPos altarPos = BlockPos.of(settingAltarPosLong);
-            ActiveStructureManager manager = ActiveStructureManager.get(level);
+            String modeName = (newMode == MODE_OUTPUT) ? "输出模式（设置掉落位置）" : "输入模式（绑定发送方块）";
+            player.displayClientMessage(
+                    Component.literal("切换到 " + modeName).withStyle(ChatFormatting.GRAY),
+                    true
+            );
 
-            // 验证祭坛是否仍然激活
-            if (manager.isPositionActive(level, TrainerAltarPattern.STRUCTURE_ID, altarPos)) {
-                // 确定候选位置
-                BlockPos candidate = null;
-                BlockState state = level.getBlockState(clickedPos);
-                if (state.getBlock() instanceof AbsorbBlock) {
-                    candidate = clickedPos;
-                } else {
-                    BlockPos above = clickedPos.above();
-                    if (level.isEmptyBlock(above)) {
-                        candidate = above;
-                    }
-                }
-
-                if (candidate != null) {
-                    // 尝试设置掉落位置
-                    boolean success = TrainerAltarPattern.setDropPosition(level, altarPos, candidate);
-                    if (success) {
-                        // 设置成功，清除设置模式
-                        configData.remove("SettingMode");
-                        configData.remove("SettingAltarPos");
-                        persistentData.put(configKey, configData);
-                        player.displayClientMessage(SuccessC,true);
-                    } else {
-                        player.displayClientMessage(tr("hint.invalid_drop_pos_out_of_range_or_block_unavailable")
-                                .withStyle(ChatFormatting.RED),true);
-
-//                                Component.literal("无效的掉落位置（超出范围或方块不可用）");
-                    }
-                } else {
-                    player.displayClientMessage(tr("hint.target_block_must_absorb_block_or_air_above")
-                            .withStyle(ChatFormatting.RED), true);
-
-
-//                            Component.literal("目标方块必须是吸收块或上方为空气"), true);
-                }
-            } else {
-                // 祭坛不再激活，自动退出配置模式
-                configData.remove("SettingMode");
-                configData.remove("SettingAltarPos");
-                persistentData.put(configKey, configData);
-                player.displayClientMessage(tr("hint.altar_invalid_setting_canceled").withStyle(ChatFormatting.RED), true);
-
-//                        Component.literal("祭坛已失效，配置取消"), true);
-            }
+            // 添加冷却防止误触
+            player.getCooldowns().addCooldown(itemStack.getItem(), 5);
             return InteractionResult.SUCCESS;
-        } else {
-            // 未处于设置模式，检查点击的是否为核心方块且祭坛已激活
-            if (level.getBlockState(clickedPos).is(ModBlocks.ALTAR_CORE_BLOCK.get())) {
-                ActiveStructureManager manager = ActiveStructureManager.get(level);
-                if (manager.isPositionActive(level, TrainerAltarPattern.STRUCTURE_ID, clickedPos)) {
-                    // 进入设置模式
-                    configData.putBoolean("SettingMode", true);
-                    configData.putLong("SettingAltarPos", clickedPos.asLong());
-                    persistentData.put(configKey, configData);
-                    player.getCooldowns().addCooldown(itemStack.getItem(), 5);
-                    player.displayClientMessage(tr("hint.enter_drop_pos_setting_right_click_block_set_pos"), true);
+        }
 
-//                            Component.literal("进入掉落位置配置模式，右键方块设置位置"), true);
-                    return InteractionResult.SUCCESS;
-                }
+        // ========== 2. 读取当前模式 ==========
+        int currentMode = configData.getInt(MODE_KEY); // 默认0（输出模式）
+        boolean isSetting = configData.getBoolean(SETTING_MODE_KEY);
+        long altarPosLong = configData.getLong(SETTING_ALTAR_POS_KEY);
+
+        // ========== 3. 处理点击核心方块 ==========
+        if (level.getBlockState(clickedPos).is(ModBlocks.ALTAR_CORE_BLOCK.get())) {
+            // 检查核心是否已激活
+            ActiveStructureManager manager = ActiveStructureManager.get(level);
+            boolean isActive = manager.isPositionActive(level, TrainerAltarPattern.STRUCTURE_ID, clickedPos);
+
+            if (!isActive) {
+                player.displayClientMessage(
+                        Component.literal("目标核心未激活").withStyle(ChatFormatting.RED),
+                        true
+                );
+                return InteractionResult.FAIL;
             }
+
+            if (!isSetting) {
+                // 进入设置模式
+                configData.putBoolean(SETTING_MODE_KEY, true);
+                configData.putLong(SETTING_ALTAR_POS_KEY, clickedPos.asLong());
+                persistentData.put(CONFIG_KEY, configData);
+
+                String modeName = (currentMode == MODE_OUTPUT) ? "输出" : "输入";
+                player.displayClientMessage(
+                        Component.literal("进入设置模式（" + modeName + "），右键目标方块完成绑定").withStyle(ChatFormatting.GRAY),
+                        true
+                );
+            } else {
+                // 已在设置模式，再次点击核心则取消设置
+                configData.remove(SETTING_MODE_KEY);
+                configData.remove(SETTING_ALTAR_POS_KEY);
+                persistentData.put(CONFIG_KEY, configData);
+
+                player.displayClientMessage(
+                        Component.literal("已取消设置").withStyle(ChatFormatting.GRAY),
+                        true
+                );
+            }
+            player.getCooldowns().addCooldown(itemStack.getItem(), 5);
+            return InteractionResult.SUCCESS;
+        }
+
+
+        // ========== 4. 点击其他方块（处理设置模式） ==========
+        if (!isSetting) {
+            // 未处于设置模式，忽略
             return InteractionResult.PASS;
         }
+
+        // 读取核心位置
+        BlockPos altarPos = BlockPos.of(altarPosLong);
+
+        // 验证核心是否仍然激活
+        ActiveStructureManager manager = ActiveStructureManager.get(level);
+        if (!manager.isPositionActive(level, TrainerAltarPattern.STRUCTURE_ID, altarPos)) {
+            // 核心已失效，自动退出设置模式
+            configData.remove(SETTING_MODE_KEY);
+            configData.remove(SETTING_ALTAR_POS_KEY);
+            persistentData.put(CONFIG_KEY, configData);
+            player.displayClientMessage(tr("hint.altar_invalid_setting_canceled").withStyle(ChatFormatting.RED), true);
+            return InteractionResult.FAIL;
+        }
+
+        // ----- 根据模式执行不同操作 -----
+        if (currentMode == MODE_OUTPUT) {
+            // ===== 输出模式：设置掉落位置 =====
+            BlockPos candidate = null;
+            if (state.getBlock() instanceof AbsorbBlock) {
+                candidate = clickedPos;
+            } else {
+                BlockPos above = clickedPos.above();
+                if (level.isEmptyBlock(above)) {
+                    candidate = above;
+                }
+            }
+
+            if (candidate != null) {
+                boolean success = TrainerAltarPattern.setDropPosition(level, altarPos, candidate);
+                if (success) {
+                    // 清除设置状态
+                    configData.remove(SETTING_MODE_KEY);
+                    configData.remove(SETTING_ALTAR_POS_KEY);
+                    persistentData.put(CONFIG_KEY, configData);
+                    player.displayClientMessage(Success2C, true);
+                } else {
+                    player.displayClientMessage(tr("hint.invalid_drop_pos_out_of_range_or_block_unavailable")
+                                    .withStyle(ChatFormatting.RED), true
+                    );
+                }
+            } else {
+                player.displayClientMessage(tr("hint.target_block_must_absorb_block_or_air_above")
+                        .withStyle(ChatFormatting.RED), true);
+            }
+            return InteractionResult.SUCCESS;
+        }
+
+        if (currentMode == MODE_INPUT) {
+            // ===== 输入模式：绑定发送方块 =====
+            if (!(state.getBlock() instanceof SenderBlock)) {
+                player.displayClientMessage(
+                        Component.literal("目标必须是发送方块 (Sender Block)").withStyle(ChatFormatting.RED),
+                        true
+                );
+                return InteractionResult.FAIL;
+            }
+
+            // 获取发送方块的 BlockEntity
+            if (level.getBlockEntity(clickedPos) instanceof SenderBlockEntity senderBE) {
+                // 执行绑定
+                senderBE.bindToCore(altarPos);
+                // 清除设置状态
+                configData.remove(SETTING_MODE_KEY);
+                configData.remove(SETTING_ALTAR_POS_KEY);
+                persistentData.put(CONFIG_KEY, configData);
+
+                player.displayClientMessage(
+                        Component.literal("§a发送方块已绑定到核心").withStyle(ChatFormatting.GREEN),
+                        true
+                );
+                return InteractionResult.SUCCESS;
+            } else {
+                player.displayClientMessage(
+                        Component.literal("发送方块实体异常").withStyle(ChatFormatting.RED),
+                        true
+                );
+                return InteractionResult.FAIL;
+            }
+        }
+
+        return InteractionResult.PASS;
+
     }
 }

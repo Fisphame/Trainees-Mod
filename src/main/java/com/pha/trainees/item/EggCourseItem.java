@@ -1,7 +1,7 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.util.interfaces.Eggs;
-import com.pha.trainees.util.interfaces.HoverText;
+import com.pha.trainees.util.interfaces.IEggs;
+import com.pha.trainees.util.interfaces.IHoverText;
 import com.pha.trainees.registry.ModEntities;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class EggCourseItem {
-    public static abstract class BaseEggItem extends EggItem implements Eggs, HoverText{
+    public static abstract class BaseEggItem extends EggItem implements IEggs, IHoverText {
         private final int whichEgg;
         private final String itemId;
 
@@ -43,7 +43,7 @@ public class EggCourseItem {
         }
     }
 
-    public abstract static class BaseThrownEggItem extends ThrownEgg implements Eggs {
+    public abstract static class BaseThrownEggItem extends ThrownEgg implements IEggs {
         private final Entity targetEntity;
 
         public BaseThrownEggItem(Level level, Player player, Entity targetEntity) {

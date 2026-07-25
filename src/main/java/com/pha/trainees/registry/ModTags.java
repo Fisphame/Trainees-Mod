@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
+@SuppressWarnings({"deprecation", "removal"})
 public class ModTags {
 
     public static final TagKey<Item> POWDER_ANTI_2 = create("powder_anti_2");

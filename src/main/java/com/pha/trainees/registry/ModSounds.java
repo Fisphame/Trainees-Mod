@@ -11,6 +11,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
 
+@SuppressWarnings({"deprecation", "removal"})
 public class ModSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Main.MODID);

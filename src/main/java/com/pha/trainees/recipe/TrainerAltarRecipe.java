@@ -10,6 +10,10 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public class TrainerAltarRecipe implements Recipe<Container> {
     private final ResourceLocation id;
     private final Ingredient input1;
@@ -80,7 +84,47 @@ public class TrainerAltarRecipe implements Recipe<Container> {
     }
 
     public boolean matches(ItemStack stack1, ItemStack stack2, ItemStack stack3, ItemStack stack4) {
-        return input1.test(stack1) && input2.test(stack2) && input3.test(stack3) && input4.test(stack4);
+        // 1. 输入物品列表（过滤空物品）
+        List<ItemStack> inputs = new ArrayList<>();
+        addIfNotEmpty(inputs, stack1);
+        addIfNotEmpty(inputs, stack2);
+        addIfNotEmpty(inputs, stack3);
+        addIfNotEmpty(inputs, stack4);
+
+        // 2. 配方 Ingredient 列表
+        List<Ingredient> ingredients = List.of(input1, input2, input3, input4);
+
+        // 3. 如果输入物品数量不等于4（有空的），直接失败
+        if (inputs.size() != 4) {
+            return false;
+        }
+
+        // 4. 尝试为每个 Ingredient 匹配一个输入物品
+        List<ItemStack> remaining = new ArrayList<>(inputs);
+        for (Ingredient ingredient : ingredients) {
+            boolean matched = false;
+            Iterator<ItemStack> iterator = remaining.iterator();
+            while (iterator.hasNext()) {
+                ItemStack candidate = iterator.next();
+                if (ingredient.test(candidate)) {
+                    iterator.remove(); // 匹配后移除，处理重复物品
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) {
+                return false;
+            }
+        }
+
+        // 5. 所有 Ingredient 都匹配成功，且剩余列表为空（因为数量相等）
+        return true;
+    }
+
+    private void addIfNotEmpty(List<ItemStack> list, ItemStack stack) {
+        if (stack != null && !stack.isEmpty()) {
+            list.add(stack);
+        }
     }
 
     public Ingredient getInput1() {

@@ -35,6 +35,11 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.WAXED_TWO_HALF_INGOT_BLOCK.get(),
                     new Item.Properties()
             ));
+    // 反两锭半块
+    public static final RegistryObject<Item> ANTI_TWO_HALF_INGOT_BLOCK_ITEM = ITEMS.register("anti_two_half_ingot_block",
+            () -> new BlockItem(ModBlocks.ANTI_TWO_HALF_INGOT_BLOCK.get(),
+                    new Item.Properties()
+            ));
     // 金矽块
     public static final RegistryObject<Item> AURIVERSITE_BLOCK_ITEM = ITEMS.register("auriversite_block",
             () -> new BlockItem(ModBlocks.AURIVERSITE_BLOCK.get(),
@@ -159,18 +164,18 @@ public class ModItems {
                     new Item.Properties()
             )
     );
-    //反应炉
-    public static final RegistryObject<Item> REACTING_FURNACE_BLOCK_ITEM = ITEMS.register("reacting_furnace",
-            () -> new BlockItem(ModBlocks.REACTING_FURNACE.get(),
-                    new Item.Properties()
-            )
-    );
-    //
-    public static final RegistryObject<Item> REACTION_MACHINE_ITEM = ITEMS.register("reaction_machine",
-            () -> new BlockItem(ModBlocks.REACTION_MACHINE.get(),
-                    new Item.Properties()
-            )
-    );
+//    //反应炉
+//    public static final RegistryObject<Item> REACTING_FURNACE_BLOCK_ITEM = ITEMS.register("reacting_furnace",
+//            () -> new BlockItem(ModBlocks.REACTING_FURNACE.get(),
+//                    new Item.Properties()
+//            )
+//    );
+//    //
+//    public static final RegistryObject<Item> REACTION_MACHINE_ITEM = ITEMS.register("reaction_machine",
+//            () -> new BlockItem(ModBlocks.REACTION_MACHINE.get(),
+//                    new Item.Properties()
+//            )
+//    );
     //祭坛核心
     public static final RegistryObject<Item> ALTAR_CORE_BLOCK_ITEM = ITEMS.register("altar_core_block",
             () -> new BlockItem(ModBlocks.ALTAR_CORE_BLOCK.get(),
@@ -186,6 +191,12 @@ public class ModItems {
     // 汲取方块
     public static final RegistryObject<Item> ABSORB_BLOCK_ITEM = ITEMS.register("absorb_block",
             () -> new BlockItem(ModBlocks.ABSORB_BLOCK.get(),
+                    new Item.Properties()
+            )
+    );
+    // 发送方块
+    public static final RegistryObject<Item> SENDER_BLOCK_ITEM = ITEMS.register("sender_block",
+            () -> new BlockItem(ModBlocks.SENDER_BLOCK.get(),
                     new Item.Properties()
             )
     );

@@ -2,6 +2,8 @@ package com.pha.trainees;
 
 import com.mojang.logging.LogUtils;
 import com.pha.trainees.api.DeepSeekClient;
+import com.pha.trainees.chemistry.material.SubstanceBlueprintRegistry;
+import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.event.*;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.util.game.chemistry.ChemicalReaction;
@@ -19,6 +21,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
+@SuppressWarnings({"deprecation", "removal"})
 @Mod(Main.MODID)
 public class Main {
 
@@ -31,11 +34,16 @@ public class Main {
     public Main() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         IEventBus ebus = MinecraftForge.EVENT_BUS;
-        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.COMMON, ModConfig.COMMON_SPEC, "trainees-common.toml");
+        ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.COMMON,
+                ModConfig.COMMON_SPEC, "trainees-common.toml");
+        ModLoadingContext.get().registerConfig(
+                net.minecraftforge.fml.config.ModConfig.Type.SERVER,
+                ChemConfig.SERVER_SPEC, "trainees-server.toml");
 
         ModBlocks.BLOCKS.register(bus);
-        ModBlocks.ModBlockEntities.BLOCK_ENTITIES.register(bus);
         ModChemistry.ModChemistryBlocks.BLOCKS.register(bus);
+        ModBlocks.ModBlockEntities.BLOCK_ENTITIES.register(bus);
+        ModChemistry.ModChemistryBlockEntities.BLOCK_ENTITIES.register(bus);
         ModSounds.SOUNDS.register(bus);
         ModEnchantments.ENCHANTMENTS.register(bus);
         ModItems.ITEMS.register(bus);
@@ -53,20 +61,25 @@ public class Main {
         ModRecipes.TYPES.register(bus);
         ModFluids.FLUID_TYPES.register(bus);
         ModFluids.FLUIDS.register(bus);
+//        ModChemistry.ModFluids.FLUID_TYPES.register(bus);
+//        ModChemistry.ModFluids.FLUIDS.register(bus);
+//        ModChemistry.ModFluids.FLUID_BLOCKS.register(bus);
         ModCommand.register();
         ebus.register(ModCommand.AskCommand.class);  // 注册命令
 //        bus.addListener(this::onClientSetup);
+
 
         bus.register(new Register());
         bus.addListener(this::commonSetup);
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
         ebus.register(this);
+
+
     }
 
     private void commonSetup(final @NotNull FMLCommonSetupEvent event) {
         Main.LOGGER.info("Chemistry System: Starting commonSetup");
-
         event.enqueueWork(() -> {
             Main.LOGGER.info("Chemistry System: Executing enqueueWork");
             try {
@@ -81,6 +94,15 @@ public class Main {
                 Main.LOGGER.info("Chemistry System: Calling registerAllReactions()");
                 ChemicalReaction.registerAllReactions();
                 Main.LOGGER.info("Chemistry System: registerAllReactions() call complete");
+
+                // 注册物质蓝图
+                Main.LOGGER.info("Chemistry System: Registering substance blueprints...");
+                SubstanceBlueprintRegistry.registerAll();
+                Main.LOGGER.info("Chemistry System: Substance blueprints registered");
+
+                // 注册反应
+                Main.LOGGER.info("Chemistry System: Calling registerAllReactions()");
+                ModChemistry.Reactions.registerAll();
 
             } catch (Exception e) {
                 Main.LOGGER.error("Chemistry System: Initialization failed", e);

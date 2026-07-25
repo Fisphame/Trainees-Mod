@@ -5,7 +5,7 @@ import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.util.game.enums.KunAltarType;
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.interfaces.Machine;
+import com.pha.trainees.util.interfaces.IMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class KunAltarBlockEntity extends ItemHandlerBlockEntity implements Machine {
+public class KunAltarBlockEntity extends ItemHandlerBlockEntity implements IMachine {
 
     private KunAltarType altarType = KunAltarType.COMPLETE;
 

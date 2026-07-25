@@ -12,98 +12,198 @@ import com.pha.trainees.util.game.enums.AbsorbWorkModel;
 import com.pha.trainees.util.game.enums.KunAltarType;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.*;
-import com.pha.trainees.util.interfaces.Traversal;
+import com.pha.trainees.util.interfaces.ITraversal;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * Trainer Altar 多方块结构
  */
+@SuppressWarnings({"removal"})
 public class TrainerAltarPattern {
     public static final String STRUCTURE_ID = "trainees:trainer_altar";
     // 1 - north  2 - east  3 - south  4 - west
     // 掉落位置允许的范围（相对于核心方块 matchPos）
-    private static final int MIN_X = -4;
-    private static final int MAX_X = 4;
-    private static final int MIN_Y = -4;
-    private static final int MAX_Y = 4;
-    private static final int MIN_Z = -1;
+    private static final int MIN_X = -5;
+    private static final int MAX_X = 5;
+    private static final int MIN_Y = -2;
+    private static final int MAX_Y = 5;
+    private static final int MIN_Z = -5;
     private static final int MAX_Z = 5;
 
     public static void register() {
-        // 创建激活处理器
-        IActivationHandler activationHandler = new TrainerAltarActivationHandler();
+//        // 创建激活处理器
+//        IActivationHandler activationHandler = new TrainerAltarActivationHandler();
+//
+//        // 关键：设置正确的偏移
+//        // 我们以 (0,0,0) 位置（two_half_ingot_block）作为结构原点
+//        BlockPos originOffset = new BlockPos(0, 0, 0);  // 检查位置就是原点位置
+//        BlockPos matchPos = new BlockPos(0, 1, 0);      // 核心方块在原点上方一格
+//
+//
+//        // 构建结构模式
+//        MultiblockPattern pattern = new MultiblockPattern.Builder()
+//                .dimensions(7, 3, 7)  // a×b×c 结构
+//                .originOffset(originOffset)
+//                .matchPos(matchPos)
+//                .activationHandler(activationHandler)
+//
+//                // 基础方块 (0,0,0)
+//                .addCondition(new BlockPos(0, 0, 0),
+//                        (level, pos, state) ->
+//                                state.is(ModBlocks.ANTI_TWO_HALF_INGOT_BLOCK.get())
+//                )
+//
+//                // 核心方块
+//                .addCondition(new BlockPos(0, 1, 0),
+//                        IBlockPredicate.block(ModBlocks.ALTAR_CORE_BLOCK.get())
+//                )
+//
+//                // 顶部方块
+//                .addCondition(new BlockPos(0, 2, 0),
+//                        (level, pos, state) ->
+//                        state.is(ModBlocks.ANTI_TWO_HALF_INGOT_BLOCK.get())
+//                )
+//
+//                // KunAltar 方块
+//                .addCondition(new BlockPos(-3, 0, 0),
+//                        createKunAltarCondition(KunAltarType.HALF)
+//                )
+//                .addCondition(new BlockPos(3, 0, 0),
+//                        createKunAltarCondition(KunAltarType.HALF)
+//                )
+//                .addCondition(new BlockPos(0, 0, -3),
+//                        createKunAltarCondition(KunAltarType.HALF)
+//                )
+//                .addCondition(new BlockPos(0, 0, 3),
+//                        createKunAltarCondition(KunAltarType.HALF)
+//                )
+//
+//                // 添加一些忽略的位置（结构内部可以有空位）
+////                .addIgnoredPosition(new BlockPos(-1, 0, 0))
+////                .addIgnoredPosition(new BlockPos(1, 0, 0))
+////                .addIgnoredPosition(new BlockPos(0, 0, -1))
+////                .addIgnoredPosition(new BlockPos(0, 0, 1))
+//                .build();
+//
+//        // 注册结构
+//        MultiblockStructure.registerStructure(STRUCTURE_ID, pattern);
+//
+//        Main.LOGGER.info("[TrainerAltar] Structure registered success : {}", STRUCTURE_ID);
 
-        // 关键：设置正确的偏移
-        // 我们以 (0,0,0) 位置（two_half_ingot_block）作为结构原点
-        BlockPos originOffset = new BlockPos(0, 0, 0);  // 检查位置就是原点位置
-        BlockPos matchPos = new BlockPos(0, 1, 0);      // 核心方块在原点上方一格
+        // 1. 加载结构 NBT
+        CompoundTag structureNbt;
+        ResourceLocation nbtLoc = new ResourceLocation(Main.MODID, "structures/trainer_altar.nbt");
 
+        try {
+            // 在 Forge 1.20.1 中，使用 ResourceManager 获取 Resource
+            Resource resource = Minecraft.getInstance().getResourceManager()
+                    .getResource(nbtLoc)
+                    .orElseThrow(() -> new FileNotFoundException("Structure nbt not found: " + nbtLoc));
 
-        // 构建结构模式
-        MultiblockPattern pattern = new MultiblockPattern.Builder()
-                .dimensions(7, 3, 7)  // a×b×c 结构
-                .originOffset(originOffset)
-                .matchPos(matchPos)
-                .activationHandler(activationHandler)
+            try (InputStream inputStream = resource.open()) { // 使用 open() 获取输入流
+                // 使用 NbtIo.readCompressed 并传入 NbtAccounter
+                structureNbt = NbtIo.readCompressed(inputStream);
+            }
+        } catch (Exception e) {
+            Main.LOGGER.error("Failed to load trainer_altar structure NBT", e);
+            return;
+        }
 
-                // 基础方块 (0,0,0)
-                .addCondition(new BlockPos(0, 0, 0),
-                        (level, pos, state) ->
-                                state.is(ModBlocks.TWO_HALF_INGOT_BLOCK.get()) || state.is(ModBlocks.WAXED_TWO_HALF_INGOT_BLOCK.get())
-                )
+        // 2. 解析 palette 和 blocks
+        ListTag paletteTag = structureNbt.getList("palette", Tag.TAG_COMPOUND);
+        ListTag blocksTag = structureNbt.getList("blocks", Tag.TAG_COMPOUND);
 
-                // 核心方块
-                .addCondition(new BlockPos(0, 1, 0),
-                        IBlockPredicate.block(ModBlocks.ALTAR_CORE_BLOCK.get())
-                )
+        // 获取空气的 palette 索引
+        int airIndex = -1;
+        for (int i = 0; i < paletteTag.size(); i++) {
+            CompoundTag entry = paletteTag.getCompound(i);
+            String name = entry.getString("Name");
+            if ("minecraft:air".equals(name)) {
+                airIndex = i;
+                break;
+            }
+        }
+        if (airIndex == -1) {
+            Main.LOGGER.warn("No air found in palette, assuming index 2");
+            airIndex = 2; // fallback
+        }
 
-                // 顶部方块
-                .addCondition(new BlockPos(0, 2, 0),
-                        (level, pos, state) ->
-                        state.is(ModBlocks.TWO_HALF_INGOT_BLOCK.get()) || state.is(ModBlocks.WAXED_TWO_HALF_INGOT_BLOCK.get())
-                )
+        // 核心方块在 NBT 中的相对坐标（从你的NBT中固定为 (5,1,5)）
+        BlockPos coreRelative = new BlockPos(5, 1, 5);
 
-                // KunAltar 方块
-                .addCondition(new BlockPos(-3, 0, 0),
-                        createKunAltarCondition(KunAltarType.HALF)
-                )
-                .addCondition(new BlockPos(3, 0, 0),
-                        createKunAltarCondition(KunAltarType.HALF)
-                )
-                .addCondition(new BlockPos(0, 0, -3),
-                        createKunAltarCondition(KunAltarType.HALF)
-                )
-                .addCondition(new BlockPos(0, 0, 3),
-                        createKunAltarCondition(KunAltarType.HALF)
-                )
+        // 3. 构建结构模式
+        MultiblockPattern.Builder builder = new MultiblockPattern.Builder()
+                .dimensions(11, 4, 11)
+                .originOffset(BlockPos.ZERO)
+                .matchPos(BlockPos.ZERO)
+                .activationHandler(new TrainerAltarActivationHandler());
 
-                // 添加一些忽略的位置（结构内部可以有空位）
-//                .addIgnoredPosition(new BlockPos(-1, 0, 0))
-//                .addIgnoredPosition(new BlockPos(1, 0, 0))
-//                .addIgnoredPosition(new BlockPos(0, 0, -1))
-//                .addIgnoredPosition(new BlockPos(0, 0, 1))
-                .build();
+        // 遍历所有方块，添加条件
+        for (int i = 0; i < blocksTag.size(); i++) {
+            CompoundTag blockTag = blocksTag.getCompound(i);
+            int state = blockTag.getInt("state");
+            if (state == airIndex) continue; // 跳过空气
 
-        // 注册结构
+            ListTag posList = blockTag.getList("pos", Tag.TAG_INT);
+            int x = posList.getInt(0);
+            int y = posList.getInt(1);
+            int z = posList.getInt(2);
+            // 计算相对核心的偏移
+            BlockPos relativePos = new BlockPos(x - coreRelative.getX(),
+                    y - coreRelative.getY(),
+                    z - coreRelative.getZ());
+
+            // 获取该 state 对应的方块名称
+            CompoundTag paletteEntry = paletteTag.getCompound(state);
+            String blockName = paletteEntry.getString("Name");
+            // 构建 IBlockPredicate
+            IBlockPredicate predicate = createPredicateFromBlockName(blockName);
+            if (predicate != null) {
+                builder.addCondition(relativePos, predicate, true, blockName);
+            } else {
+                Main.LOGGER.warn("Unsupported block: {}", blockName);
+            }
+        }
+
+        MultiblockPattern pattern = builder.build();
         MultiblockStructure.registerStructure(STRUCTURE_ID, pattern);
-
-        Main.LOGGER.info("[TrainerAltar] Structure registered success : {}", STRUCTURE_ID);
+        Main.LOGGER.info("[TrainerAltar] Structure registered from NBT");
     }
+
+    private static IBlockPredicate createPredicateFromBlockName(String blockName) {
+        Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(blockName));
+        if (block == Blocks.AIR) return null;
+        return (level, pos, state) -> state.is(block);
+    }
+
 
     /**
      * 创建 KunAltar 条件检查器
@@ -143,7 +243,7 @@ public class TrainerAltarPattern {
     /**
      * 激活处理器实现
      */
-    private static class TrainerAltarActivationHandler implements IActivationHandler, Traversal {
+    private static class TrainerAltarActivationHandler implements IActivationHandler, ITraversal {
 
         @Override
         public void onActivate(Level level, BlockPos matchPos) {
@@ -192,10 +292,12 @@ public class TrainerAltarPattern {
             if (!(level.getBlockEntity(altar3Pos) instanceof KunAltarBlockEntity altar3)) return;
             if (!(level.getBlockEntity(altar4Pos) instanceof KunAltarBlockEntity altar4)) return;
 
-            ItemStack stack1 = altar1.getStoredItem();ItemStack stack2 = altar2.getStoredItem();
-            ItemStack stack3 = altar3.getStoredItem();ItemStack stack4 = altar4.getStoredItem();
-
-            if (stack1.isEmpty() || stack2.isEmpty() || stack3.isEmpty() || stack4.isEmpty()) return;
+            ItemStack[] altarStacks = {
+                    altar1.getStoredItem(), // 北
+                    altar2.getStoredItem(), // 南
+                    altar3.getStoredItem(), // 西
+                    altar4.getStoredItem()  // 东
+            };
 
             RecipeManager recipeManager = Objects.requireNonNull(level.getServer()).getRecipeManager();
             List<TrainerAltarRecipe> recipes = recipeManager.getAllRecipesFor(ModRecipes.TRAINER_ALTAR_TYPE.get())
@@ -204,7 +306,7 @@ public class TrainerAltarPattern {
 
             // 遍历配方
             for (TrainerAltarRecipe recipe : recipes) {
-                if (recipe.matches(stack1, stack2, stack3, stack4)) {
+                if (recipe.matches(altarStacks[0], altarStacks[1], altarStacks[2], altarStacks[3])) {
 
                     ActiveStructureManager manager = ActiveStructureManager.get(level);
                     BlockPos dropPos = manager.getDropPos(level, matchPos);
@@ -298,6 +400,26 @@ public class TrainerAltarPattern {
             }
             clearStoredItems(entities);
             level.playSound(null, matchPos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.6F, 1.0F);
+        }
+
+        @Override
+        public BlockPos getAltarNorth(BlockPos pos) {
+            return pos.offset(0, 2, -3);
+        }
+
+        @Override
+        public BlockPos getAltarSouth(BlockPos pos) {
+            return pos.offset(0, 2, 3);
+        }
+
+        @Override
+        public BlockPos getAltarWest(BlockPos pos) {
+            return pos.offset(-3, 2, 0);
+        }
+
+        @Override
+        public BlockPos getAltarEast(BlockPos pos) {
+            return pos.offset(3, 2, 0);
         }
 
 

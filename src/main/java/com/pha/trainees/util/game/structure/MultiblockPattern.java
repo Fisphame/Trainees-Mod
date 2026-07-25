@@ -150,9 +150,7 @@ public class MultiblockPattern {
      * 检查特定朝向的结构
      */
     private boolean checkAtFacing(Level level, BlockPos originPos, Direction facing) {
-
-        int passed = 0;
-        int total = conditions.size();
+//        Main.LOGGER.info("Checking structure at origin {} facing {}", originPos, facing);
 
         for (Map.Entry<BlockPos, ConditionEntry> entry : conditions.entrySet()) {
             BlockPos relativePos = entry.getKey();
@@ -168,12 +166,13 @@ public class MultiblockPattern {
             // 执行条件检查
             boolean testResult = condition.predicate.test(level, absolutePos, state);
 
-            if (testResult) {
-                passed++;
-            } else {
-                if (condition.required) {
-                    return false;
-                }
+//            Main.LOGGER.info("  Pos {} -> {} (expected {}) => {}",
+//                    absolutePos, state.getBlock().getDescriptionId(),
+//                    condition.description, testResult);
+
+            if (!testResult && condition.required) {
+                Main.LOGGER.warn("Condition failed at {}", absolutePos);
+                return false;
             }
         }
 

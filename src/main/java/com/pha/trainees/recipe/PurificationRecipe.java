@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 
-
+@SuppressWarnings({"deprecation", "removal"})
 public class PurificationRecipe implements Recipe<Container> {
     public static final String RECIPE_ID = "purification_upgrade";
 

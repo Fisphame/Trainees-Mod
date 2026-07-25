@@ -15,7 +15,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-
+@SuppressWarnings({"deprecation", "removal"})
 public class Something {
     public static class PrankBlocks {
         public static final DeferredRegister<Block> BLOCKS =

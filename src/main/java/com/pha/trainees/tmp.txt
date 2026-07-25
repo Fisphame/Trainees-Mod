@@ -21,7 +21,9 @@
 // TODO 拓展化学反应之第3弹
 // TODO 矿石的用途
 // TODO 纬度设定和功能补全
-
+TODO 烧杯破裂 玩家与容器交互 hud显示 物质基类 一桶 一个对应mol基准值及可配置
+@SuppressWarnings({"deprecation", "removal"})
+TODO 翻译键
 
 selenaurite_ore
 deepslate_selenaurite_ore

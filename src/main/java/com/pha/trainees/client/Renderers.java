@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
+@SuppressWarnings({"deprecation", "removal"})
 public class Renderers {
     public static class CalledSwordRenderer extends EntityRenderer<CalledSwordEntity> {
         public CalledSwordRenderer(EntityRendererProvider.Context context) {

@@ -1,6 +1,6 @@
 package com.pha.trainees.enchantments;
 
-import com.pha.trainees.util.interfaces.KineticWeapon;
+import com.pha.trainees.util.interfaces.IKineticWeapon;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -38,7 +38,7 @@ public class AdventEnchantment extends Enchantment{
     @Override
     public boolean canEnchant(ItemStack stack) {
         // 只允许附魔在动能武器上
-        return stack.getItem() instanceof KineticWeapon;
+        return stack.getItem() instanceof IKineticWeapon;
     }
 
     @Override

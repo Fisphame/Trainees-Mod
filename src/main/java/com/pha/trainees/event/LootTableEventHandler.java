@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings({"deprecation", "removal"})
 @Mod.EventBusSubscriber(modid = Main.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class LootTableEventHandler {
 

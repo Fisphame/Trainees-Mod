@@ -1,9 +1,9 @@
 package com.pha.trainees.item;
 
-import com.pha.trainees.util.interfaces.BackStab;
-import com.pha.trainees.util.interfaces.Chemistry;
-import com.pha.trainees.util.interfaces.HoverText;
-import com.pha.trainees.util.interfaces.MineBlock;
+import com.pha.trainees.util.interfaces.IBackStab;
+import com.pha.trainees.util.interfaces.IChemistry;
+import com.pha.trainees.util.interfaces.IHoverText;
+import com.pha.trainees.util.interfaces.IMineBlock;
 import com.pha.trainees.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -24,7 +24,7 @@ import java.util.List;
 
 public class KunCourseItem {
 
-    public static class KunNuggetItem extends Item implements Chemistry {
+    public static class KunNuggetItem extends Item implements IChemistry {
 
         public KunNuggetItem(Properties properties) {
             super(properties);
@@ -37,7 +37,7 @@ public class KunCourseItem {
 
     }
 
-    public static class TwoHalfIngotItem extends Item implements Chemistry {
+    public static class TwoHalfIngotItem extends Item implements IChemistry {
 
         public TwoHalfIngotItem(Properties properties) {
             super(properties);
@@ -49,7 +49,7 @@ public class KunCourseItem {
         }
     }
 
-    public static class TwoHalfIngotBlockItem extends BlockItem implements Chemistry {
+    public static class TwoHalfIngotBlockItem extends BlockItem implements IChemistry {
 
         public TwoHalfIngotBlockItem(Block p_40565_, Properties p_40566_) {
             super(p_40565_, p_40566_);
@@ -61,7 +61,7 @@ public class KunCourseItem {
         }
     }
 
-    public static class KunPickaxeFinal extends PickaxeItem implements MineBlock, HoverText {
+    public static class KunPickaxeFinal extends PickaxeItem implements IMineBlock, IHoverText {
         public KunPickaxeFinal(Tier p_42961_, int p_42962_, float p_42963_, Properties p_42964_) {
             super(p_42961_, p_42962_, p_42963_, p_42964_);
         }
@@ -101,7 +101,7 @@ public class KunCourseItem {
         }
     }
 
-    public static class KunDaggerItem extends KunSwordItem implements BackStab {
+    public static class KunDaggerItem extends KunSwordItem implements IBackStab {
 
         public KunDaggerItem(Tier p_43269_, int p_43270_, float p_43271_, Properties p_43272_) {
             super(p_43269_, p_43270_, p_43271_, p_43272_);

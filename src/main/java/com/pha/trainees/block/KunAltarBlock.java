@@ -3,7 +3,7 @@ package com.pha.trainees.block;
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.util.game.enums.KunAltarType;
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.interfaces.Machine;
+import com.pha.trainees.util.interfaces.IMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 
 
-public class KunAltarBlock extends BaseEntityBlock implements Machine {
+public class KunAltarBlock extends BaseEntityBlock implements IMachine {
 
     public static final EnumProperty<KunAltarType> TYPE = EnumProperty.create("type", KunAltarType.class);
 

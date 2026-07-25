@@ -1,0 +1,243 @@
+package com.pha.trainees.chemistry.block;
+
+import com.pha.trainees.Main;
+import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
+import com.pha.trainees.chemistry.item.AnalyzerItem;
+import com.pha.trainees.chemistry.item.SubstanceItem;
+import com.pha.trainees.chemistry.particle.IonType;
+import com.pha.trainees.chemistry.particle.Phase;
+import com.pha.trainees.chemistry.util.FluidIonMapper;
+import com.pha.trainees.chemistry.util.SolidIonMapper;
+import com.pha.trainees.config.ChemConfig;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import org.jetbrains.annotations.Nullable;
+
+import java.text.DecimalFormat;
+import java.util.Map;
+
+public class BeakerBlock extends BaseEntityBlock {
+
+    private static final VoxelShape SHAPE = Shapes.box(0.125, 0.0, 0.125, 0.875, 0.75, 0.875);
+    private static final DecimalFormat DF = new DecimalFormat("#0.000");
+
+    public BeakerBlock(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return SHAPE;
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
+    }
+
+    @Override
+    public boolean useShapeForLightOcclusion(BlockState state) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new BeakerBlockEntity(pos, state);
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                                 InteractionHand hand, BlockHitResult hit) {
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+
+        BlockEntity entity = level.getBlockEntity(pos);
+        if (!(entity instanceof BeakerBlockEntity beaker)) {
+            return InteractionResult.PASS;
+        }
+
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (heldItem.isEmpty()) {
+            Main.LOGGER.info("[Beaker] Empty hand right-clicked beaker at {}", pos);
+            return InteractionResult.CONSUME;
+        }
+
+        // ====== 分析仪：由 HUD 处理，这里仅返回成功 ======
+        if (heldItem.getItem() instanceof AnalyzerItem) {
+            return InteractionResult.SUCCESS;
+        }
+
+        // ====== 流体桶/瓶（倒入） ======
+        if (heldItem.getItem() instanceof BucketItem) {
+            // 使用 Forge 工具获取流体
+            FluidStack fluidStack = FluidUtil.getFluidContained(heldItem).orElse(null);
+            if (fluidStack != null) {
+                Fluid fluid = fluidStack.getFluid();
+                if (fluid != Fluids.EMPTY) {
+                    IonType ion = FluidIonMapper.getIonForFluid(fluid);
+                    if (ion != null) {
+                        double added = beaker.addIon(ion, ChemConfig.BEAKER_DEFAULT_FLUID_ADD_AMOUNT.get());
+                        if (added > 0) {
+                            // 消耗桶，返回空桶
+                            ItemStack emptyBucket = new ItemStack(Items.BUCKET);
+                            player.setItemInHand(hand, emptyBucket);
+                            Main.LOGGER.info("[Beaker] Added {} mol of {} to beaker at {}", added, ion.getId().getPath(), pos);
+                            return InteractionResult.CONSUME;
+                        }
+                    } else {
+                        player.displayClientMessage(
+                                Component.literal("§c无法识别该流体: " + fluid.getFluidType().getDescription().getString()),
+                                true
+                        );
+                        return InteractionResult.FAIL;
+                    }
+                }
+            }
+            return InteractionResult.PASS;
+        }
+
+        // ====== 空桶（取出） ======
+        if (heldItem.getItem() == Items.BUCKET) {
+            // 找物质的量最多的液态离子
+            IonType targetIon = null;
+            double maxMoles = 0;
+            for (Map.Entry<IonType, Double> entry : beaker.getContents().entrySet()) {
+                IonType ion = entry.getKey();
+                double moles = entry.getValue();
+                if (ion.getPhase() == Phase.LIQUID && moles > maxMoles) {
+                    targetIon = ion;
+                    maxMoles = moles;
+                }
+            }
+
+            if (targetIon != null && maxMoles >= 1.0) {
+                // 检查是否有对应的流体映射
+                Fluid fluid = FluidIonMapper.getFluidForIon(targetIon);
+                if (fluid != null && fluid != Fluids.EMPTY) {
+                    double removed = beaker.removeIon(targetIon, 1.0);
+                    if (removed > 0) {
+                        FluidStack stack = new FluidStack(fluid, 1000);
+                        ItemStack bucketStack = fluid.getFluidType().getBucket(stack);
+                        if (!bucketStack.isEmpty()) {
+                            player.setItemInHand(hand, bucketStack);
+                            Main.LOGGER.info("[Beaker] Removed {} mol of {} from beaker at {}, gave bucket of {}",
+                                    removed, targetIon.getId().getPath(), pos, fluid.getFluidType().getDescription().getString());
+                            return InteractionResult.CONSUME;
+                        } else {
+                            Main.LOGGER.warn("[Beaker] Fluid {} has no bucket item!", fluid.getFluidType().getDescription().getString());
+                            player.displayClientMessage(Component.literal("§c该流体无法用桶盛装！"), true);
+                            // 重要：虽然取不出，但我们已经移除了离子，需要回滚！
+                            // 由于移除失败，需要把离子加回去
+                            beaker.addIon(targetIon, removed);
+                            return InteractionResult.FAIL;
+                        }
+                    }
+                } else {
+                    player.displayClientMessage(Component.literal("§c烧杯中的液态物质无法被桶盛装（未映射）"), true);
+                    Main.LOGGER.warn("[Beaker] No fluid mapping for ion: {}", targetIon.getId().getPath());
+                    return InteractionResult.FAIL;
+                }
+            }
+
+            player.displayClientMessage(Component.literal("§7烧杯中没有可取的液态物质"), true);
+            return InteractionResult.FAIL;
+        }
+
+
+
+
+        // ====== 处理物质基类物品 ======
+        if (heldItem.getItem() instanceof SubstanceItem) {
+            // 获取成分
+            Map<IonType, Double> composition = SubstanceItem.getComposition(heldItem);
+            if (composition.isEmpty()) {
+                player.displayClientMessage(Component.literal("§c这个物质是空的！"), true);
+                return InteractionResult.FAIL;
+            }
+
+            // 检查是否超过容量上限
+            double totalMoles = composition.values().stream().mapToDouble(Double::doubleValue).sum();
+            double currentTotal = beaker.getContents().values().stream().mapToDouble(Double::doubleValue).sum();
+            double maxCapacity = ChemConfig.MAX_TOTAL_MOLES.get();
+
+            if (currentTotal + totalMoles > maxCapacity) {
+                player.displayClientMessage(Component.literal("§c烧杯容量不足！当前 " +
+                        String.format("%.3f", currentTotal) + " / " + String.format("%.3f", maxCapacity) + " mol"), true);
+                return InteractionResult.FAIL;
+            }
+
+            // 逐成分加入烧杯
+            boolean anyAdded = false;
+            for (Map.Entry<IonType, Double> entry : composition.entrySet()) {
+                IonType ion = entry.getKey();
+                double moles = entry.getValue();
+                // 检查单成分上限
+                double currentIon = beaker.getAmount(ion);
+                double maxPerComponent = ChemConfig.MAX_MOLES_PER_COMPONENT.get();
+                if (currentIon + moles > maxPerComponent) {
+                    player.displayClientMessage(Component.literal("§c" + ion.getId().getPath() +
+                            " 超过单成分上限 " + String.format("%.3f", maxPerComponent) + " mol"), true);
+                    return InteractionResult.FAIL;
+                }
+                beaker.addIon(ion, moles);
+                anyAdded = true;
+            }
+
+            if (anyAdded) {
+                heldItem.shrink(1);
+                Main.LOGGER.info("[Beaker] Added substance ({} components, {} mol total) to beaker at {}",
+                        composition.size(), String.format("%.3f", totalMoles), pos);
+                return InteractionResult.CONSUME;
+            }
+            return InteractionResult.FAIL;
+        }
+
+        // ====== 固体物品（溶解/添加） ======
+        IonType ion = SolidIonMapper.getIonForItem(heldItem.getItem());
+        if (ion != null) {
+            double added = beaker.addIon(ion, ChemConfig.SOLID_INGOT_TO_MOL.get());
+            if (added > 0) {
+                heldItem.shrink(1);
+                Main.LOGGER.info("[Beaker] Added {} mol of {} from solid item to beaker at {}", added, ion.getId().getPath(), pos);
+                return InteractionResult.CONSUME;
+            }
+        }
+
+        player.displayClientMessage(Component.literal("§7这个物品无法放入烧杯"), true);
+        return InteractionResult.FAIL;
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof BeakerBlockEntity beaker) {
+                Main.LOGGER.info("[Beaker] Beaker at {} broken! Contents: {}", pos, beaker.getContents().size());
+            }
+            super.onRemove(state, level, pos, newState, isMoving);
+        }
+    }
+}

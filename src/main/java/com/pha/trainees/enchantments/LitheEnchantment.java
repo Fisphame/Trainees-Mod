@@ -1,6 +1,6 @@
 package com.pha.trainees.enchantments;
 
-import com.pha.trainees.util.interfaces.Chargeable;
+import com.pha.trainees.util.interfaces.IChargeable;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -17,7 +17,7 @@ public class LitheEnchantment extends Enchantment {
 
     @Override
     public boolean canEnchant(ItemStack stack) {
-        return stack.getItem() instanceof Chargeable;
+        return stack.getItem() instanceof IChargeable;
     }
 
     @Override

@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.NotNull;
 
-
+@SuppressWarnings({"deprecation", "removal"})
 public class GoldChickenEntity extends Chicken {
 
     public GoldChickenEntity(EntityType<? extends Chicken> type, Level level) {

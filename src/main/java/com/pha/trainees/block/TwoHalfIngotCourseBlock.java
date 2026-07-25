@@ -3,7 +3,7 @@ package com.pha.trainees.block;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.util.game.Tools;
-import com.pha.trainees.util.interfaces.Honeycomb;
+import com.pha.trainees.util.interfaces.IHoneycomb;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +20,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
 public class TwoHalfIngotCourseBlock {
-    public static class TwoHalfIngotBlock extends Block implements Honeycomb {
+    public static class TwoHalfIngotBlock extends Block implements IHoneycomb {
         public TwoHalfIngotBlock(Properties p_49795_) {
             super(p_49795_);
         }
@@ -66,7 +66,7 @@ public class TwoHalfIngotCourseBlock {
         }
     }
 
-    public static class WaxedTwoHalfIngotBlock extends Block implements Honeycomb {
+    public static class WaxedTwoHalfIngotBlock extends Block implements IHoneycomb {
         public WaxedTwoHalfIngotBlock(Properties p_49795_) {
             super(p_49795_);
         }
@@ -75,6 +75,12 @@ public class TwoHalfIngotCourseBlock {
         public InteractionResult use(BlockState state, Level level, BlockPos pos,
                                      Player player, InteractionHand hand, BlockHitResult hit) {
             return useAxe(state, level, pos, player, hand, hit, ModBlocks.TWO_HALF_INGOT_BLOCK.get());
+        }
+    }
+
+    public static class AntiTwoHalfIngotBlock extends Block {
+        public AntiTwoHalfIngotBlock(Properties p_49795_) {
+            super(p_49795_);
         }
     }
 }

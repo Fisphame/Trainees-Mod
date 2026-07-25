@@ -56,6 +56,7 @@
   "block.trainees.myblock": "只因块",
   "block.trainees.two_half_ingot_block": "两锭半块",
   "block.trainees.waxed_two_half_ingot_block": "涂蜡的两锭半块",
+  "block.trainees.anti_two_half_ingot_block": "反两锭半块",
   "block.trainees.auriversite_block": "金矽块",
   "block.trainees.selenaurite_ore": "鈅矿",
   "block.trainees.deepslate_selenaurite_ore": "深层鈅矿",
@@ -318,5 +319,47 @@
   "container.trainees.purification_station.fuel_slot": "升级/提纯物……",
   "button.trainees.purify": "提升",
   
-  "jei.trainees.trainer_altar": "土申祭坛"
+  "jei.trainees.trainer_altar": "土申祭坛",
+
+  
+  "gui.trainees.config.title": "化学模组配置 - 当前存档",
+  "gui.trainees.config.error.not_loaded": "错误：配置未加载！请先加载一个存档。",
+  
+  "gui.trainees.config.score": "难度指标: %s / 100",
+  
+  "gui.trainees.config.difficulty.easy": "简单",
+  "gui.trainees.config.difficulty.normal": "普通",
+  "gui.trainees.config.difficulty.hard": "困难",
+  "gui.trainees.config.difficulty.custom": "自定义",
+  
+  "gui.trainees.config.group.resource_getting": "▼ 资源获取",
+  "gui.trainees.config.group.pollution": "▼ 污染与环境",
+  "gui.trainees.config.group.energy": "▼ 能源效率",
+  "gui.trainees.config.group.strict_mapping": "▼ 严格映射（固定）",
+  
+  "gui.trainees.config.slider.ore_valuable": "矿石有效成分比例",
+  "gui.trainees.config.slider.ore_gangue": "矿石脉石比例",
+  "gui.trainees.config.slider.pollution_speed": "污染扩散速度",
+  "gui.trainees.config.slider.pollution_toxicity": "毒性触发阈值",
+  "gui.trainees.config.slider.plant_penalty": "植物生长惩罚",
+  "gui.trainees.config.slider.energy_consumption": "机器耗电倍数",
+  "gui.trainees.config.slider.energy_generation": "机器发电倍数",
+  
+  "gui.trainees.config.button.save": "保存",
+  "gui.trainees.config.button.reset": "恢复默认",
+  "gui.trainees.config.button.close": "关闭",
+  
+  "gui.trainees.config.save.success": "当前存档的化学配置已保存！",
+  "gui.trainees.config.save.failed": "保存失败！请查看日志。",
+  "gui.trainees.analyzer.title": "=== 烧杯分析报告 ===",
+  "gui.trainees.analyzer.temperature": "温度: %s K (%s°C)",
+  "gui.trainees.analyzer.volume": "体积: %s L",
+  "gui.trainees.analyzer.contents": "内容物:",
+  "gui.trainees.analyzer.contents_empty": "空",
+  "gui.trainees.analyzer.pressure": "压力: %s atm",
+  "gui.trainees.analyzer.heat_capacity": "热容: %s J/K",
+  "gui.trainees.analyzer.warning.critical": "⚠ 警告: 温度接近临界值! (%s%%)",
+  "gui.trainees.analyzer.warning.high": "⚠ 注意: 温度较高 (%s%%)",
+  "gui.trainees.analyzer.creative_footer": "[创造模式调试信息]",
+  "gui.trainees.analyzer.normal_footer": "[右键烧杯可锁定目标]"
 }

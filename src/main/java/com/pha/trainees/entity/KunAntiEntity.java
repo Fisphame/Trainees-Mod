@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.damagesource.DamageSource;
 
 
-
+@SuppressWarnings({"deprecation", "removal"})
 public class KunAntiEntity extends Chicken {
 
     public KunAntiEntity(EntityType<? extends Chicken> type, Level level) {
