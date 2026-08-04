@@ -48,13 +48,6 @@ public class ReactionEngine {
 
     private static final ConcurrentLinkedQueue<QueuedEntry> PENDING_QUEUE = new ConcurrentLinkedQueue<>();
 
-    /**
-     * 挂起规则集
-     * 存储因缺少反应物而暂时无法执行的规则
-     * 在 Tick 轮询时会重检这些规则
-     */
-    private static final Set<ReactionRule> PENDING_RULES = Collections.synchronizedSet(new HashSet<>());
-
     // ============================================================
     // 三、最近反应记录（环形缓冲区，蓝本 §14.2）
     // ============================================================
@@ -117,7 +110,7 @@ public class ReactionEngine {
 
         long gameTime = container.getLevel().getGameTime();
 //        Main.LOGGER.info("[Engine] ⏰ tick() called (gameTime: {}, queue size: {}, pending rules: {})",
-//                gameTime, PENDING_QUEUE.size(), PENDING_RULES.size());
+//                gameTime, PENDING_QUEUE.size());
 
         // ====== 1. 处理待处理队列（事件驱动） ======
         // 只处理属于当前容器的队列项；其他容器的项保留在队列中，由其自身的 tick 处理
@@ -171,23 +164,7 @@ public class ReactionEngine {
             }
 
             if (!container.containsAll(rule.getReactants())) {
-                // 检查是否有至少一种反应物仍然存在
-                boolean hasAnyReactant = false;
-                for (IonType ion : rule.getReactants().keySet()) {
-                    if (container.getAmount(ion) > EPSILON) {
-                        hasAnyReactant = true;
-                        break;
-                    }
-                }
-                if (hasAnyReactant) {
-                    // H⁺ 和 OH⁻ 单独存在时不挂起，避免污染
-                    boolean isCommonIon = source == ModChemistry.ModIons.H_plus || source == ModChemistry.ModIons.OH_minus;
-                    if (!isCommonIon) {
-                        Main.LOGGER.debug("[Engine] Reactants incomplete for {} (some remain), pending",
-                                rule.getId().getPath());
-                        PENDING_RULES.add(rule);
-                    }
-                }
+                // 反应物不齐全：跳过（轮询会在反应物齐全后处理所有可执行规则）
                 continue;
             }
 
@@ -215,65 +192,51 @@ public class ReactionEngine {
     private static void processPolling(IChemicalContainer container) {
         int executed = 0;
 
-        // ====== 重检挂起规则 ======
-        synchronized (PENDING_RULES) {
-            Iterator<ReactionRule> iterator = PENDING_RULES.iterator();
-            while (iterator.hasNext() && executed < MAX_RULES_PER_POLL) {
-                ReactionRule rule = iterator.next();
-
-                // 跳过已平衡的规则
-                if (container.isRuleBalanced(rule)) {
-                    iterator.remove();
-                    continue;
-                }
-
-                // 检查反应物是否现在齐全了
-                if (container.containsAll(rule.getReactants())) {
-                    // 尝试执行该规则
-                    // 需要找到对应的边
-                    List<ReactionEdge> edges = ReactionGraph.getInstance().getAllEdges();
-                    for (ReactionEdge edge : edges) {
-                        if (edge.getRule().equals(rule)) {
-                            if (executeRule(container, edge)) {
-                                executed++;
-                                iterator.remove();
-                                break;
-                            }
-                        }
+        // ====== 处理所有当前可执行的规则（自环 + 非自环） ======
+        // 非自环反应若仅靠事件驱动，一次添加只推进一个 Δξ 步后即停滞，
+        // 故让所有可执行规则（含非自环）随轮询持续推进至平衡。
+        // 注意必须按优先级排序：对共享反应物的竞争规则只执行最高优先级者，
+        // 否则轮询会按边的迭代顺序误选产物（如碳酸盐的 HCO₃⁻/CO₂ 选择）。
+        if (executed < MAX_RULES_PER_POLL) {
+            // 1. 收集所有可执行规则（同一规则经多条边只算一次）
+            List<ReactionEdge> candidates = new ArrayList<>();
+            Set<ReactionRule> seen = new HashSet<>();
+            for (IonType ion : container.getPresentIons()) {
+                for (ReactionEdge edge : ReactionGraph.getInstance().getEdgesFrom(ion)) {
+                    ReactionRule rule = edge.getRule();
+                    if (!seen.add(rule)) continue;
+                    if (container.isRuleBalanced(rule)) continue;
+                    if (!rule.checkPreconditions(container)
+                            || container.getTemperature() < rule.getMinTemperature()) {
+                        continue;
+                    }
+                    if (container.containsAll(rule.getReactants())) {
+                        candidates.add(edge);
                     }
                 }
             }
-        }
-
-        // ====== 处理自环（分解反应） ======
-        if (executed < MAX_RULES_PER_POLL) {
-            for (IonType ion : container.getPresentIons()) {
-                List<ReactionEdge> edges = ReactionGraph.getInstance().getEdgesFrom(ion);
-                for (ReactionEdge edge : edges) {
-                    if (edge.isSelfLoop()) {
-                        ReactionRule rule = edge.getRule();
-
-                        // 跳过已平衡的规则
-                        if (container.isRuleBalanced(rule)) {
-                            continue;
-                        }
-
-                        // 检查前置条件和温度
-                        if (!rule.checkPreconditions(container) ||
-                                container.getTemperature() < rule.getMinTemperature()) {
-                            continue;
-                        }
-
-                        // 检查反应物（自环只有一个反应物）
-                        if (container.containsAll(rule.getReactants())) {
-                            if (executeRule(container, edge)) {
-                                executed++;
-                                break;
-                            }
-                        }
+            // 2. 按优先级降序
+            candidates.sort((a, b) -> Double.compare(
+                    b.getRule().calculatePriority(container),
+                    a.getRule().calculatePriority(container)));
+            // 3. 贪心执行：共享反应物的竞争规则只执行最高优先级者；不相交的独立规则可并行
+            Set<IonType> touched = new HashSet<>();
+            for (ReactionEdge edge : candidates) {
+                if (executed >= MAX_RULES_PER_POLL) break;
+                ReactionRule rule = edge.getRule();
+                boolean conflicts = false;
+                for (IonType reactant : rule.getReactants().keySet()) {
+                    if (touched.contains(reactant)) {
+                        conflicts = true;
+                        break;
                     }
                 }
-                if (executed >= MAX_RULES_PER_POLL) break;
+                if (conflicts) continue;
+                if (executeRule(container, edge)) {
+                    executed++;
+                    rule.getReactants().keySet().forEach(touched::add);
+                    rule.getProducts().keySet().forEach(touched::add);
+                }
             }
         }
     }
@@ -327,8 +290,8 @@ public class ReactionEngine {
 
         // ====== 7. 计算净速率（考虑平衡限制） ======
         double netRate = forwardRate * (1.0 - Q / K);
+        // Q>=K 已被步骤4拦截，此处 netRate<0 不应发生（防御性返回，但不标记平衡）
         if (netRate < 0) {
-            container.markRuleBalanced(rule);
             return false;
         }
 
@@ -337,8 +300,9 @@ public class ReactionEngine {
         double deltaXi = netRate * deltaTime;
 
         // ====== 9. 进度截断（防 Zeno） ======
+        // 注意：不在此标记 BALANCED——Δξ 过小可能只是低温等暂态，
+        // 标记会导致加热后反应无法恢复（平衡标记仅由 Q>=K 与 addThermalEnergy 管理）
         if (deltaXi < EPSILON) {
-            container.markRuleBalanced(rule);
             return false;
         }
 
@@ -485,15 +449,7 @@ public class ReactionEngine {
         return PENDING_QUEUE.size();
     }
 
-    public static int getPendingRulesCount() {
-        return PENDING_RULES.size();
-    }
-
     public static void clearPendingQueue() {
         PENDING_QUEUE.clear();
-    }
-
-    public static void clearPendingRules() {
-        PENDING_RULES.clear();
     }
 }

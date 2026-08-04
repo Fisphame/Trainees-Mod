@@ -181,7 +181,13 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         if (totalHeatCapacity < 1e-9) return;
         double deltaT = joules / totalHeatCapacity;
         double newTemp = temperature + deltaT;
+        double oldTemp = temperature;
         this.temperature = Math.min(Math.max(0, newTemp), MAX_SAFE_TEMPERATURE);
+        // 温度变化时重置平衡标记：K 随温度按范特霍夫变化，需重新评估平衡状态，
+        // 否则加热/冷却后已达平衡的反应会被永久跳过
+        if (Math.abs(this.temperature - oldTemp) > 1e-9) {
+            resetBalancedRules();
+        }
         setChanged();
         syncToClient();
     }
@@ -219,6 +225,25 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     private void syncToClient() {
         if (getLevel() != null && !getLevel().isClientSide) {
             getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    /**
+     * 忽略阈值（mol）：低于此量的物种视为不存在。
+     * 与显示精度（%.4f）对齐——反应跑完后留下的浮点残渣会被清理，
+     * 而有意义的平衡量（如碳酸根交叉产物 ~0.0015）远高于此、不受影响。
+     */
+    private static final double NEGLIGIBLE_AMOUNT = 1e-4;
+
+    /**
+     * 清理低于忽略阈值的物种（仅剩"已完成反应"的浮点尾巴时，让显示为诚实的 0）
+     */
+    private void sweepNegligibleSpecies() {
+        var it = contents.entrySet().iterator();
+        while (it.hasNext()) {
+            if (it.next().getValue() < NEGLIGIBLE_AMOUNT) {
+                it.remove();
+            }
         }
     }
 
@@ -285,8 +310,9 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
         ReactionEngine.tick(beaker);
 
-        // 每 20 tick（1秒）输出烧杯内容物与温度，便于观察反应进程（调试用，稳定后可移除）
+        // 每 20 tick（1秒）清理忽略阈值下的残渣，并输出烧杯内容物与温度（日志调试用，稳定后可移除）
         if (level.getGameTime() % 20 == 0) {
+            beaker.sweepNegligibleSpecies();
             Main.LOGGER.info("[Beaker] {} contents: {} | T={}K",
                     pos, beaker.formatContents(), String.format("%.1f", beaker.temperature));
         }
@@ -315,7 +341,8 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     private double getEnvironmentTemperature(Level level, BlockPos pos) {
         double base = ChemConfig.ENVIRONMENT_TEMPERATURE_BASE.get();
         double yFactor = Math.max(0, (pos.getY() - 64) / 100.0) * ChemConfig.ENVIRONMENT_TEMPERATURE_LAPSE_RATE.get();
-        return base - yFactor;
+        // 钳制非负：极端高 Y 时递减项不应把环境温度推到负值
+        return Math.max(0, base - yFactor);
     }
 
     // ==================== NBT ====================
