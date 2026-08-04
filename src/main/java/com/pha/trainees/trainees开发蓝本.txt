@@ -25,6 +25,7 @@
   - 非金属离子：`H_plus`、`OH_minus`、`Cl_minus`、`SO4_2minus`（n=1 时写作 `_plus/_minus`，n≠1 时写作 `_[价数]minus`）。
   - 特殊：铵根写作 `NH4_plus`。
   - 分子/气体/固体：化学式直接作为 ID（如 `hcl`、`h2o`、`nacl`、`nacl_molten`）。
+- **显示规范（`IonDisplay.format`）**：内部 ID 用 `minus/plus` 与小写拼接，但**显示层**（指令回复、反应图节点）转为化学式——原子数下标、价态上标、物态后缀：`so4_2minus → SO₄²⁻`、`h2o → H₂O`、`fe_3 → Fe³⁺`、`nacl_molten → NaCl(熔)`。元素匹配用本模组集合（**刻意排除钴 `co`**，因本模组 `co2/co3` 恒为碳+氧；将来若加钴需处理歧义）。
 - **注册方式**：静态注册于 `ModChemistry.ModIons`（静态字段 + `ALL_IONS` 列表，非 Forge `DeferredRegister`）。
 - **物态区分**：同一物质的不同物态（固/液/气/熔融/水溶液）注册为**完全独立**的节点，因为其热力学参数、活度计算规则完全不同。
 - **强电解质处理**：在水溶液中**拆分为独立的水合离子**（如 NaCl → Na⁺ + Cl⁻），而非保留分子态。这使引擎能准确捕捉“自由离子反应”的本质。
@@ -441,7 +442,9 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 | **Phase 4** | 热力学集成 | 温度/压强计算、物态区分浓度、阿伦尼乌斯/范特霍夫修正 | ✅ 已完成 |
 | **Phase 5** | 物质基类系统 | `IMaterial`、`SubstanceBlueprint`、`SubstanceItem` | ✅ 已完成 |
 | **Phase 6** | 配置系统 | `ChemConfig`、难度预设、GUI 配置界面 | ✅ 已完成 |
-| **Phase 7** | 反应注册 | 中和、分解、沉淀、催化、可逆、多反应物、浓度依赖、电解（理论验证完成） | ✅ 已完成 |
+| **Phase 7** | 反应注册 | 中和、分解、沉淀、催化、可逆、多反应物、浓度依赖、电解（理论验证完成）+ 硫磺→硫酸链/水电解/盐酸合成 | ✅ 已完成 |
+
+> **开发工具**：`/chemtester graph` 将反应图发到客户端可视化（节点按物态着色、边按规则着色）；`/chemtester last` 看最近反应记录；`/chemtester power` 开关电解电源。反应图可视化是趣味调试功能，反应规模大了会重叠卡顿，届时可关。
 | **Phase 8** | 数据生成器 | 基团循环、自动生成规则 | ⬜ 进行中 |
 | **Phase 9** | 开放网格 | `GasGridManager`、菲克扩散、存档抹平策略、泄漏接口 | ⬜ 待开始 |
 | **Phase 10** | 游戏性表现 | 音效、粒子、中毒/缺氧判定、护目镜 HUD | ⬜ 待开始 |
