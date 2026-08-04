@@ -55,7 +55,7 @@ public class MultiblockStructure {
      * 尝试激活结构
      */
     public static Booleanf tryActivateStructure(Level level, BlockPos pos, String structureId, @Nullable Player player) {
-        Main.LOGGER.info("tryActivateStructure called at pos: {}, block: {}", pos, level.getBlockState(pos));
+        Main.LOGGER.debug("tryActivateStructure called at pos: {}, block: {}", pos, level.getBlockState(pos));
         // 检查结构是否存在
         MultiblockPattern pattern = REGISTERED_STRUCTURES.get(structureId);
         if (pattern == null) {

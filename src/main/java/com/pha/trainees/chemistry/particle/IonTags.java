@@ -25,6 +25,7 @@ public final class IonTags {
     public static final ResourceLocation HALOGEN = new ResourceLocation(Main.MODID, "halogen");     // 卤素单质（F₂/Cl₂/Br₂/I₂）
     public static final ResourceLocation METAL = new ResourceLocation(Main.MODID, "metal");         // 金属单质
     public static final ResourceLocation MOLTEN_SALT = new ResourceLocation(Main.MODID, "molten_salt"); // 熔融盐（用于电解）
+    public static final ResourceLocation CATALYST = new ResourceLocation(Main.MODID, "catalyst");
 
     // ==================== 物理性质 ====================
     public static final ResourceLocation VOLATILE = new ResourceLocation(Main.MODID, "volatile");   // 易挥发（沸点较低）

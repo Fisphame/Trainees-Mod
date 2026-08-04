@@ -2,19 +2,17 @@ package com.pha.trainees.multiblock;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.block.AbsorbBlock;
-import com.pha.trainees.block.KunAltarBlock;
 import com.pha.trainees.blockentity.AbsorbBlockEntity;
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
 import com.pha.trainees.recipe.TrainerAltarRecipe;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModRecipes;
 import com.pha.trainees.util.game.enums.AbsorbWorkModel;
-import com.pha.trainees.util.game.enums.KunAltarType;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.*;
+import com.pha.trainees.util.interfaces.IHoverText;
 import com.pha.trainees.util.interfaces.ITraversal;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -25,6 +23,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +46,7 @@ import java.util.Objects;
  * Trainer Altar 多方块结构
  */
 @SuppressWarnings({"removal"})
-public class TrainerAltarPattern {
+public class TrainerAltarPattern implements IHoverText {
     public static final String STRUCTURE_ID = "trainees:trainer_altar";
     // 1 - north  2 - east  3 - south  4 - west
     // 掉落位置允许的范围（相对于核心方块 matchPos）
@@ -58,74 +57,14 @@ public class TrainerAltarPattern {
     private static final int MIN_Z = -5;
     private static final int MAX_Z = 5;
 
-    public static void register() {
-//        // 创建激活处理器
-//        IActivationHandler activationHandler = new TrainerAltarActivationHandler();
-//
-//        // 关键：设置正确的偏移
-//        // 我们以 (0,0,0) 位置（two_half_ingot_block）作为结构原点
-//        BlockPos originOffset = new BlockPos(0, 0, 0);  // 检查位置就是原点位置
-//        BlockPos matchPos = new BlockPos(0, 1, 0);      // 核心方块在原点上方一格
-//
-//
-//        // 构建结构模式
-//        MultiblockPattern pattern = new MultiblockPattern.Builder()
-//                .dimensions(7, 3, 7)  // a×b×c 结构
-//                .originOffset(originOffset)
-//                .matchPos(matchPos)
-//                .activationHandler(activationHandler)
-//
-//                // 基础方块 (0,0,0)
-//                .addCondition(new BlockPos(0, 0, 0),
-//                        (level, pos, state) ->
-//                                state.is(ModBlocks.ANTI_TWO_HALF_INGOT_BLOCK.get())
-//                )
-//
-//                // 核心方块
-//                .addCondition(new BlockPos(0, 1, 0),
-//                        IBlockPredicate.block(ModBlocks.ALTAR_CORE_BLOCK.get())
-//                )
-//
-//                // 顶部方块
-//                .addCondition(new BlockPos(0, 2, 0),
-//                        (level, pos, state) ->
-//                        state.is(ModBlocks.ANTI_TWO_HALF_INGOT_BLOCK.get())
-//                )
-//
-//                // KunAltar 方块
-//                .addCondition(new BlockPos(-3, 0, 0),
-//                        createKunAltarCondition(KunAltarType.HALF)
-//                )
-//                .addCondition(new BlockPos(3, 0, 0),
-//                        createKunAltarCondition(KunAltarType.HALF)
-//                )
-//                .addCondition(new BlockPos(0, 0, -3),
-//                        createKunAltarCondition(KunAltarType.HALF)
-//                )
-//                .addCondition(new BlockPos(0, 0, 3),
-//                        createKunAltarCondition(KunAltarType.HALF)
-//                )
-//
-//                // 添加一些忽略的位置（结构内部可以有空位）
-////                .addIgnoredPosition(new BlockPos(-1, 0, 0))
-////                .addIgnoredPosition(new BlockPos(1, 0, 0))
-////                .addIgnoredPosition(new BlockPos(0, 0, -1))
-////                .addIgnoredPosition(new BlockPos(0, 0, 1))
-//                .build();
-//
-//        // 注册结构
-//        MultiblockStructure.registerStructure(STRUCTURE_ID, pattern);
-//
-//        Main.LOGGER.info("[TrainerAltar] Structure registered success : {}", STRUCTURE_ID);
-
+    public static void register(ResourceManager resourceManager) {
         // 1. 加载结构 NBT
         CompoundTag structureNbt;
         ResourceLocation nbtLoc = new ResourceLocation(Main.MODID, "structures/trainer_altar.nbt");
 
         try {
-            // 在 Forge 1.20.1 中，使用 ResourceManager 获取 Resource
-            Resource resource = Minecraft.getInstance().getResourceManager()
-                    .getResource(nbtLoc)
+            // 使用 ResourceManager 获取结构 NBT（客户端与服务器共用，避免结构仅在客户端注册）
+            Resource resource = resourceManager.getResource(nbtLoc)
                     .orElseThrow(() -> new FileNotFoundException("Structure nbt not found: " + nbtLoc));
 
             try (InputStream inputStream = resource.open()) { // 使用 open() 获取输入流
@@ -202,42 +141,6 @@ public class TrainerAltarPattern {
         Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(blockName));
         if (block == Blocks.AIR) return null;
         return (level, pos, state) -> state.is(block);
-    }
-
-
-    /**
-     * 创建 KunAltar 条件检查器
-     */
-    private static IBlockPredicate createKunAltarCondition(KunAltarType requiredType) {
-        return (level, pos, state) -> {
-            try {
-                // 1. 检查是否为 KunAltar 方块
-                if (!state.is(ModBlocks.KUN_ALTAR.get())) {
-                    return false;
-                }
-
-                // 2. 安全地检查方块实体
-                if (level.getBlockEntity(pos) instanceof KunAltarBlockEntity altarEntity) {
-                    KunAltarType actualType = altarEntity.getAltarType();
-                    return actualType == requiredType;
-                }
-
-                // 3. 或者使用方块的方法（如果可用）
-                if (state.getBlock() instanceof KunAltarBlock altarBlock) {
-                    try {
-                        KunAltarType actualType = KunAltarBlock.getKunAltarType(level, pos);
-                        return actualType == requiredType;
-                    } catch (Exception e) {
-                        Main.LOGGER.error("Failed to get KunAltar type from block method", e);
-                    }
-                }
-
-                return false;
-            } catch (Exception e) {
-                Main.LOGGER.error("Error checking KunAltar condition at {}", pos, e);
-                return false;
-            }
-        };
     }
 
     /**
@@ -459,10 +362,7 @@ public class TrainerAltarPattern {
             // 通知玩家
             Player nearestPlayer = level.getNearestPlayer(matchPos.getX(), matchPos.getY(), matchPos.getZ(), 10, false);
             if (nearestPlayer != null) {
-                nearestPlayer.displayClientMessage(
-                        Component.literal("§k-------").withStyle(ChatFormatting.RED),
-                        true
-                );
+                nearestPlayer.displayClientMessage(KC.withStyle(ChatFormatting.RED), true);
             }
         }
 

@@ -390,7 +390,7 @@ public class ActiveStructureManager extends SavedData {
         // 这里需要根据你的结构定义来计算
         // 例如：如果matchPos是核心方块，而原点是核心方块下方一格
         // 需要根据pattern的originOffset和matchPos来计算
-        return matchPos; // 示例：假设原点是核心下方一格
+        return matchPos.subtract(pattern.getMatchPos());// 示例：假设原点是核心下方一格
     }
 
     /**

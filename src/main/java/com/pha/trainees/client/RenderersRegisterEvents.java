@@ -16,6 +16,7 @@ public class RenderersRegisterEvents {
         event.registerEntityRenderer(ModEntities.KUN_TRAINEES.get(), Renderers.KunTraineesRenderer::new);
         event.registerEntityRenderer(ModEntities.KUN_ANTI.get(), Renderers.KunAntiRenderer::new);
         event.registerEntityRenderer(ModEntities.GOLD_CHICKEN.get(), Renderers.GoldChickenRenderer::new);
+        event.registerEntityRenderer(ModEntities.KUN_ANTI_BOSS.get(), Renderers.KunAntiBossRenderer::new);
         event.registerEntityRenderer(ModEntities.HYDROGEN.get(), Renderers.HydrogenRenderer::new);
         event.registerEntityRenderer(ModEntities.OXYGEN.get(), Renderers.OxygenRenderer::new);
     }

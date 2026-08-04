@@ -3,8 +3,10 @@ package com.pha.trainees;
 import com.mojang.logging.LogUtils;
 import com.pha.trainees.api.DeepSeekClient;
 import com.pha.trainees.chemistry.material.SubstanceBlueprintRegistry;
+import com.pha.trainees.command.DebugCommand;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.event.*;
+import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.util.game.chemistry.ChemicalReaction;
 import com.pha.trainees.util.game.chemistry.ReactionConditions;
@@ -100,9 +102,6 @@ public class Main {
                 SubstanceBlueprintRegistry.registerAll();
                 Main.LOGGER.info("Chemistry System: Substance blueprints registered");
 
-                // 注册反应
-                Main.LOGGER.info("Chemistry System: Calling registerAllReactions()");
-                ModChemistry.Reactions.registerAll();
 
             } catch (Exception e) {
                 Main.LOGGER.error("Chemistry System: Initialization failed", e);
@@ -121,6 +120,22 @@ public class Main {
             LOGGER.info("DeepSeek Client initialized.");
         } else {
             LOGGER.warn("DeepSeek API Key not set! Please configure it in config/trainees-common.toml");
+        }
+
+        // 注册反应（此时 SERVER 配置已加载）
+        Main.LOGGER.info("Chemistry System: Registering reactions after server start...");
+        try {
+            ModChemistry.Reactions.registerAll();
+            Main.LOGGER.info("Chemistry System: Reactions registered successfully");
+        } catch (Exception e) {
+            Main.LOGGER.error("Chemistry System: Failed to register reactions", e);
+        }
+
+        // 注册多方块结构（服务器侧），使专用服务器也能识别祭坛结构
+        try {
+            TrainerAltarPattern.register(event.getServer().getResourceManager());
+        } catch (Exception e) {
+            LOGGER.error("Failed to register Trainer Altar structure", e);
         }
     }
 

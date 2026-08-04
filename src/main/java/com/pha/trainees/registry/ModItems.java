@@ -158,24 +158,6 @@ public class ModItems {
                     .rarity(Rarity.RARE)
     ));
 
-    //提纯台
-    public static final RegistryObject<Item> PURIFICATION_STATION_ITEM = ITEMS.register("purification_station",
-            () -> new BlockItem(ModBlocks.PURIFICATION_STATION.get(),
-                    new Item.Properties()
-            )
-    );
-//    //反应炉
-//    public static final RegistryObject<Item> REACTING_FURNACE_BLOCK_ITEM = ITEMS.register("reacting_furnace",
-//            () -> new BlockItem(ModBlocks.REACTING_FURNACE.get(),
-//                    new Item.Properties()
-//            )
-//    );
-//    //
-//    public static final RegistryObject<Item> REACTION_MACHINE_ITEM = ITEMS.register("reaction_machine",
-//            () -> new BlockItem(ModBlocks.REACTION_MACHINE.get(),
-//                    new Item.Properties()
-//            )
-//    );
     //祭坛核心
     public static final RegistryObject<Item> ALTAR_CORE_BLOCK_ITEM = ITEMS.register("altar_core_block",
             () -> new BlockItem(ModBlocks.ALTAR_CORE_BLOCK.get(),
@@ -357,6 +339,14 @@ public class ModItems {
             )
     );
     //15*4=60 提升4倍
+
+    // 号角
+    public static final RegistryObject<Item> TENEBRIS_PLUME_CLARION = ITEMS.register("tenebris_plume_clarion",
+            () -> new TenebrisPlumeClarionItem(
+                    new Item.Properties()
+                            .rarity(Rarity.UNCOMMON)
+                            .stacksTo(1)
+            ));
 
     // 金矽刺剑
     public static final RegistryObject<Item> AURIVERSITE_RAPIER = ITEMS.register("auriversite_rapier",
@@ -590,6 +580,12 @@ public class ModItems {
     public static final RegistryObject<Item> GOLD_FEATHER = ITEMS.register("gold_feather",
             ()-> new Item(new Item.Properties())
     );
+    //心
+    public static final RegistryObject<Item> TENEBRIS_PLUME_HEART = ITEMS.register("tenebris_plume_heart",
+            () -> new Item(new Item.Properties()
+                    .rarity(Rarity.RARE)
+            )
+    );
     //兑换券
     public static final RegistryObject<Item> duihuanquan = ITEMS.register("duihuanquan",
             () -> new Duihuanquan(new Item.Properties()
@@ -598,12 +594,10 @@ public class ModItems {
     //升级模版
     public static final RegistryObject<Item> UPGRADE_THEME = ITEMS.register("upgrade_theme",
             ()-> new Item(new Item.Properties()
-                    .rarity(Rarity.RARE)
             ));
     //盔甲升级模版
     public static final RegistryObject<Item> UPGRADE_THEME_ARMOR = ITEMS.register("upgrade_theme_armor",
             ()-> new Item(new Item.Properties()
-                    .rarity(Rarity.RARE)
             ));
     //只因蛋
     public static final RegistryObject<Item> KUN_EGG = ITEMS.register("kun_egg",

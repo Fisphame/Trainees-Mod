@@ -4,7 +4,6 @@ import com.pha.trainees.Main;
 import com.pha.trainees.block.*;
 import com.pha.trainees.blockentity.AbsorbBlockEntity;
 import com.pha.trainees.blockentity.KunAltarBlockEntity;
-import com.pha.trainees.blockentity.PurificationStationBlockEntity;
 import com.pha.trainees.blockentity.SenderBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -36,13 +35,13 @@ public class ModBlocks {
                                 ModBlocks.ABSORB_BLOCK.get()
                         ).build(null));
 
-        public static final RegistryObject<BlockEntityType<PurificationStationBlockEntity>> PURIFICATION_STATION =
-                BLOCK_ENTITIES.register("purification_station",
-                        () -> BlockEntityType.Builder.of(
-                                PurificationStationBlockEntity::new,
-                                ModBlocks.PURIFICATION_STATION.get()
-                        ).build(null)
-                );
+//        public static final RegistryObject<BlockEntityType<PurificationStationBlockEntity>> PURIFICATION_STATION =
+//                BLOCK_ENTITIES.register("purification_station",
+//                        () -> BlockEntityType.Builder.of(
+//                                PurificationStationBlockEntity::new,
+//                                ModBlocks.PURIFICATION_STATION.get()
+//                        ).build(null)
+//                );
 
         public static final RegistryObject<BlockEntityType<SenderBlockEntity>> SENDER_BLOCK_ENTITY =
                 BLOCK_ENTITIES.register("sender_block_entity",
@@ -335,14 +334,14 @@ public class ModBlocks {
 
 
     //提纯台
-    public static final RegistryObject<Block> PURIFICATION_STATION = BLOCKS.register("purification_station",
-            () -> new PurificationStationBlock(
-                    BlockBehaviour.Properties.of()
-                            .strength(3.0f, 6.0f)
-                            .sound(SoundType.METAL)
-                            .requiresCorrectToolForDrops()
-            )
-    );
+//    public static final RegistryObject<Block> PURIFICATION_STATION = BLOCKS.register("purification_station",
+//            () -> new PurificationStationBlock(
+//                    BlockBehaviour.Properties.of()
+//                            .strength(3.0f, 6.0f)
+//                            .sound(SoundType.METAL)
+//                            .requiresCorrectToolForDrops()
+//            )
+//    );
 
     // 化学机械
 //    public static final RegistryObject<Block> REACTION_MACHINE = BLOCKS.register("reaction_machine",

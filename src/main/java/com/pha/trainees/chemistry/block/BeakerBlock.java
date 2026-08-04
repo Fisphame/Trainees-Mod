@@ -9,6 +9,7 @@ import com.pha.trainees.chemistry.particle.Phase;
 import com.pha.trainees.chemistry.util.FluidIonMapper;
 import com.pha.trainees.chemistry.util.SolidIonMapper;
 import com.pha.trainees.config.ChemConfig;
+import com.pha.trainees.registry.ModChemistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -22,6 +23,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -39,7 +42,8 @@ import java.util.Map;
 
 public class BeakerBlock extends BaseEntityBlock {
 
-    private static final VoxelShape SHAPE = Shapes.box(0.125, 0.0, 0.125, 0.875, 0.75, 0.875);
+    private static final VoxelShape SHAPE = Shapes.box(0.125, 0.0, 0.125,
+            0.875, 0.75, 0.875);
     private static final DecimalFormat DF = new DecimalFormat("#0.000");
 
     public BeakerBlock(Properties properties) {
@@ -240,4 +244,15 @@ public class BeakerBlock extends BaseEntityBlock {
             super.onRemove(state, level, pos, newState, isMoving);
         }
     }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide) {
+            return null;
+        }
+        // 使用 createTickerHelper 将 BeakerBlockEntity 的静态 tick 方法绑定到正确的 BlockEntityType
+        return createTickerHelper(type, ModChemistry.ModChemistryBlockEntities.BEAKER.get(), BeakerBlockEntity::tick);
+    }
+
 }

@@ -11,6 +11,7 @@ import com.pha.trainees.chemistry.item.SubstanceItem;
 import com.pha.trainees.chemistry.particle.IonTags;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
+import com.pha.trainees.chemistry.reaction.ReactionEdge;
 import com.pha.trainees.chemistry.reaction.ReactionGraph;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
 import com.pha.trainees.util.game.chemistry.ChemicalEquation;
@@ -598,7 +599,7 @@ public class ModChemistry {
         public static final IonType HCl = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "hcl"), Phase.GAS)
                 .molarMass(36.46)
-                .specificHeat(0.798)
+                .specificHeat(29.1)
                 .formationEnthalpy(-92.3)
                 .formationGibbs(-95.3)
                 .toxicityLevel(2)
@@ -611,7 +612,7 @@ public class ModChemistry {
         public static final IonType Cl2 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "cl2"), Phase.GAS)
                 .molarMass(70.90)
-                .specificHeat(0.478)
+                .specificHeat(33.9)
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .toxicityLevel(3)
@@ -624,7 +625,7 @@ public class ModChemistry {
         public static final IonType O2 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "o2"), Phase.GAS)
                 .molarMass(32.00)
-                .specificHeat(0.918)
+                .specificHeat(29.4)
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .tag(IonTags.OXIDIZER)
@@ -634,7 +635,7 @@ public class ModChemistry {
         public static final IonType H2 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "h2"), Phase.GAS)
                 .molarMass(2.016)
-                .specificHeat(14.30)
+                .specificHeat(28.8)
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .tag(IonTags.REDUCER)
@@ -644,7 +645,7 @@ public class ModChemistry {
         public static final IonType CO2 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "co2"), Phase.GAS)
                 .molarMass(44.01)
-                .specificHeat(0.846)
+                .specificHeat(37.2)
                 .formationEnthalpy(-393.5)
                 .formationGibbs(-394.4)
                 .build()
@@ -653,7 +654,7 @@ public class ModChemistry {
         public static final IonType SO2 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "so2"), Phase.GAS)
                 .molarMass(64.07)
-                .specificHeat(0.622)
+                .specificHeat(39.9)
                 .formationEnthalpy(-296.8)
                 .formationGibbs(-300.1)
                 .toxicityLevel(2)
@@ -665,7 +666,7 @@ public class ModChemistry {
         public static final IonType NH3 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "nh3"), Phase.GAS)
                 .molarMass(17.03)
-                .specificHeat(2.06)
+                .specificHeat(35.1)
                 .formationEnthalpy(-46.1)
                 .formationGibbs(-16.4)
                 .toxicityLevel(2)
@@ -690,6 +691,17 @@ public class ModChemistry {
                 .specificHeat(75.3)
                 .formationEnthalpy(-285.8)
                 .formationGibbs(-237.1)
+                .build()
+        );
+
+        public static final IonType H2O2 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "h2o2"), Phase.LIQUID)
+                .molarMass(34.01)
+                .specificHeat(89.1)
+                .formationEnthalpy(-187.8)
+                .formationGibbs(-120.4)
+                .tag(IonTags.OXIDIZER)
+                .tag(IonTags.REDUCER)  // 既可作氧化剂也可作还原剂
                 .build()
         );
 
@@ -744,6 +756,27 @@ public class ModChemistry {
                 .build()
         );
 
+        public static final IonType MnO2 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "mno2"), Phase.SOLID)
+                .molarMass(86.94)
+                .specificHeat(46.9)
+                .formationEnthalpy(-520.0)
+                .formationGibbs(-465.0)
+                .tag(IonTags.CATALYST)
+                .tag(IonTags.OXIDE)
+                .build()
+        );
+
+        public static final IonType CaCO3 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "caco3"), Phase.SOLID)
+                .molarMass(100.09)
+                .specificHeat(84.1)
+                .formationEnthalpy(-1207.6)
+                .formationGibbs(-1128.8)
+                .tag(IonTags.PRECIPITATE)
+                .build()
+        );
+
         // ---- 金属单质 ----
         public static final IonType Fe = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "fe"), Phase.SOLID)
@@ -771,7 +804,7 @@ public class ModChemistry {
         public static final IonType H2SO4 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "h2so4"), Phase.LIQUID)
                 .molarMass(98.08)
-                .specificHeat(1.42)
+                .specificHeat(139.3)
                 .formationEnthalpy(-814.0)
                 .formationGibbs(-690.0)
                 .tag(IonTags.ACID)
@@ -784,7 +817,7 @@ public class ModChemistry {
         public static final IonType Fe2O3 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "fe2o3"), Phase.SOLID)
                 .molarMass(159.69)
-                .specificHeat(0.67)          // J/(g·K) 近似
+                .specificHeat(107.0)         // J/(mol·K)（原按 J/(g·K) 填写，已×摩尔质量换算）
                 .formationEnthalpy(-824.2)
                 .formationGibbs(-742.2)
                 .tag(IonTags.OXIDE)
@@ -795,7 +828,7 @@ public class ModChemistry {
         public static final IonType SiO2 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "sio2"), Phase.SOLID)
                 .molarMass(60.08)
-                .specificHeat(0.73)
+                .specificHeat(43.9)
                 .formationEnthalpy(-910.9)
                 .formationGibbs(-856.3)
                 .tag(IonTags.OXIDE)
@@ -806,7 +839,7 @@ public class ModChemistry {
         public static final IonType Cu2O = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "cu2o"), Phase.SOLID)
                 .molarMass(143.09)
-                .specificHeat(0.43)
+                .specificHeat(61.5)
                 .formationEnthalpy(-168.6)
                 .formationGibbs(-146.0)
                 .tag(IonTags.OXIDE)
@@ -838,7 +871,7 @@ public class ModChemistry {
         public static final IonType C8H18 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "c8h18"), Phase.LIQUID)
                 .molarMass(114.23)
-                .specificHeat(2.22)
+                .specificHeat(253.6)
                 .formationEnthalpy(-249.9)
                 .formationGibbs(6.4)
                 .tag(IonTags.HYDROCARBON)
@@ -849,7 +882,7 @@ public class ModChemistry {
         public static final IonType C10H22 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "c10h22"), Phase.LIQUID)
                 .molarMass(142.28)
-                .specificHeat(2.18)
+                .specificHeat(310.2)
                 .formationEnthalpy(-300.9)
                 .formationGibbs(17.3)
                 .tag(IonTags.HYDROCARBON)
@@ -860,7 +893,7 @@ public class ModChemistry {
         public static final IonType C12H26 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "c12h26"), Phase.LIQUID)
                 .molarMass(170.34)
-                .specificHeat(2.15)
+                .specificHeat(366.2)
                 .formationEnthalpy(-352.0)
                 .formationGibbs(28.1)
                 .tag(IonTags.HYDROCARBON)
@@ -872,7 +905,7 @@ public class ModChemistry {
         public static final IonType C6H6 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "c6h6"), Phase.LIQUID)
                 .molarMass(78.11)
-                .specificHeat(1.72)
+                .specificHeat(134.3)
                 .formationEnthalpy(49.0)
                 .formationGibbs(124.5)
                 .toxicityLevel(2)           // 苯有毒
@@ -886,10 +919,54 @@ public class ModChemistry {
         public static final IonType SULFUR = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "sulfur"), Phase.SOLID)
                 .molarMass(32.07)
-                .specificHeat(0.71)
+                .specificHeat(22.8)
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .tag(IonTags.NONMETAL)
+                .tag(IonTags.REDUCER)
+                .build()
+        );
+
+        // ==================== 氮氧化物与碳酸氢根（可逆/多反应物/浓度依赖反应用） ====================
+        public static final IonType N2O4 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "n2o4"), Phase.GAS)
+                .molarMass(92.01)
+                .specificHeat(77.3)
+                .formationEnthalpy(9.16)
+                .formationGibbs(97.8)
+                .toxicityLevel(2)
+                .flameColor(0xB4552A)
+                .build()
+        );
+
+        public static final IonType NO2 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "no2"), Phase.GAS)
+                .molarMass(46.01)
+                .specificHeat(37.2)
+                .formationEnthalpy(33.2)
+                .formationGibbs(51.3)
+                .toxicityLevel(2)
+                .flameColor(0xB4552A)
+                .build()
+        );
+
+        public static final IonType HCO3_minus = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "hco3_minus"), Phase.AQUEOUS)
+                .molarMass(61.02)
+                .formationEnthalpy(-692.0)
+                .formationGibbs(-586.8)
+                .tag(IonTags.BASE)
+                .build()
+        );
+
+        // ==================== 金属钠（电解产物，蓝本 §17） ====================
+        public static final IonType Na = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "na"), Phase.SOLID)
+                .molarMass(22.99)
+                .specificHeat(28.2)
+                .formationEnthalpy(0)
+                .formationGibbs(0)
+                .tag(IonTags.METAL)
                 .tag(IonTags.REDUCER)
                 .build()
         );
@@ -914,14 +991,17 @@ public class ModChemistry {
         private static final ReactionGraph GRAPH = ReactionGraph.getInstance();
 
         public static void registerAll() {
+            // 清空已有边，保证重复调用（如服务器重启）不会累积重复规则
+            GRAPH.clear();
+
             // ====== 酸碱中和：H+ + OH- → H2O ======
             ReactionRule neutralization = new ReactionRule.Builder(
                     new ResourceLocation(Main.MODID, "neutralization"))
                     .reactant(ModIons.H_plus, 1)
                     .reactant(ModIons.OH_minus, 1)
                     .product(ModIons.H2O, 1)
-                    .deltaH(-57.3)      // kJ/mol
-                    .deltaG(-79.9)
+                    .deltaHComputed()   // ΔH = ΔHf(H2O) - ΔHf(H+) - ΔHf(OH-) = -55.8 kJ/mol
+                    .deltaGComputed()   // ΔG = ΔGf(H2O) - ΔGf(H+) - ΔGf(OH-) = -79.9 kJ/mol
                     .equilibriumConstant(1e14)  // 非常彻底
                     .activationEnergy(5.0)      // 极低能垒
                     .preExponentialFactor(1e11)
@@ -934,9 +1014,190 @@ public class ModChemistry {
             // 这里留作示例，暂不启用
 
             // ====== 分解反应：H2O2 → H2O + O2（自环） ======
-            // 注意：H2O2 需要先注册，暂不启用
+            // ====== 双氧水分解（无催化剂） ======
+            ReactionRule h2o2DecomposeNoCatalyst = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "h2o2_decompose_no_catalyst")
+            )
+                    .reactant(ModIons.H2O2, 2)
+                    .product(ModIons.H2O, 2)
+                    .product(ModIons.O2, 1)
+                    .deltaHComputed()   // ΔH = 2ΔHf(H2O) - 2ΔHf(H2O2) = -196.0 kJ/mol
+                    .deltaGComputed()   // ΔG = 2ΔGf(H2O) - 2ΔGf(H2O2) = -233.4 kJ/mol
+                    .equilibriumConstant(1e20)
+                    .activationEnergy(75.0)   // 较高能垒，常温下几乎不反应
+                    .preExponentialFactor(1e6)
+                    .selfLoop(true)
+                    .build();
 
-            Main.LOGGER.info("[Chemistry] Registered {} reaction rules", GRAPH.getAllEdges().size());
+            // 无催化剂版本：自环，低优先级
+            GRAPH.addEdge(ModIons.H2O2, ModIons.H2O2, h2o2DecomposeNoCatalyst);
+
+            // ====== 双氧水分解（有催化剂 MnO₂） ======
+            ReactionRule h2o2DecomposeWithCatalyst = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "h2o2_decompose_with_catalyst")
+            )
+                    .reactant(ModIons.H2O2, 2)
+                    .product(ModIons.H2O, 2)
+                    .product(ModIons.O2, 1)
+                    .precondition(ModIons.MnO2, 1)   // 需要 MnO₂ 作为催化剂（不消耗）
+                    .deltaHComputed()                // 与无催化剂版本相同
+                    .deltaGComputed()                // 与无催化剂版本相同
+                    .equilibriumConstant(1e20)       // 与无催化剂版本相同
+                    .activationEnergy(30.0)          // 低能垒，常温下快速反应
+                    .preExponentialFactor(1e10)      // 比无催化剂版本高一个数量级
+                    .gamePriorityBias(2.0)           // 提高优先级评分
+                    .selfLoop(true)
+                    .build();
+
+            // 有催化剂版本：自环，高优先级
+            GRAPH.addEdge(ModIons.H2O2, ModIons.H2O2, h2o2DecomposeWithCatalyst);
+
+            // ====== 碳酸钙沉淀：Ca²⁺ + CO₃²⁻ → CaCO₃↓ ======
+            ReactionRule calciumCarbonatePrecipitate = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "caco3_precipitate")
+            )
+                    .reactant(ModIons.Ca_2, 1)
+                    .reactant(ModIons.CO3_2minus, 1)
+                    .product(ModIons.CaCO3, 1)
+                    .deltaHComputed()   // ΔH = ΔHf(CaCO3) - ΔHf(Ca2+) - ΔHf(CO3 2-) = +12.3 kJ/mol
+                    .deltaGComputed()   // ΔG = ΔGf(CaCO3) - ΔGf(Ca2+) - ΔGf(CO3 2-) = -47.4 kJ/mol（自发）
+                    .equilibriumConstant(1e8) // 较彻底
+                    .activationEnergy(10.0)   // 低能垒
+                    .preExponentialFactor(1e10)
+                    .build();
+
+            // 双向边
+            GRAPH.addBidirectionalEdges(ModIons.Ca_2, ModIons.CO3_2minus, calciumCarbonatePrecipitate);
+
+            // ====== NaCl 电离：NaCl(s) → Na⁺ + Cl⁻（强电解质） ======
+            // 水作为电离介质（前置条件：检测存在但不消耗），符合蓝本 §5.1 催化剂机制
+            ReactionRule naclDissociation = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "nacl_dissociation"))
+                    .reactant(ModIons.NaCl, 1)
+                    .product(ModIons.Na_1, 1)
+                    .product(ModIons.Cl_minus, 1)
+                    .precondition(ModIons.H2O, 1)
+                    .deltaHComputed()   // ΔH = ΔHf(Na+) + ΔHf(Cl-) - ΔHf(NaCl) = +3.8 kJ/mol（微吸热，符合实际）
+                    .deltaGComputed()   // ΔG = ΔGf(Na+) + ΔGf(Cl-) - ΔGf(NaCl) = -9.0 kJ/mol（自发）
+                    .equilibriumConstant(1e20)      // 强电解质，几乎完全电离
+                    .activationEnergy(5.0)          // 极低能垒，遇水即电离
+                    .preExponentialFactor(1e11)
+                    .selfLoop(true)
+                    .build();
+
+            // 自环：分解/电离类反应，由 Tick 轮询驱动
+            GRAPH.addEdge(ModIons.NaCl, ModIons.NaCl, naclDissociation);
+
+            // ====== 可逆反应：N₂O₄ ⇌ 2NO₂（蓝本 §2 可逆反应） ======
+            // 正、逆视为两个独立 ReactionRule（各自自环），ΔH/ΔG 由生成数据计算，
+            // 使 K_rev = 1/K_fwd（范特霍夫），引擎以 Q vs K 自动决定反应方向，不震荡
+            ReactionRule n2o4Decompose = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "n2o4_decompose"))
+                    .reactant(ModIons.N2O4, 1)
+                    .product(ModIons.NO2, 2)
+                    .deltaHComputed()   // ΔH = 2ΔHf(NO2) - ΔHf(N2O4) = +57.2 kJ/mol（吸热）
+                    .deltaGComputed()   // ΔG = 2ΔGf(NO2) - ΔGf(N2O4) = +4.8 kJ/mol（常温偏向 N₂O₄）
+                    .activationEnergy(60.0)
+                    .preExponentialFactor(1e8)
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.N2O4, ModIons.N2O4, n2o4Decompose);
+
+            ReactionRule no2Combine = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "no2_combine"))
+                    .reactant(ModIons.NO2, 2)
+                    .product(ModIons.N2O4, 1)
+                    .deltaHComputed()   // ΔG = -4.8 kJ/mol（自发），优先级略高于正反应
+                    .deltaGComputed()
+                    .activationEnergy(60.0)
+                    .preExponentialFactor(1e8)
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.NO2, ModIons.NO2, no2Combine);
+
+            // ====== 三反应物完全矩阵：NH₃ + CO₂ + H₂O → NH₄⁺ + HCO₃⁻（制碱法步骤） ======
+            // 三个反应物两两双向，共 3×2 = 6 条边，保证任意添加顺序都能触发
+            ReactionRule ammoniaBicarbonate = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "ammonia_bicarbonate"))
+                    .reactant(ModIons.NH3, 1)
+                    .reactant(ModIons.CO2, 1)
+                    .reactant(ModIons.H2O, 1)
+                    .product(ModIons.NH4_plus, 1)
+                    .product(ModIons.HCO3_minus, 1)
+                    .deltaHComputed()   // ΔH = -99.1 kJ/mol（放热）
+                    .deltaGComputed()   // ΔG = -18.2 kJ/mol（自发）
+                    .equilibriumConstant(1e4)
+                    .activationEnergy(40.0)
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.NH3, ModIons.CO2, ammoniaBicarbonate);
+            GRAPH.addBidirectionalEdges(ModIons.NH3, ModIons.H2O, ammoniaBicarbonate);
+            GRAPH.addBidirectionalEdges(ModIons.CO2, ModIons.H2O, ammoniaBicarbonate);
+
+            // ====== 浓度依赖复杂反应：碳酸盐遇酸（蓝本 §5.2） ======
+            // 同一反应物 CO₃²⁻ 与 H⁺，产物由 [H⁺] 决定：低酸 → HCO₃⁻，高酸 → CO₂↑
+            // 两条竞争规则各绑一个以 [H⁺] 为自变量的动态优先级函数，引擎按浓度选择主导路径
+            ReactionRule carbonateToBicarbonate = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "carbonate_to_bicarbonate"))
+                    .reactant(ModIons.H_plus, 1)
+                    .reactant(ModIons.CO3_2minus, 1)
+                    .product(ModIons.HCO3_minus, 1)
+                    .deltaHComputed()   // ΔG = -59.0 kJ/mol
+                    .deltaGComputed()
+                    .equilibriumConstant(1e6)
+                    .activationEnergy(40.0)
+                    .preExponentialFactor(1e9)
+                    .dynamicPriorityBias(c -> {
+                        double h = c.getEffectiveConcentration(ModIons.H_plus);
+                        return 4.0 / (4.0 + h);   // 低酸路径：随 [H⁺] 升高而减弱
+                    })
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.H_plus, ModIons.CO3_2minus, carbonateToBicarbonate);
+
+            ReactionRule carbonateToCo2 = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "carbonate_to_co2"))
+                    .reactant(ModIons.H_plus, 2)
+                    .reactant(ModIons.CO3_2minus, 1)
+                    .product(ModIons.H2O, 1)
+                    .product(ModIons.CO2, 1)
+                    .deltaHComputed()   // ΔG = -103.7 kJ/mol（更彻底）
+                    .deltaGComputed()
+                    .equilibriumConstant(1e6)
+                    .activationEnergy(40.0)
+                    .preExponentialFactor(1e9)
+                    .dynamicPriorityBias(c -> {
+                        double h = c.getEffectiveConcentration(ModIons.H_plus);
+                        return h / (4.0 + h);   // 高酸路径：随 [H⁺] 升高而占优
+                    })
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.H_plus, ModIons.CO3_2minus, carbonateToCo2);
+
+            // ====== 电解：2NaCl(熔融) → 2Na + Cl₂（蓝本 §17） ======
+            // 自环分解反应。通电时引擎用 ΔG_eff = ΔG - W 参与优先级与平衡（W 取理论最小电功 = ΔG，
+            // 由生成数据折算），未通电则被门控拦截、不可运行。
+            ReactionRule naclElectrolysis = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "nacl_electrolysis"))
+                    .reactant(ModIons.NaCl_MOLTEN, 2)
+                    .product(ModIons.Na, 2)
+                    .product(ModIons.Cl2, 1)
+                    .deltaHComputed()          // ΔH = +771.6 kJ（吸热）
+                    .deltaGComputed()          // ΔG = +718.8 kJ（非自发，需通电）
+                    .electricalWorkComputed()  // W = ΔG = 718.8 kJ（理论最小电功）
+                    .activationEnergy(50.0)
+                    .preExponentialFactor(1e8)  // k≈0.17 s⁻¹，约12秒可见推进
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.NaCl_MOLTEN, ModIons.NaCl_MOLTEN, naclElectrolysis);
+
+            Main.LOGGER.info("[Chemistry] Reaction graph ready: {} nodes, {} edges",
+                    GRAPH.getAllNodes().size(), GRAPH.getAllEdges().size());
+            // 逐边信息仅用于调试（默认不输出）
+            for (ReactionEdge edge : GRAPH.getAllEdges()) {
+                Main.LOGGER.debug("[Chemistry]   {} → {} (rule: {})",
+                        edge.getSource().getId().getPath(),
+                        edge.getTarget().getId().getPath(),
+                        edge.getRule().getId().getPath());
+            }
         }
 
         /**

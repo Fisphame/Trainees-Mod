@@ -54,11 +54,12 @@ public class ChemConfig {
     // 七、固定物理参数（由材料决定，保留用于自定义）
     // ============================================================
     public static final ForgeConfigSpec.DoubleValue DEFAULT_VOLUME;
-    public static final ForgeConfigSpec.DoubleValue BEAKER_GLASS_HEAT_CAPACITY;
+    public static final ForgeConfigSpec.DoubleValue BEAKER_BASE_HEAT_CAPACITY;
+    public static final ForgeConfigSpec.DoubleValue BEAKER_HEAT_TRANSFER_COEFFICIENT;
+    public static final ForgeConfigSpec.DoubleValue AMBIENT_HEAT_TRANSFER_COEFFICIENT;
     public static final ForgeConfigSpec.DoubleValue MIN_HEAT_CAPACITY;
     public static final ForgeConfigSpec.DoubleValue DEFAULT_TEMPERATURE;
     public static final ForgeConfigSpec.DoubleValue MAX_SAFE_TEMPERATURE;
-    public static final ForgeConfigSpec.DoubleValue HEAT_TRANSFER_COEFFICIENT;
     public static final ForgeConfigSpec.DoubleValue CRITICAL_TEMPERATURE_RATIO;
     public static final ForgeConfigSpec.DoubleValue ENVIRONMENT_TEMPERATURE_BASE;
     public static final ForgeConfigSpec.DoubleValue ENVIRONMENT_TEMPERATURE_LAPSE_RATE;
@@ -98,6 +99,11 @@ public class ChemConfig {
     // 十二、环境模拟
     // ============================================================
     public static final ForgeConfigSpec.DoubleValue PRESSURE_STANDARD_ATMOSPHERE;
+
+    // ============================================================
+    // 十三、电解（理论调试）
+    // ============================================================
+    public static final ForgeConfigSpec.BooleanValue ELECTROLYZER_FREE_POWER;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -217,9 +223,19 @@ public class ChemConfig {
                 .comment("容器的默认有效容积（升 L）")
                 .defineInRange("defaultVolume", 1.0, 0.01, 1000.0);
 
-        BEAKER_GLASS_HEAT_CAPACITY = builder
-                .comment("烧杯玻璃本身的热容（J/K）")
-                .defineInRange("beakerGlassHeatCapacity", 50.0, 0.0, 10000.0);
+        BEAKER_BASE_HEAT_CAPACITY = builder
+                .comment("烧杯玻璃本身的基础热容（J/K），不包括内容物")
+                .defineInRange("beakerBaseHeatCapacity", 4000.0, 100.0, 100000.0);
+
+        BEAKER_HEAT_TRANSFER_COEFFICIENT = builder
+                .comment("烧杯与热源（火/岩浆/篝火等）的换热系数，值越大升温越快", "推荐值 1.5 ~ 3.0")
+                .defineInRange("beakerHeatTransferCoefficient", 2.0, 0.1, 20.0);
+
+        AMBIENT_HEAT_TRANSFER_COEFFICIENT = builder
+                .comment("烧杯与环境空气的自然换热系数（独立于热源强度，两者解耦）",
+                        "值越小热惯量越大、温度越稳定：0.05 时约 20 秒向环境温度趋近",
+                        "过强会导致烧杯瞬间弹回环境温度、留不住热")
+                .defineInRange("ambientHeatTransferCoefficient", 0.05, 0.001, 10.0);
 
         MIN_HEAT_CAPACITY = builder
                 .comment("容器允许的最小总热容（J/K），防止除零")
@@ -232,10 +248,6 @@ public class ChemConfig {
         MAX_SAFE_TEMPERATURE = builder
                 .comment("容器最高安全温度（开尔文 K），由容器材料决定，此处为默认值")
                 .defineInRange("maxSafeTemperature", 1800.0, 0.0, 10000.0);
-
-        HEAT_TRANSFER_COEFFICIENT = builder
-                .comment("容器的热传导系数，由容器材料决定，此处为默认值")
-                .defineInRange("heatTransferCoefficient", 0.3, 0.0, 1.0);
 
         CRITICAL_TEMPERATURE_RATIO = builder
                 .comment("触发临界温度警告的阈值（占最高安全温度的百分比）")
@@ -350,7 +362,17 @@ public class ChemConfig {
 
         builder.pop();
 
+        // ============================================================
+        // 十三、电解（理论调试）
+        // ============================================================
+        builder.push("electrolysis");
 
+        ELECTROLYZER_FREE_POWER = builder
+                .comment("电解理论阶段：容器是否视为无限通电（不消耗电能、恒可电解）",
+                        "true = 理论调试用，不依赖真实发电；接入能量系统后设为 false")
+                .define("electrolyzerFreePower", true);
+
+        builder.pop();
 
 //        COMMON_SPEC = builder.build();
         SERVER_SPEC = builder.build();

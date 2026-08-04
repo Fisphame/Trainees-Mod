@@ -1,5 +1,6 @@
 package com.pha.trainees.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.pha.trainees.Main;
 import com.pha.trainees.entity.*;
 import net.minecraft.client.model.ChickenModel;
@@ -85,6 +86,24 @@ public class Renderers {
         @Override
         public ResourceLocation getTextureLocation(GasEntities.OxygenEntity entity) {
             return new ResourceLocation(Main.MODID, "textures/entity/oxygen.png");
+        }
+    }
+
+    public static class KunAntiBossRenderer extends MobRenderer<KunAntiBossEntity, ChickenModel<KunAntiBossEntity>> {
+
+        public KunAntiBossRenderer(EntityRendererProvider.Context context) {
+            super(context, new ChickenModel<>(context.bakeLayer(ModelLayers.CHICKEN)), 0.8F);
+        }
+
+        @Override
+        protected void scale(KunAntiBossEntity entity, PoseStack poseStack, float partialTick) {
+            // 将模型放大 2 倍
+            poseStack.scale(2.0F, 2.0F, 2.0F);
+        }
+
+        @Override
+        public ResourceLocation getTextureLocation(KunAntiBossEntity entity) {
+            return new ResourceLocation(Main.MODID, "textures/entity/kun_anti_boss.png");
         }
     }
 }

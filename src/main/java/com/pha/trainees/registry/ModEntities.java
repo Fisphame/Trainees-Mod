@@ -51,10 +51,7 @@ public class ModEntities {
 
     public static final RegistryObject<EntityType<KunTraineesEntity>> KUN_TRAINEES =
             ENTITIES.register("kun_trainees",
-                    () -> EntityType.Builder.of(
-                                    KunTraineesEntity::new,
-                                    MobCategory.CREATURE
-                            )
+                    () -> EntityType.Builder.of(KunTraineesEntity::new, MobCategory.CREATURE)
                             .sized(0.4F, 0.7F)
                             .clientTrackingRange(16)
                             .build(new ResourceLocation(Main.MODID, "kun_trainees").toString())
@@ -62,10 +59,7 @@ public class ModEntities {
 
     public static final RegistryObject<EntityType<KunAntiEntity>> KUN_ANTI =
             ENTITIES.register("kun_anti",
-                    () -> EntityType.Builder.of(
-                                    KunAntiEntity::new,
-                                    MobCategory.CREATURE
-                            )
+                    () -> EntityType.Builder.of(KunAntiEntity::new, MobCategory.CREATURE)
                             .sized(0.4F, 0.7F)
                             .clientTrackingRange(16)
                             .build(new ResourceLocation(Main.MODID, "kun_anti").toString())
@@ -73,13 +67,18 @@ public class ModEntities {
 
     public static final RegistryObject<EntityType<GoldChickenEntity>> GOLD_CHICKEN =
             ENTITIES.register("gold_chicken",
-                    () -> EntityType.Builder.of(
-                                    GoldChickenEntity::new,
-                                    MobCategory.CREATURE
-                            )
+                    () -> EntityType.Builder.of(GoldChickenEntity::new, MobCategory.CREATURE)
                             .sized(0.4F, 0.7F)
                             .clientTrackingRange(16)
                             .build(new ResourceLocation(Main.MODID, "gold_chicken").toString())
+            );
+
+    public static final RegistryObject<EntityType<KunAntiBossEntity>> KUN_ANTI_BOSS =
+            ENTITIES.register("kun_anti_boss",
+                    () -> EntityType.Builder.of(KunAntiBossEntity::new, MobCategory.MONSTER)
+                            .sized(1.5F, 2.5F)   // 宽度1.5格，高度2.5格
+                            .clientTrackingRange(16)
+                            .build(new ResourceLocation(Main.MODID, "kun_anti_boss").toString())
             );
 
     public static final RegistryObject<EntityType<GasEntities.HydrogenEntity>> HYDROGEN =

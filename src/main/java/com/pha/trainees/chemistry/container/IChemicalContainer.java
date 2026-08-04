@@ -1,6 +1,10 @@
 package com.pha.trainees.chemistry.container;
 
+import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.particle.IonType;
+import com.pha.trainees.chemistry.particle.Phase;
+import com.pha.trainees.chemistry.reaction.ReactionRule;
+import com.pha.trainees.config.ChemConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
@@ -24,8 +28,21 @@ public interface IChemicalContainer {
     /** 添加粒子（增加物质的量），返回实际增加量 */
     double addIon(IonType ion, double moles);
 
+    /**
+     * 添加离子，可指定是否触发引擎
+     * 默认行为：调用 addIon(ion, moles) 并触发引擎
+     */
+    default double addIon(IonType ion, double moles, boolean triggerEngine) {
+        // 默认实现：直接调用原方法，由子类重写更精确的控制
+        return addIon(ion, moles);
+    }
+
     /** 移除粒子（减少物质的量），返回实际移除量（可能小于请求量） */
     double removeIon(IonType ion, double moles);
+
+    default double removeIon(IonType ion, double moles, boolean triggerEngine) {
+        return removeIon(ion, moles);
+    }
 
     /** 检查容器是否包含指定粒子且数量足够 */
     boolean contains(IonType ion, double minMoles);
@@ -71,4 +88,80 @@ public interface IChemicalContainer {
 
     /** 标记容器需要同步更新（发给客户端） */
     void setChanged();
+
+    // ==================== 引擎查询接口 ====================
+
+    /**
+     * 获取指定离子在当前容器中的有效浓度（mol/L），物态感知（蓝本 §4.2）：
+     * - GAS / AQUEOUS：浓度 = n / volume（参与速率方程与反应商的浓度乘积）
+     * - LIQUID / SOLID：活度恒为 1.0（不参与速率方程与反应商的浓度乘积）
+     * 消耗/生成的数量判断仍基于 getAmount()（摩尔数），不受此方法影响。
+     */
+    default double getEffectiveConcentration(IonType ion) {
+        Phase phase = ion.getPhase();
+        if (phase == Phase.LIQUID || phase == Phase.SOLID) {
+            return 1.0;
+        }
+        double volume = getVolume();
+        if (volume <= 0) return 0;
+        return getAmount(ion) / volume;
+    }
+
+    /**
+     * 检查容器中是否所有反应物种类都存在（非零量）。
+     * 注意：只检查"存在"，不要求达到完整计量数——具体每次消耗量由引擎按 Δξ 缩放，
+     * 计量数 >1 的反应（如 2NaCl → 2Na + Cl₂）在存量低于完整计量数时仍应能继续部分反应。
+     */
+    default boolean containsAll(Map<IonType, Integer> requirements) {
+        for (Map.Entry<IonType, Integer> entry : requirements.entrySet()) {
+            if (getAmount(entry.getKey()) <= 1e-9) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 获取容器内所有粒子的总摩尔数
+     */
+    default double getTotalMoles() {
+        return getContents().values().stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    // ==================== 电解/通电（蓝本 §17） ====================
+
+    /**
+     * 容器当前是否通电。
+     * 理论阶段由配置 ELECTROLYZER_FREE_POWER 决定（无限电调试）；
+     * 未来接入机器能量系统后，由容器的 IEnergyStorage 决定（覆盖此方法）。
+     */
+    default boolean isElectricallyPowered() {
+        return ChemConfig.ELECTROLYZER_FREE_POWER.get();
+    }
+
+    /**
+     * 消耗电能（kJ），返回是否成功扣除。
+     * 理论阶段无限电时恒成功；未来接入能量系统后从 IEnergyStorage 扣减并返回结果。
+     */
+    default boolean consumeElectricalEnergy(double kilojoules) {
+        return isElectricallyPowered();
+    }
+
+    // ==================== 平衡状态管理（用于引擎） ====================
+
+    /**
+     * 标记某个反应规则在容器中已达到平衡（暂不触发）
+     */
+    void markRuleBalanced(ReactionRule rule);
+
+    /**
+     * 检查某个反应规则是否已被标记为平衡状态
+     */
+    boolean isRuleBalanced(ReactionRule rule);
+
+    /**
+     * 重置该容器中所有规则的平衡状态
+     * 当容器成分发生变化时（添加/移除粒子），应调用此方法
+     */
+    void resetBalancedRules();
 }

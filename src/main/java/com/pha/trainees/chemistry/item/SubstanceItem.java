@@ -38,28 +38,19 @@ public class SubstanceItem extends Item {
     // ==================== 静态工厂方法 ====================
 
     /**
-     * 从蓝图创建物品堆
+     * 从蓝图创建物品堆（蓝图模式）。
+     * NBT 仅存 blueprint ID + units，成分在读取时实时计算，
+     * 因此难度变更后旧物品会自动反映新难度（蓝本 §8.3）。
      */
-
     public static ItemStack fromBlueprint(ResourceLocation blueprintId, double units) {
         SubstanceBlueprint blueprint = SubstanceBlueprintRegistry.get(blueprintId);
         if (blueprint == null) return ItemStack.EMPTY;
 
-        // 读取当前难度配置
-        ChemConfig.DifficultyLevel difficulty = ChemConfig.GAME_DIFFICULTY.get();
-        double valuableMultiplier, gangueMultiplier;
-        if (difficulty == ChemConfig.DifficultyLevel.CUSTOM) {
-            valuableMultiplier = ChemConfig.ORE_VALUABLE_RATIO_MULTIPLIER.get();
-            gangueMultiplier = ChemConfig.ORE_GANGUE_RATIO_MULTIPLIER.get();
-        } else {
-            ChemConfig.DifficultyPresets.ConfigValues preset = ChemConfig.DifficultyPresets.get(difficulty);
-            valuableMultiplier = preset.oreValuableMultiplier;
-            gangueMultiplier = preset.oreGangueMultiplier;
-        }
-
-        // 使用带难度缩放的成分
-        Map<IonType, Double> composition = blueprint.createComposition(units, valuableMultiplier, gangueMultiplier);
-        return fromComposition(composition);
+        ItemStack stack = new ItemStack(ModChemistry.ModChemistryItems.SUBSTANCE.get());
+        CompoundTag tag = stack.getOrCreateTag();
+        tag.putString("blueprint", blueprintId.toString());
+        tag.putDouble("units", units > 0 ? units : 1.0);
+        return stack;
     }
 
     /**
@@ -97,14 +88,15 @@ public class SubstanceItem extends Item {
         CompoundTag tag = stack.getTag();
         if (tag == null) return Map.of();
 
-        // 蓝图模式
+        // 蓝图模式：读取时实时解析蓝图并套用当前难度乘数
         if (tag.contains("blueprint")) {
             ResourceLocation id = ResourceLocation.tryParse(tag.getString("blueprint"));
             if (id != null) {
                 SubstanceBlueprint blueprint = SubstanceBlueprintRegistry.get(id);
                 if (blueprint != null) {
                     double units = tag.getDouble("units");
-                    return blueprint.createComposition(units);
+                    if (units <= 0) units = 1.0;
+                    return blueprint.createComposition(units, getValuableMultiplier(), getGangueMultiplier());
                 }
             }
             return Map.of();
@@ -158,6 +150,31 @@ public class SubstanceItem extends Item {
     public static boolean isBlueprint(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         return tag != null && tag.contains("blueprint");
+    }
+
+    // ==================== 难度乘数解析 ====================
+
+    /**
+     * 根据当前难度档位获取有效成分乘数。
+     * CUSTOM 档直接读配置字段；预设档读取预设表。
+     */
+    private static double getValuableMultiplier() {
+        ChemConfig.DifficultyLevel difficulty = ChemConfig.GAME_DIFFICULTY.get();
+        if (difficulty == ChemConfig.DifficultyLevel.CUSTOM) {
+            return ChemConfig.ORE_VALUABLE_RATIO_MULTIPLIER.get();
+        }
+        return ChemConfig.DifficultyPresets.get(difficulty).oreValuableMultiplier;
+    }
+
+    /**
+     * 根据当前难度档位获取脉石乘数。
+     */
+    private static double getGangueMultiplier() {
+        ChemConfig.DifficultyLevel difficulty = ChemConfig.GAME_DIFFICULTY.get();
+        if (difficulty == ChemConfig.DifficultyLevel.CUSTOM) {
+            return ChemConfig.ORE_GANGUE_RATIO_MULTIPLIER.get();
+        }
+        return ChemConfig.DifficultyPresets.get(difficulty).oreGangueMultiplier;
     }
     // ==================== 显示相关 ====================
 

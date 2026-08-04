@@ -2,7 +2,10 @@ package com.pha.trainees.chemistry.blockentity;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.chemistry.container.IChemicalContainer;
+import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.particle.IonType;
+import com.pha.trainees.chemistry.particle.Phase;
+import com.pha.trainees.chemistry.reaction.ReactionRule;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.registry.ModChemistry.ModIons;
@@ -17,7 +20,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -30,7 +36,6 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     private static final double DEFAULT_TEMPERATURE = ChemConfig.DEFAULT_TEMPERATURE.get();
     private static final double DEFAULT_VOLUME = ChemConfig.DEFAULT_VOLUME.get();
     private static final double MAX_SAFE_TEMPERATURE = ChemConfig.MAX_SAFE_TEMPERATURE.get();
-    private static final double HEAT_TRANSFER_COEFFICIENT = ChemConfig.HEAT_TRANSFER_COEFFICIENT.get();
 
     private static final Map<Block, Double> HEAT_SOURCE_TEMPS = new HashMap<>();
     static {
@@ -46,7 +51,10 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     private final Map<IonType, Double> contents = new ConcurrentHashMap<>();
     private double temperature = DEFAULT_TEMPERATURE;
     private double volume = DEFAULT_VOLUME;
-    private double totalHeatCapacity = ChemConfig.BEAKER_GLASS_HEAT_CAPACITY.get();
+    private double totalHeatCapacity = ChemConfig.BEAKER_BASE_HEAT_CAPACITY.get();
+
+    private final Set<ReactionRule> balancedRules = ConcurrentHashMap.newKeySet();
+
 
     public BeakerBlockEntity(BlockPos pos, BlockState state) {
         super(ModChemistry.ModChemistryBlockEntities.BEAKER.get(), pos, state);
@@ -64,8 +72,14 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         return contents.getOrDefault(ion, 0.0);
     }
 
+
     @Override
     public synchronized double addIon(IonType ion, double moles) {
+        return addIon(ion, moles, true);
+    }
+
+    @Override
+    public synchronized double addIon(IonType ion, double moles, boolean triggerEngine) {
         if (moles <= 0 || ion == null) return 0;
         double current = contents.getOrDefault(ion, 0.0);
         double newAmount = current + moles;
@@ -73,11 +87,20 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         recalcHeatCapacity();
         setChanged();
         syncToClient();
+        resetBalancedRules();
+        if (triggerEngine && level != null && !level.isClientSide) {
+            ReactionEngine.trigger(this, ion);
+        }
         return moles;
     }
 
     @Override
     public synchronized double removeIon(IonType ion, double moles) {
+        return removeIon(ion, moles, true);
+    }
+
+    @Override
+    public synchronized double removeIon(IonType ion, double moles, boolean triggerEngine) {
         if (moles <= 0 || ion == null) return 0;
         double current = contents.getOrDefault(ion, 0.0);
         double removed = Math.min(current, moles);
@@ -91,8 +114,13 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         recalcHeatCapacity();
         setChanged();
         syncToClient();
+        resetBalancedRules();
+        if (triggerEngine && level != null && !level.isClientSide) {
+            ReactionEngine.trigger(this, ion);
+        }
         return removed;
     }
+
 
     @Override
     public boolean contains(IonType ion, double minMoles) {
@@ -132,10 +160,14 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
     @Override
     public double getPressure() {
-        double totalMoles = contents.values().stream().mapToDouble(Double::doubleValue).sum();
-        if (totalMoles < 1e-9 || volume < 1e-9) return 0;
+        // 压强仅由气相粒子贡献（蓝本 §4.2）
+        double gasMoles = contents.entrySet().stream()
+                .filter(e -> e.getKey().getPhase() == Phase.GAS)
+                .mapToDouble(Map.Entry::getValue)
+                .sum();
+        if (gasMoles < 1e-9 || volume < 1e-9) return 0;
         double R = 8.314;
-        double pressurePa = (totalMoles * R * temperature) / volume;
+        double pressurePa = (gasMoles * R * temperature) / volume;
         return pressurePa / ChemConfig.PRESSURE_STANDARD_ATMOSPHERE.get();
     }
 
@@ -160,7 +192,7 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     }
 
     @Override
-    public BlockPos getBlockPos() {
+    public @NotNull BlockPos getBlockPos() {
         return super.getBlockPos();
     }
 
@@ -178,7 +210,7 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
             double moles = entry.getValue();
             sum += moles * ion.getSpecificHeat();
         }
-        this.totalHeatCapacity = sum + ChemConfig.BEAKER_GLASS_HEAT_CAPACITY.get();
+        this.totalHeatCapacity = sum + ChemConfig.BEAKER_BASE_HEAT_CAPACITY.get();
         if (this.totalHeatCapacity < ChemConfig.MIN_HEAT_CAPACITY.get()) {
             this.totalHeatCapacity = ChemConfig.MIN_HEAT_CAPACITY.get();
         }
@@ -188,6 +220,20 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         if (getLevel() != null && !getLevel().isClientSide) {
             getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
+    }
+
+    /**
+     * 格式化当前内容物，用于调试日志（如 "h_plus=1.0000, co2=0.5000"）
+     */
+    private String formatContents() {
+        if (contents.isEmpty()) return "empty";
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<IonType, Double> e : contents.entrySet()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(e.getKey().getId().getPath()).append('=')
+                    .append(String.format("%.4f", e.getValue()));
+        }
+        return sb.toString();
     }
 
     // ==================== 网络同步（核心修复） ====================
@@ -228,18 +274,28 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
         beaker.detectAndApplyHeat(level, pos);
 
+        // 环境换热（牛顿冷却，对称）：高于环境散热、低于环境回温。
+        // 使用独立的环境系数（弱于热源），使烧杯有热惯量：可被热源烧热并保持住，
+        // 不会瞬间弹回环境温度。修复原"只散热不回温"不对称
         double envTemp = beaker.getEnvironmentTemperature(level, pos);
-        if (beaker.temperature > envTemp) {
-            double heatLoss = HEAT_TRANSFER_COEFFICIENT * (beaker.temperature - envTemp) * 0.05;
-            beaker.addThermalEnergy(-heatLoss);
+        double heatDelta = ChemConfig.AMBIENT_HEAT_TRANSFER_COEFFICIENT.get() * (envTemp - beaker.temperature) * 0.05;
+        if (Math.abs(heatDelta) > 1e-6) {
+            beaker.addThermalEnergy(heatDelta * beaker.getTotalHeatCapacity());
         }
 
-        // 后续接入 ReactionEngine
-        // beaker.reactionEngineTick();
+        ReactionEngine.tick(beaker);
 
-        if (beaker.temperature >= ChemConfig.MAX_SAFE_TEMPERATURE.get() * ChemConfig.CRITICAL_TEMPERATURE_RATIO.get()) {
+        // 每 20 tick（1秒）输出烧杯内容物与温度，便于观察反应进程（调试用，稳定后可移除）
+        if (level.getGameTime() % 20 == 0) {
+            Main.LOGGER.info("[Beaker] {} contents: {} | T={}K",
+                    pos, beaker.formatContents(), String.format("%.1f", beaker.temperature));
+        }
+
+        // 临界温度警告节流：每 100 tick（5秒）最多输出一次，避免持续刷屏
+        if (beaker.temperature >= ChemConfig.MAX_SAFE_TEMPERATURE.get() * ChemConfig.CRITICAL_TEMPERATURE_RATIO.get()
+                && level.getGameTime() % 100 == 0) {
             Main.LOGGER.warn("[Beaker] Beaker at {} is reaching critical temperature! {:.1f}K",
-                    pos, beaker.temperature);
+                    pos, String.format("%.1f", beaker.temperature));
         }
     }
 
@@ -251,7 +307,7 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         Double heatSourceTemp = HEAT_SOURCE_TEMPS.get(belowBlock);
         if (heatSourceTemp == null || heatSourceTemp <= temperature) return;
 
-        double deltaT = HEAT_TRANSFER_COEFFICIENT * (heatSourceTemp - temperature) * 0.05;
+        double deltaT = ChemConfig.BEAKER_HEAT_TRANSFER_COEFFICIENT.get() * (heatSourceTemp - temperature) * 0.05;
         double heatEnergy = deltaT * totalHeatCapacity;
         addThermalEnergy(heatEnergy);
     }
@@ -309,5 +365,23 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         }
 
         recalcHeatCapacity();
+    }
+
+    @Override
+    public void markRuleBalanced(ReactionRule rule) {
+        balancedRules.add(rule);
+    }
+
+    @Override
+    public boolean isRuleBalanced(ReactionRule rule) {
+        return balancedRules.contains(rule);
+    }
+
+    @Override
+    public void resetBalancedRules() {
+        if (!balancedRules.isEmpty()) {
+            balancedRules.clear();
+            Main.LOGGER.debug("[Beaker] Balanced rules reset due to container change");
+        }
     }
 }

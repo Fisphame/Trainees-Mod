@@ -1,14 +1,18 @@
 package com.pha.trainees.chemistry.reaction;
 
+import com.pha.trainees.Main;
 import com.pha.trainees.chemistry.container.IChemicalContainer;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
 import com.pha.trainees.config.ChemConfig;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * 反应规则对象
@@ -20,20 +24,26 @@ public class ReactionRule {
     private final Map<IonType, Integer> reactants;    // 反应物及计量数（精确匹配）
     private final Map<IonType, Integer> products;     // 生成物及计量数
     private final Map<IonType, Integer> preconditions; // 前置条件（催化剂等，不消耗）
-    private final double deltaH;          // 反应焓变 (kJ/mol)
-    private final double deltaG;          // 标准吉布斯自由能变 (kJ/mol)
-    private final double equilibriumConstant; // 298K 平衡常数
-    private final double activationEnergy; // 活化能 (kJ/mol)
-    private final double preExponentialFactor; // 指前因子 A
-    private final double gamePriorityBias; // 游戏性优先级偏置（默认1.0）
-    private final double minTemperature;  // 最低触发温度 (K)
-    private final boolean isSelfLoop;     // 是否为自环（分解反应）
+    // 使用 Supplier 支持懒求值与热加载（配置变更即时生效）
+    private final Supplier<Double> deltaH;              // 反应焓变 (kJ/mol)
+    private final Supplier<Double> deltaG;              // 标准吉布斯自由能变 (kJ/mol)
+    private final Supplier<Double> equilibriumConstant; // 298K 平衡常数
+    private final Supplier<Double> activationEnergy;    // 活化能 (kJ/mol)
+    private final Supplier<Double> preExponentialFactor;// 指前因子 A
+    private final Supplier<Double> gamePriorityBias;    // 游戏性优先级偏置（默认1.0）
+    private final Supplier<Double> minTemperature;      // 最低触发温度 (K)
+    // 电解所需电功（kJ/mol，蓝本 §17）：>0 表示该反应为电解反应，通电时 ΔG_eff = ΔG - W
+    private final Supplier<Double> electricalWorkPerMol;
+    // 动态优先级函数（蓝本 §5.2）：以容器状态为自变量的优先级偏置，为空则用 gamePriorityBias
+    private final Function<IChemicalContainer, Double> dynamicPriorityBias;
+    private final boolean isSelfLoop;                   // 是否为自环（分解反应）
 
     private ReactionRule(Builder builder) {
         this.id = builder.id;
         this.reactants = Map.copyOf(builder.reactants);
         this.products = Map.copyOf(builder.products);
         this.preconditions = Map.copyOf(builder.preconditions);
+
         this.deltaH = builder.deltaH;
         this.deltaG = builder.deltaG;
         this.equilibriumConstant = builder.equilibriumConstant;
@@ -41,6 +51,8 @@ public class ReactionRule {
         this.preExponentialFactor = builder.preExponentialFactor;
         this.gamePriorityBias = builder.gamePriorityBias;
         this.minTemperature = builder.minTemperature;
+        this.electricalWorkPerMol = builder.electricalWorkPerMol;
+        this.dynamicPriorityBias = builder.dynamicPriorityBias;
         this.isSelfLoop = builder.isSelfLoop;
     }
 
@@ -49,13 +61,13 @@ public class ReactionRule {
     public Map<IonType, Integer> getReactants() { return reactants; }
     public Map<IonType, Integer> getProducts() { return products; }
     public Map<IonType, Integer> getPreconditions() { return preconditions; }
-    public double getDeltaH() { return deltaH; }
-    public double getDeltaG() { return deltaG; }
-    public double getEquilibriumConstant() { return equilibriumConstant; }
-    public double getActivationEnergy() { return activationEnergy; }
-    public double getPreExponentialFactor() { return preExponentialFactor; }
-    public double getGamePriorityBias() { return gamePriorityBias; }
-    public double getMinTemperature() { return minTemperature; }
+    public double getDeltaH() { return deltaH.get(); }
+    public double getDeltaG() { return deltaG.get(); }
+    public double getEquilibriumConstant() { return equilibriumConstant.get(); }
+    public double getActivationEnergy() { return activationEnergy.get(); }
+    public double getPreExponentialFactor() { return preExponentialFactor.get(); }
+    public double getGamePriorityBias() { return gamePriorityBias.get(); }
+    public double getMinTemperature() { return minTemperature.get(); }
     public boolean isSelfLoop() { return isSelfLoop; }
 
     /**
@@ -77,55 +89,65 @@ public class ReactionRule {
     public double calculateRateConstant(double temperatureKelvin) {
         if (temperatureKelvin <= 0) return 0;
         double R = 8.314; // J/(mol·K)
-        return preExponentialFactor * Math.exp(-activationEnergy * 1000 / (R * temperatureKelvin));
+        return preExponentialFactor.get() * Math.exp(-activationEnergy.get() * 1000 / (R * temperatureKelvin));
     }
 
     /**
-     * 计算当前温度下的实际平衡常数 K
-     * 使用范特霍夫方程：ln(K/K°) = -ΔH/R * (1/T - 1/298)
+     * 计算当前温度下的实际平衡常数 K。
+     * 电解反应（W>0）通电时：K 由 ΔG_eff 决定（电功等效于把平衡推向产物）。
+     * 其余情况：范特霍夫方程 ln(K/K°) = -ΔH/R * (1/T - 1/298)。
      */
-    public double calculateEquilibriumConstant(double temperatureKelvin) {
-        if (temperatureKelvin <= 0) return 0;
+    public double calculateEquilibriumConstant(double temperatureKelvin, IChemicalContainer container) {
+        double work = electricalWorkPerMol.get();
+        if (work > 0 && container.isElectricallyPowered()) {
+            double R = 8.314;
+            double deltaGEff = deltaG.get() - work;
+            return Math.exp(-deltaGEff * 1000 / (R * temperatureKelvin));
+        }
+
+        double rawEq = equilibriumConstant.get();
+        if (temperatureKelvin <= 0) {
+            Main.LOGGER.warn("[Engine] calculateEquilibriumConstant: temperature {} <= 0, returning 0",
+                    temperatureKelvin);
+            return 0;
+        }
         double R = 8.314;
-        double exponent = -deltaH * 1000 / R * (1.0 / temperatureKelvin - 1.0 / 298.0);
-        return equilibriumConstant * Math.exp(exponent);
+        double exponent = -deltaH.get() * 1000 / R * (1.0 / temperatureKelvin - 1.0 / 298.0);
+        return rawEq * Math.exp(exponent);
     }
 
     /**
-     * 计算反应商 Q
-     * Q = ∏[生成物]^ν / ∏[反应物]^ν
+     * 电解所需电功（kJ/mol），>0 表示该反应为电解反应
      */
-    public double calculateReactionQuotient(IChemicalContainer container) {
-        double numerator = 1.0;
-        double denominator = 1.0;
-        // 生成物
-        for (Map.Entry<IonType, Integer> entry : products.entrySet()) {
-            double conc = container.getAmount(entry.getKey());
-            numerator *= Math.pow(conc, entry.getValue());
-        }
-        // 反应物
-        for (Map.Entry<IonType, Integer> entry : reactants.entrySet()) {
-            double conc = container.getAmount(entry.getKey());
-            denominator *= Math.pow(conc, entry.getValue());
-        }
-        if (denominator < 1e-9) return Double.MAX_VALUE;
-        return numerator / denominator;
+    public double getElectricalWorkPerMol() { return electricalWorkPerMol.get(); }
+
+    /**
+     * 有效自由能变（蓝本 §17 电解）：ΔG_eff = ΔG - W。
+     * 电解反应（W>0）且容器通电时返回抵消后的值；否则返回原 ΔG。
+     */
+    public double getEffectiveDeltaG(IChemicalContainer container) {
+        double work = electricalWorkPerMol.get();
+        if (work <= 0 || !container.isElectricallyPowered()) return deltaG.get();
+        return deltaG.get() - work;
     }
 
     /**
      * 计算该反应在当前容器状态下的“优先级评分”
-     * Score = (-ΔG / Ea) * gamePriorityBias
-     * 用于竞争反应排序
+     * Score = (-ΔG_eff / Ea) * 温度修正 * 偏置
+     * 电解反应（W>0）未通电时不可运行（返回 0）
      */
     public double calculatePriority(IChemicalContainer container) {
         double temp = container.getTemperature();
-        if (temp < minTemperature) return 0;
-        // 基础评分：热力学驱动力 / 动力学壁垒
-        double baseScore = (-deltaG) / (activationEnergy + ChemConfig.PRIORITY_EPSILON.get());
+        if (temp < minTemperature.get()) return 0;
+        // 电解反应未通电时不可运行
+        if (electricalWorkPerMol.get() > 0 && !container.isElectricallyPowered()) return 0;
+        // 基础评分：热力学驱动力（有效自由能）/ 动力学壁垒
+        double baseScore = (-getEffectiveDeltaG(container)) / (activationEnergy.get() + ChemConfig.PRIORITY_EPSILON.get());
         // 温度修正：温度越高，动力学因素权重越大
         double tempModifier = 1.0 +
                 ChemConfig.PRIORITY_TEMPERATURE_MODIFIER.get() * (temp - 298.0) / ChemConfig.PRIORITY_TEMPERATURE_REFERENCE.get();
-        return baseScore * tempModifier * gamePriorityBias;
+        double bias = dynamicPriorityBias != null ? dynamicPriorityBias.apply(container) : gamePriorityBias.get();
+        return baseScore * tempModifier * bias;
     }
 
     @Override
@@ -139,13 +161,15 @@ public class ReactionRule {
         private final Map<IonType, Integer> reactants = new HashMap<>();
         private final Map<IonType, Integer> products = new HashMap<>();
         private final Map<IonType, Integer> preconditions = new HashMap<>();
-        private double deltaH = 0;
-        private double deltaG = 0;
-        private double equilibriumConstant = ChemConfig.DEFAULT_EQUILIBRIUM_CONSTANT.get();
-        private double activationEnergy = ChemConfig.DEFAULT_ACTIVATION_ENERGY.get();
-        private double preExponentialFactor = ChemConfig.DEFAULT_PRE_EXPONENTIAL_FACTOR.get();
-        private double gamePriorityBias = 1.0;
-        private double minTemperature = ChemConfig.DEFAULT_MIN_TEMPERATURE.get();
+        private Supplier<Double> deltaH = () -> 0.0;
+        private Supplier<Double> deltaG = () -> 0.0;
+        private Supplier<Double> equilibriumConstant = ChemConfig.DEFAULT_EQUILIBRIUM_CONSTANT;
+        private Supplier<Double> activationEnergy = ChemConfig.DEFAULT_ACTIVATION_ENERGY;
+        private Supplier<Double> preExponentialFactor = ChemConfig.DEFAULT_PRE_EXPONENTIAL_FACTOR;
+        private Supplier<Double> gamePriorityBias = () -> 1.0;
+        private Supplier<Double> minTemperature = ChemConfig.DEFAULT_MIN_TEMPERATURE;
+        private Supplier<Double> electricalWorkPerMol = () -> 0.0;
+        private Function<IChemicalContainer, Double> dynamicPriorityBias = null;
         private boolean isSelfLoop = false;
 
         public Builder(ResourceLocation id) {
@@ -167,14 +191,105 @@ public class ReactionRule {
             return this;
         }
 
-        public Builder deltaH(double val) { this.deltaH = val; return this; }
-        public Builder deltaG(double val) { this.deltaG = val; return this; }
-        public Builder equilibriumConstant(double val) { this.equilibriumConstant = val; return this; }
-        public Builder activationEnergy(double val) { this.activationEnergy = val; return this; }
-        public Builder preExponentialFactor(double val) { this.preExponentialFactor = val; return this; }
-        public Builder gamePriorityBias(double val) { this.gamePriorityBias = val; return this; }
-        public Builder minTemperature(double val) { this.minTemperature = val; return this; }
+        public Builder deltaH(double val) { this.deltaH = () -> val; return this; }
+        public Builder deltaG(double val) { this.deltaG = () -> val; return this; }
+        public Builder equilibriumConstant(double val) { this.equilibriumConstant = () -> val; return this; }
+        public Builder activationEnergy(double val) { this.activationEnergy = () -> val; return this; }
+        public Builder preExponentialFactor(double val) { this.preExponentialFactor = () -> val; return this; }
+        public Builder gamePriorityBias(double val) { this.gamePriorityBias = () -> val; return this; }
+        public Builder minTemperature(double val) { this.minTemperature = () -> val; return this; }
+
+        /**
+         * 设置动态优先级函数（蓝本 §5.2 浓度依赖反应）。
+         * 以容器当前状态为自变量返回偏置系数，用于竞争反应按浓度选择主导路径。
+         */
+        public Builder dynamicPriorityBias(Function<IChemicalContainer, Double> fn) {
+            this.dynamicPriorityBias = fn;
+            return this;
+        }
+
+        /**
+         * 设置电解所需电功（kJ/mol，蓝本 §17）。>0 表示该反应为电解反应，
+         * 通电时引擎以 ΔG_eff = ΔG - W 参与优先级与平衡计算，并按 Δξ 消耗电功。
+         */
+        public Builder electricalWorkPerMol(double val) {
+            this.electricalWorkPerMol = () -> val;
+            return this;
+        }
+
+        /**
+         * 自动以反应自由能作为理论最小电功（W = ΔG）。
+         * 适用于电解等非自发反应：通电后 ΔG_eff = 0（临界可驱动）。
+         */
+        public Builder electricalWorkComputed() {
+            this.electricalWorkPerMol = () -> deltaGOf(products) - deltaGOf(reactants);
+            return this;
+        }
+
+        /**
+         * 按能量守恒自动计算反应焓变：ΔH = ΣΔHf°(产物) - ΣΔHf°(反应物)
+         * 数据来源为 IonType 的生成焓，符合蓝本 §8.3 硬约束（禁止手填经验值）
+         */
+        public Builder deltaHComputed() {
+            this.deltaH = () -> deltaHOf(products) - deltaHOf(reactants);
+            return this;
+        }
+
+        /**
+         * 按能量守恒自动计算标准自由能变：ΔG = ΣΔGf°(产物) - ΣΔGf°(反应物)
+         */
+        public Builder deltaGComputed() {
+            this.deltaG = () -> deltaGOf(products) - deltaGOf(reactants);
+            return this;
+        }
+
+        private static double deltaHOf(Map<IonType, Integer> map) {
+            double sum = 0;
+            for (Map.Entry<IonType, Integer> e : map.entrySet()) {
+                sum += e.getKey().getFormationEnthalpy() * e.getValue();
+            }
+            return sum;
+        }
+
+        private static double deltaGOf(Map<IonType, Integer> map) {
+            double sum = 0;
+            for (Map.Entry<IonType, Integer> e : map.entrySet()) {
+                sum += e.getKey().getFormationGibbs() * e.getValue();
+            }
+            return sum;
+        }
+
         public Builder selfLoop(boolean val) { this.isSelfLoop = val; return this; }
+
+        // ====== 从配置读取（懒求值） ======
+        public Builder deltaHFromConfig(ForgeConfigSpec.DoubleValue config) {
+            this.deltaH = config::get;
+            return this;
+        }
+        public Builder deltaGFromConfig(ForgeConfigSpec.DoubleValue config) {
+            this.deltaG = config::get;
+            return this;
+        }
+        public Builder equilibriumConstantFromConfig(ForgeConfigSpec.DoubleValue config) {
+            this.equilibriumConstant = config::get;
+            return this;
+        }
+        public Builder activationEnergyFromConfig(ForgeConfigSpec.DoubleValue config) {
+            this.activationEnergy = config::get;
+            return this;
+        }
+        public Builder preExponentialFactorFromConfig(ForgeConfigSpec.DoubleValue config) {
+            this.preExponentialFactor = config::get;
+            return this;
+        }
+        public Builder gamePriorityBiasFromConfig(ForgeConfigSpec.DoubleValue config) {
+            this.gamePriorityBias = config::get;
+            return this;
+        }
+        public Builder minTemperatureFromConfig(ForgeConfigSpec.DoubleValue config) {
+            this.minTemperature = config::get;
+            return this;
+        }
 
         public ReactionRule build() {
             if (reactants.isEmpty() || products.isEmpty()) {

@@ -85,6 +85,9 @@ repositories {
         name = "Jared's maven"
         url = "https://maven.blamejared.com/"
     }
+    maven {
+        url "https://www.cursemaven.com"
+    }
     mavenCentral()
 }
 
@@ -109,6 +112,11 @@ dependencies {
 
     // Gson (JSON 处理)
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    // AE2 15.4.0 [FORGE] curseforge
+    // GuideME 20.1.13
+    implementation fg.deobf("curse.maven:guideme-1173950:7013686")
+    implementation fg.deobf("curse.maven:applied-energistics-2-223794:7148487")
 }
 
 tasks.named('processResources', ProcessResources).configure {

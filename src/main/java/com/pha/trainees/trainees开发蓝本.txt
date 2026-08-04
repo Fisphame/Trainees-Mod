@@ -1,206 +1,493 @@
-# 《 trainees 》模组化学引擎 —— 终极开发蓝本（Forge 1.20.1 / Java）
+# 《 trainees 》模组化学引擎 —— 终极开发蓝本（修订版）
 
-**版本号**：v1.0-Architecture
+**版本号**：v2.0-Architecture
 **对应环境**：Minecraft 1.20.1，Forge 47.4.10，IDEA，Git
-**核心设计哲学**：**规则驱动（Rule-Driven）** 取代 **配方驱动（Recipe-Driven）**，实现“自由混合、动态平衡”的无机及官能团级有机化学模拟。
+**核心设计哲学**：**规则驱动（Rule-Driven）** 取代 **配方驱动（Recipe-Driven）**，实现“自由混合、动态平衡”的化学模拟。
 
----
 
 ## 第一部分：核心数据模型（The Data Layer）
 
 ### 1.1 节点（Vertex）：粒子类型（`IonType`）
+
 - **定义**：代表一种具体的化学实体（离子、分子、原子或官能团占位符）。
 - **核心属性**：
-  - `ResourceLocation id`（唯一标识，如 `trainees:chloride`）。
+  - `ResourceLocation id`（唯一标识，如 `trainees:h_plus`、`trainees:na_1`）。
   - `Phase phase`（枚举：`GAS`、`LIQUID`、`AQUEOUS`、`SOLID`）。
   - `double molarMass`（g/mol）。
   - `double specificHeat`（J/(mol·K)）。
   - `double formationEnthalpy`（ΔHf°，kJ/mol）。
   - `double formationGibbsEnergy`（ΔGf°，kJ/mol）。
   - `int toxicityLevel`（0~3，用于中毒判定）。
-  - `int flameColor`（ARGB 颜色值，用于焰色反应）。
-  - `Set<Tag> tags`（**有机扩展预留**：如 `ALCOHOL`、`CARBOXYLIC_ACID`）。
-- **注册方式**：`DeferredRegister` 静态注册（无机 & 常见有机物）。
+  - `int flameColor`（ARGB 颜色值，用于焰色反应和气体颜色）。
+  - `Set<ResourceLocation> tags`（有机扩展预留：`ALCOHOL`、`CARBOXYLIC_ACID`，与代码一致）。
+- **命名规范**：
+  - 金属离子：`Na_1`、`Fe_2`、`Fe_3`、`Cu_1`、`Cu_2`（正1价金属写作 `_1`，正2价及以上写作 `_[价数]`）。
+  - 非金属离子：`H_plus`、`OH_minus`、`Cl_minus`、`SO4_2minus`（n=1 时写作 `_plus/_minus`，n≠1 时写作 `_[价数]minus`）。
+  - 特殊：铵根写作 `NH4_plus`。
+  - 分子/气体/固体：化学式直接作为 ID（如 `hcl`、`h2o`、`nacl`、`nacl_molten`）。
+- **注册方式**：静态注册于 `ModChemistry.ModIons`（静态字段 + `ALL_IONS` 列表，非 Forge `DeferredRegister`）。
+- **物态区分**：同一物质的不同物态（固/液/气/熔融/水溶液）注册为**完全独立**的节点，因为其热力学参数、活度计算规则完全不同。
+- **强电解质处理**：在水溶液中**拆分为独立的水合离子**（如 NaCl → Na⁺ + Cl⁻），而非保留分子态。这使引擎能准确捕捉“自由离子反应”的本质。
 
 ### 1.2 有向边（Directed Edge）与反应规则对象（`ReactionRule`）
+
 - **边（Edge）**：仅存储起点（`IonType source`）和终点（`IonType target`），以及一个指向 `ReactionRule` 的引用。
 - **规则对象（Rule）**：这是“权重”的真正载体，包含：
-  - **反应物（Reactants）**：`Map<IonType, Integer> exactReactants`（精确匹配，用于无机）。
-  - **标签反应物（Tag Reactants）**：`Map<Tag, Integer> tagReactants`（有机匹配，只要有该标签即可）。
+  - **反应物（Reactants）**：`Map<IonType, Integer> exactReactants`（精确匹配）。
   - **生成物（Products）**：`Map<IonType, Integer>`。
-  - **前置条件（Preconditions）**：`Map<IonType, Integer>`（检测存在，但不消耗，如催化剂 MnO₂）。
-  - **热力学锚点**：`double deltaH`（反应焓变）、`double deltaG`（标准自由能变）、`double equilibriumConstantK`（298K 平衡常数）。
-  - **动力学参数**：`double activationEnergy`（Ea，kJ/mol）、`double preExponentialFactor`（指前因子 A）。
-  - **游戏性调参**：`double gamePriorityBias`（默认 1.0，用于手动调整竞争倾向）。
-  - **环境要求**：`double minTemperature`（最低触发温度）。
-- **数据约束**：`deltaH` 和 `deltaG` **必须**由基础物质的生成焓/生成能相减得出，**禁止**手填经验值以保证能量守恒。
+  - **前置条件（Preconditions）**：`Map<IonType, Integer>`（检测存在但不消耗，如催化剂 MnO₂）。
+  - **热力学锚点**：`Supplier<Double> deltaH`、`Supplier<Double> deltaG`、`Supplier<Double> equilibriumConstantK`（使用 `Supplier` 实现懒加载和热更新）。
+  - **动力学参数**：`Supplier<Double> activationEnergy`、`Supplier<Double> preExponentialFactor`（同样使用 `Supplier`）。
+  - **游戏性调参**：`Supplier<Double> gamePriorityBias`（用于手动调整竞争倾向）。
+  - **环境要求**：`Supplier<Double> minTemperature`（最低触发温度）。
+  - **自环标记**：`boolean isSelfLoop`（区分分解反应）。
+- **`Supplier` 设计**：所有 `double` 参数均使用 `Supplier<Double>` 包装，支持直接从 `ChemConfig` 读取或固定数值。这样既实现了**配置热加载**（修改配置后立即生效），又保证了注册阶段的启动安全（配置加载前不会触发 `.get()`）。
 
 ### 1.3 反应图（`ReactionGraph`）
-- 底层结构：`Map<IonType, List<ReactionEdge>> adjacencyMap`（邻接表）。
-- 全局单例，在 `CommonSetup` 事件中由 `DataGenerator` 构建并加载。
 
----
+- 底层结构：`Map<IonType, List<ReactionEdge>> adjacencyMap`（邻接表）。
+- 全局单例 `getInstance()`。
+- 核心方法：
+  - `addEdge(IonType source, IonType target, ReactionRule rule)`：添加单条有向边。
+  - `addBidirectionalEdges(IonType a, IonType b, ReactionRule rule)`：添加双向边（复分解/中和反应）。
+  - `getEdgesFrom(IonType source)`：获取从某节点出发的所有边。
+- **自环去重**：添加自环时检查是否已存在同规则自环，避免重复。
+
 
 ## 第二部分：反应图绘制铁律（The Drawing Rules）
 
 | 反应类型 | 绘制规则 | 示例 | 备注 |
 | :--- | :--- | :--- | :--- |
-| **双反应物（A+B→...）** | 画双向边：`A→B` 和 `B→A` | `Ag⁺ + Cl⁻ → AgCl` | 确保任意添加顺序均触发 |
-| **三反应物及以上（A+B+C→...）** | 完全触发矩阵：在所有反应物间两两双向（n×(n-1)条） | 制碱法（4种反应物）：12条边 | 每条边指向同一个 `ReactionRule` 实例（共享） |
-| **分解反应（A→B+C）** | 画自环：`A→A` | `CaCO₃→CaO+CO₂` | **仅由 Tick 轮询驱动**，非事件驱动 |
+| **双反应物（A+B→...）** | 画双向边：`A→B` 和 `B→A` | `H⁺ + OH⁻ → H₂O` | 确保任意添加顺序均触发 |
+| **三反应物及以上（A+B+C→...）** | 完全触发矩阵：在所有反应物间两两双向（n×(n-1)条） | 制碱法（4种反应物）：12条边 | 每条边指向同一个 `ReactionRule` 实例 |
+| **分解反应（A→B+C）** | 画自环：`A→A` | `H₂O₂ → H₂O + O₂` | **仅由 Tick 轮询驱动** |
 | **可逆反应** | 正、逆视为两个独立 `ReactionRule`，各自绘制子图 | `N₂O₄ ⇌ 2NO₂` | 热力学（Q 与 K）自动决定方向 |
-| **催化加速（不消耗）** | 为同一变化建立两条竞争自环：高Ea（无催化剂） + 低Ea（带`Preconditions`） | H₂O₂ 分解（MnO₂催化） | 引擎评分自动选择低Ea路径 |
+| **催化加速（不消耗）** | 同一自环反应注册两条竞争规则：高Ea（无催化剂）+ 低Ea + Preconditions（有催化剂） | H₂O₂ 分解（MnO₂催化） | 引擎按优先级评分自动选择路径 |
 
----
 
 ## 第三部分：引擎调度机制（The Engine Core）
 
 ### 3.1 双模式驱动（Dual-Mode Scheduling）
+
 | 模式 | 触发源 | 处理范围 | 频次 | 防崩溃策略 |
 | :--- | :--- | :--- | :--- | :--- |
-| **事件驱动（Event-Driven）** | 玩家倾倒 / 管道输入 | **非自环** 的多反应物反应 | 即时（入队） | **反应队列**（每 Tick 限 10 次连锁） |
-| **Tick 轮询（Polling）** | 容器定时扫描（每 5 Tick） | **自环（分解）** + **挂起规则重检** | 固定间隔 | 频率可调（配置 `pollingInterval`） |
+| **事件驱动** | 玩家倾倒 / 管道输入 / 调试命令 | **非自环** 的多反应物反应 | 入队（1 Tick 延迟） | **反应队列**（每 Tick 限 10 次连锁） |
+| **Tick 轮询** | 容器定时扫描（每 5 Tick） | **自环（分解）** + **挂起规则重检** | 固定间隔 | 可配置频率 |
 
-### 3.2 关键防崩溃逻辑
-- **无限递归防护**：反应生成的产物不立即递归触发，而是存入 `ConcurrentLinkedQueue`，由下一 Tick 按序处理。
-- **平衡死区截断（Zeno's Paradox）**：若 `|Δξ| < 1e-6 mol` 或任一反应物存量 `< 1e-6 mol`，将该规则标记为 `BALANCED`，随后的 Tick 轮询跳过该规则，直至有新粒子入栈重置状态。
-- **挂起规则重检（Pending Rules）**：容器维护 `Set<ReactionRule> pendingRules`。事件驱动匹配失败但检测到部分反应物存在时，加入该集合。Tick 轮询时优先重检，避免多反应物因缺少最后一个组分而永久卡死。
+### 3.2 关键防崩溃与性能优化
 
----
+#### 3.2.1 无限递归防护（事件队列）
+反应生成的产物不立即递归触发，而是存入 `ConcurrentLinkedQueue<QueuedEntry>`（队列项携带**所属容器与离子**），由对应容器下一 Tick 按序处理。每 Tick 最多处理 10 个队列事件。
+**注意**：队列必须关联容器。多个容器同时存在时，若只存 `IonType`，离子会被错误的容器 tick 消费（跨容器污染），故每个队列项需同时持有 `container` 与 `ion`。
+
+#### 3.2.2 平衡死区截断（Zeno 悖论规避）
+若 `|Δξ| < 1e-6 mol` 或任一反应物存量 `< 1e-6 mol`，将该规则标记为 `BALANCED`，后续 Tick 轮询跳过该规则，直至新粒子入栈重置状态。
+
+#### 3.2.3 挂起规则重检（Pending Rules）
+容器维护 `Set<ReactionRule> pendingRules`。事件驱动匹配失败但检测到部分反应物存在时，加入该集合。Tick 轮询时优先重检这些规则，避免多反应物因缺少最后一个组分而永久卡死。
+
+#### 3.2.4 H⁺/OH⁻ 不挂起（特殊优化）
+H⁺ 和 OH⁻ 在无机化学中极其常见，但它们单独存在时不应导致大量规则被挂起。引擎在 `processTrigger` 中特殊处理：当 H⁺ 或 OH⁻ 作为触发源且反应物不齐全时，**不加入 PENDING_RULES**，避免队列污染。
+
+#### 3.2.5 产物入队优化
+生成产物时，只将**在图中存在出边**的离子加入 `PENDING_QUEUE`，避免 H₂O 等不参与后续反应的粒子产生无效处理。
+
+#### 3.2.6 重复触发防护
+`addIon` 方法提供 `triggerEngine` 参数（默认 `true`）。外部调用（玩家倒入、调试命令）触发引擎，内部调用（`executeRule` 生成产物）传入 `false` 并手动将产物加入 `PENDING_QUEUE`，防止同一离子被多次入队。
+
+### 3.3 引擎执行流程（`executeRule`）
+
+1. **前置检查**：温度、前置条件、反应物存量。`containsAll` 只检查反应物**种类存在**（非零量），不要求达到完整计量数——计量数 >1 的反应在存量不足完整计量数时仍可部分进行（消耗量由 Δξ 按存量缩放）。
+2. **计算反应商 Q**：`Q = ∏[生成物]^ν / ∏[反应物]^ν`。
+3. **计算平衡常数 K**：`K = K° × exp(-ΔH/R × (1/T - 1/298))`（范特霍夫方程）。
+4. **若 Q ≥ K**：标记为已平衡，跳过执行。
+5. **计算速率常数 k**：`k = A × exp(-Ea/(R×T))`（阿伦尼乌斯公式）。
+6. **计算正向速率**：`v_f = k × ∏[反应物]^ν`。
+7. **计算净速率**：`v_net = v_f × (1 - Q/K)`。
+8. **计算本 Tick 进度**：`Δξ = v_net × 0.05`。
+9. **进度截断**：若 `Δξ < EPSILON`，标记为已平衡，跳过。
+10. **平衡约束（防欧拉越界）**：高速反应（高温/高浓度）Δξ 可能一步冲过平衡（Q 越过 K）。按当前 Δξ 估算推进后的 `Q_after`，若 `Q_after > K` 则二分缩小 Δξ 使 `Q_after ≈ K`，保证不越过平衡点。
+11. **应用反应**：消耗反应物，生成产物。
+12. **热力学反馈**：`T += (-ΔH × Δξ) / C_total`（注意符号取反，放热升温）。
+13. **产物入队**：有出边的产物加入 `PENDING_QUEUE`（`triggerEngine=false`）。
+
 
 ## 第四部分：热力学与物理环境集成
 
 ### 4.1 温度（Temperature）闭环
-- **热容计算**：`C_total = Σ (n_i × c_i)`（摩尔热容累加）。
-- **环境换热**：`T += (hA × (T_env - T) / C_total) × Δt`（牛顿冷却定律，`Δt = 0.05s`）。
-- **反应热反馈**：执行反应后，`T += (ΔH × Δξ) / C_total`。
-- **速率修正**：`k = A × exp(-Ea / (R × T))`（阿伦尼乌斯）。
-- **平衡修正**：`K = K° × exp(-ΔH/R × (1/T - 1/298))`（范特霍夫方程）。
+
+#### 4.1.1 热容计算
+```
+C_total = Σ(n_i × c_i) + BEAKER_BASE_HEAT_CAPACITY（由材料决定）
+```
+烧杯基础热容通过 `ChemConfig.BEAKER_BASE_HEAT_CAPACITY` 配置（推荐 4000 J/K）。
+
+#### 4.1.2 环境换热（牛顿冷却定律）
+```
+ΔT = (hA × (T_env - T) / C_total) × 0.05
+```
+**重要**：`hA`（散热系数）由容器材料决定，通过 `ChemConfig.BEAKER_HEAT_TRANSFER_COEFFICIENT` 配置（推荐 2.0）。
+
+#### 4.1.3 反应热反馈
+```
+T += (-ΔH × Δξ) / C_total
+```
+**关键**：`-ΔH` 确保放热反应（ΔH < 0）使温度升高，吸热反应（ΔH > 0）使温度降低。
+
+#### 4.1.4 速率修正（阿伦尼乌斯）
+```
+k = A × exp(-Ea / (R × T))
+```
+温度越高，k 指数级增大。
+
+#### 4.1.5 平衡修正（范特霍夫）
+```
+K = K° × exp(-ΔH/R × (1/T - 1/298))
+```
+放热反应（ΔH < 0）升温使 K 减小，平衡逆向移动。
 
 ### 4.2 压强（Pressure）—— 仅限气相
-- **核心逻辑**：压强不改变 `Ea`，仅通过 **容器体积（`volume`）** 改变浓度 `[X] = n / V`。
-- **物态区分（Phase Enum）**：
+
+- 压强不改变 `Ea`，仅通过**容器体积（`volume`）** 改变浓度 `[X] = n / V`。
+- **物态区分**：
   - `GAS`：浓度 = `n / volume`（受压缩影响）。
   - `AQUEOUS`：浓度 = `n / fluidVolume`（受溶剂体积影响）。
   - `LIQUID` / `SOLID`：活度恒为 `1.0`（不参与速率方程浓度乘积）。
-- **平衡迁移**：根据 `Δn`（气体总摩尔数变化）自动遵循勒夏特列原理，由 Q 与 K 的比较自然驱动。
 
-### 4.3 催化剂（Catalyst）统一处理
-- **中间产物型**：拆分为多个基元反应，作为普通 `ReactionRule` 注册，引擎无感。
-- **加速型（不消耗）**：在 `ReactionRule` 中设置 `preconditions` 字段（如 `{MnO₂: 1}`），引擎在执行前检测容器内是否存在该物质（仅检测，不扣减）。
+### 4.3 温度异常处理
 
----
+- **最低温度保护**：`temperature = max(0, temperature)`，防止负温度。
+- **最高温度限制**：`MAX_SAFE_TEMPERATURE`（可配置），超过阈值触发警告。
+- **环境温度**：主世界默认 293K（20°C），随高度递减 0.6K/100m。
 
-## 第五部分：开放世界气体网格（Gas Grid Expansion）
 
-### 5.1 架构选择：放弃物理实体（Entity），采用网格场（Field）
-- **数据结构**：`Map<BlockPos, GasMixture>`（仅缓存已加载区块的网格）。
-- **GasMixture 内容**：`Map<IonType, Double> moles` + `double temperature`。
-- **扩散模拟**：菲克定律（Fick's Laws），每 Tick 向相邻 6 个方向迁移摩尔数 `Δn = D × (ΔC/Δx) × A × Δt`。
-- **性能保证**：O(网格数 × 6) 复杂度，无 N-Body 碰撞。
+## 第五部分：催化剂与复杂反应处理
 
-### 5.2 存档策略（Critical）
-- **烧杯容器**：使用 `ListTag` + `DoubleTag` 存储 `(ID, moles)` 对，**禁止**序列化整个 `IonType` 对象。
+### 5.1 催化剂（Catalyst）统一处理
+
+| 催化剂类型 | 处理方式 | 示例 |
+| :--- | :--- | :--- |
+| **中间产物型** | 拆分为多个基元反应，作为普通 `ReactionRule` 注册 | 总反应拆解为中间体生成与再生 |
+| **加速型（不消耗）** | 同一自环注册两条竞争规则：高Ea（无催化剂）+ 低Ea + Preconditions | H₂O₂ 分解（MnO₂催化） |
+
+### 5.2 复杂反应拟合（经验函数法）
+
+**场景**：硝酸浓度影响产物分布（如 Cu + HNO₃ 生成不同价态氮氧化物）。
+
+**解决方案**：创建多条竞争规则，每条规则绑定一个**以浓度为自变量的动态优先级函数**：
+
+```java
+// 规则 A（稀硝酸）：产物为 NO
+// 规则 B（浓硝酸）：产物为 NO₂
+// 在 calculatePriority 中根据 [HNO₃] 动态调整 scoreBias
+double scoreBias_NO = 1.0 / (1.0 + concentration);
+double scoreBias_NO2 = concentration / (concentration + 1.0);
+```
+
+**核心思想**：不拆解基元反应（会导致参数爆炸），而是用**经验函数拟合**产物分布，由引擎的竞争排序自动选择主导路径。
+
+
+## 第六部分：容器参数由材料决定（难度与科技树解耦）
+
+### 6.1 设计原则
+
+| 参数 | 是否由配置决定 | 是否由材料决定 | 说明 |
+| :--- | :--- | :--- | :--- |
+| **安全温度上限** | ❌ | ✅ | 玻璃烧杯 1800K → 陶瓷坩埚 2200K → 合金反应釜 2500K |
+| **散热系数（hA）** | ❌ | ✅ | 玻璃 0.3 → 陶瓷 0.2 → 金属 0.5 → 合金 0.35 |
+| **基础热容** | ❌ | ✅ | 玻璃 50 J/K → 陶瓷 80 J/K → 合金 180 J/K |
+| **环境温度** | ❌ | ✅ | 跟随生物群系，不配置 |
+| **反应动力学参数** | ❌ | ✅ | 化学规律客观，不随难度变化 |
+| **资源获取效率** | ✅ | ❌ | 矿石有效成分比例随难度变化 |
+| **污染扩散速度** | ✅ | ❌ | 环境压力随难度变化 |
+| **能源效率** | ✅ | ❌ | 机器耗电/发电随难度变化 |
+
+### 6.2 科技树设计（六阶段工业进化路线）
+
+| 阶段 | 核心能量 | 关键资源 | 核心产物 | 容器材料 |
+| :--- | :--- | :--- | :--- | :--- |
+| **0. 石器时代** | 原版熔炉 | 天然金属 | 铁锭 | — |
+| **1. 热力启蒙** | 热工高炉（1200°C） | 海水、锡矿、硫磺 | 青铜、粗盐、盐酸 | 玻璃烧杯 |
+| **2. 湿法冶金** | 水车/熔炉阵列 | 硫化铜矿、石灰石 | 硫酸、纯铜、SO₂ | 玻璃烧杯 |
+| **3. 钢铁时代** | 焦炭高炉（1600°C） | 磁铁矿、锰矿、铬矿 | 钢、纯碱、硅铁 | 陶瓷坩埚 |
+| **4. 电气时代** | 蒸汽轮机发电 | 铝土矿、磷矿 | 铝、烧碱、氯气 | 铁质反应釜 |
+| **5. 石化时代** | 裂化塔（热裂解） | 原油、天然气 | 聚乙烯、电木 | 合金反应釜 |
+| **6. 信息时代** | 核能/聚变 | 钛铁矿、稀土、硅 | 钛金属、单晶硅 | 钨钢反应釜 |
+
+### 6.3 容器材料属性表
+
+| 材料 | 安全温度上限 | 散热系数（hA） | 基础热容 | 解锁阶段 |
+| :--- | :--- | :--- | :--- | :--- |
+| **玻璃烧杯** | 1800K | 0.30 | 50 J/K | 阶段 1 |
+| **陶瓷坩埚** | 2200K | 0.20 | 80 J/K | 阶段 2 |
+| **铁质反应釜** | 2400K | 0.50 | 120 J/K | 阶段 3 |
+| **合金反应釜** | 2500K | 0.35 | 180 J/K | 阶段 4 |
+| **钨钢反应釜** | 3200K | 0.25 | 240 J/K | 阶段 5 |
+
+> **当前状态注**：材料体系尚未落地。当前容器（玻璃烧杯）暂统一使用 §4.1 的配置默认值：安全温度上限 1800K、基础热容 4000 J/K、换热系数 2.0。本材料表为科技树落地后的目标值，届时将替换配置驱动。在完成反应系统理论验证前，不开发科技树。
+
+
+## 第七部分：难度系统（全局配置）
+
+### 7.1 难度设计原则
+
+- **不通过削弱玩家实现难度**，而是通过**结构性挑战**驱动。
+- **容器参数由材料决定**，不随难度变化。
+- **难度影响资源获取效率、污染压力、能源效率**三个维度。
+
+### 7.2 难度参数表
+
+| 参数 | 简单 | 普通 | 困难 | 说明 |
+| :--- | :--- | :--- | :--- | :--- |
+| `ORE_VALUABLE_RATIO_MULTIPLIER` | 1.2 | 1.0 | 0.7 | 矿石中有效成分占比乘数 |
+| `ORE_GANGUE_RATIO_MULTIPLIER` | 0.8 | 1.0 | 1.3 | 矿石中脉石占比乘数 |
+| `POLLUTION_DIFFUSION_SPEED` | 0.5 | 1.0 | 2.0 | 污染物扩散速度 |
+| `POLLUTION_TOXICITY_THRESHOLD` | 2.0 | 1.0 | 0.5 | 毒性触发阈值（值越小越易中毒） |
+| `ENERGY_CONSUMPTION_MULTIPLIER` | 0.7 | 1.0 | 1.5 | 机器耗电倍数 |
+| `ENERGY_GENERATION_MULTIPLIER` | 1.5 | 1.0 | 0.7 | 机器发电倍数 |
+
+### 7.3 严格映射（所有难度保持一致）
+
+| 参数 | 值 | 说明 |
+| :--- | :--- | :--- |
+| `BUCKET_TO_MOL_WATER` | 64 mol | 1 桶水对应 64 mol（64进制对齐） |
+| `SOLID_INGOT_TO_MOL` | 1 mol | 1 个金属锭对应 1 mol |
+| `SOLID_NUGGET_TO_MOL` | 1/9 mol | 1 个金属粒对应 1/9 mol（9粒=1锭） |
+| `MAX_MOLES_PER_COMPONENT` | 64 mol | 容器中单一成分上限 |
+| `MAX_TOTAL_MOLES` | 64 mol | 容器中总摩尔数上限 |
+
+### 7.4 难度指标计算器
+
+```java
+// 加权综合评分，0~100
+资源得分 = f(矿石有效成分比例, 脉石比例)
+污染得分 = f(扩散速度, 毒性阈值)
+能源得分 = f(耗电倍数, 发电倍数)
+难度指标 = (资源得分 × 权重1 + 污染得分 × 权重2 + 能源得分 × 权重3) / 总权重 × 100
+```
+
+
+## 第八部分：物质基类与混合物系统
+
+### 8.1 设计架构
+
+| 层级 | 存储内容 | 存储位置 | 说明 |
+| :--- | :--- | :--- | :--- |
+| **蓝图层** | 预定义的成分映射（如铁矿石含 Fe₂O₃ 80% + SiO₂ 15%） | 静态注册表 | 只读，共享数据 |
+| **物品层** | 蓝图 ID + 份数（如 `blueprint:"iron_ore_rich", units:1.0`） | 物品 NBT | 体积小，支持堆叠 |
+| **动态混合物** | 完整的 `Map<IonType, Double>` | 物品 NBT | 玩家配制的溶液 |
+
+### 8.2 物质蓝图（`SubstanceBlueprint`）
+
+- **定义**：预定义的成分映射，用于矿石、海水等大宗原材料。
+- **标记**：`valuableComponents`（有效成分）和 `gangueComponents`（脉石），用于难度缩放。
+- **创建**：`blueprint.createMaterial(units, valuableMultiplier, gangueMultiplier)`。
+
+### 8.3 物质物品（`SubstanceItem`）
+
+- **两种模式**：
+  1. **蓝图模式**：NBT 存储 `blueprint` ID + `units`，成分实时从蓝图计算。
+  2. **动态模式**：NBT 存储完整的 `composition` Map。
+- **显示**：Tooltip 显示成分列表、摩尔数和百分比。
+
+### 8.4 烧杯交互
+
+- 手持 `SubstanceItem` 右键烧杯 → 将所有成分加入烧杯。
+- 取液时返回 `IMaterial` 实例（按比例从烧杯中抽取）。
+
+
+## 第九部分：配置系统（ChemConfig）
+
+### 9.1 配置分类
+
+| 分类 | 说明 | 示例字段 |
+| :--- | :--- | :--- |
+| **难度** | 游戏难度档位 | `GAME_DIFFICULTY` |
+| **资源获取** | 矿石有效成分/脉石比例 | `ORE_VALUABLE_RATIO_MULTIPLIER` |
+| **污染** | 扩散速度、毒性阈值、植物惩罚 | `POLLUTION_DIFFUSION_SPEED` |
+| **能源** | 耗电/发电倍数 | `ENERGY_CONSUMPTION_MULTIPLIER` |
+| **严格映射** | 64进制对齐，不受难度影响 | `BUCKET_TO_MOL_WATER` |
+| **物理参数** | 由容器材料决定，保留默认值 | `MAX_SAFE_TEMPERATURE` |
+| **热源温度** | 原版方块温度 | `HEAT_SOURCE_FIRE` |
+| **反应默认值** | 未指定时的默认参数 | `DEFAULT_ACTIVATION_ENERGY` |
+| **优先级** | 反应评分计算参数 | `PRIORITY_EPSILON` |
+| **烧杯交互** | 默认添加量 | `BEAKER_DEFAULT_FLUID_ADD_AMOUNT` |
+| **难度权重** | 难度指标计算权重 | `WEIGHT_RESOURCE_GETTING` |
+
+### 9.2 难度预设值（`DifficultyPresets`）
+
+| 难度 | 资源乘数 | 污染参数 | 能源参数 |
+| :--- | :--- | :--- | :--- |
+| **简单** | 有效 1.2 / 脉石 0.8 | 扩散 0.5 / 毒性 2.0 | 耗电 0.7 / 发电 1.5 |
+| **普通** | 有效 1.0 / 脉石 1.0 | 扩散 1.0 / 毒性 1.0 | 耗电 1.0 / 发电 1.0 |
+| **困难** | 有效 0.7 / 脉石 1.3 | 扩散 2.0 / 毒性 0.5 | 耗电 1.5 / 发电 0.7 |
+
+### 9.3 GUI 配置界面
+
+- **触发位置**：游戏内 ESC 菜单（`PauseScreen`）。
+- **设计**：
+  - 顶部三个难度按钮（简单/普通/困难），点按切换预设。
+  - 实时显示难度指标（0~100）。
+  - 下方按分类显示所有可配置字段的滑动条。
+  - 当任一字段与预设不符时，自动切换为“自定义”难度。
+
+
+## 第十部分：开放世界气体网格
+
+### 10.1 架构选择
+
+- **数据结构**：`Map<BlockPos, GasMixture>`（仅缓存已加载区块）。
+- **GasMixture**：`Map<IonType, Double> moles` + `double temperature`。
+- **扩散模拟**：菲克定律（Fick's Laws），每 Tick 向相邻 6 个方向迁移摩尔数。
+
+### 10.2 存档策略（关键）
+
+- **烧杯容器**：使用 `ListTag` + `DoubleTag` 存储 `(ID, moles)` 对。
 - **开放网格**：**不主动存档**。区块卸载时，将气体数据向邻近网格加权扩散（抹平）后丢弃。区块重新加载时从零开始重新扩散。保证存档体积恒定。
 
-### 5.3 烧杯-网格交互接口（Leakage API）
-- 烧杯 `BlockEntity` 检测顶部是否为空气，若内部气体分压 > 外部，每 Tick 调用 `GasGridManager.addGas(pos.above(), ion, Δn)` 释放气体。
+### 10.3 烧杯-网格交互（Leakage API）
 
----
+烧杯检测顶部是否为空气，若内部气体分压 > 外部，每 Tick 调用 `GasGridManager.addGas(pos.above(), ion, Δn)` 释放气体。
 
-## 第六部分：游戏性表现与沉浸感（VFX / SFX / Hazards）
 
-### 6.1 视觉与听觉反馈矩阵
-| 表现内容 | 触发条件 | 实现路径（Forge Hook） |
+## 第十一部分：沉浸感与游戏性表现
+
+### 11.1 五重境体系
+
+| 重境 | 实现内容 | 触发条件 |
 | :--- | :--- | :--- |
-| **剧烈反应音效** | 放热强度 `\|ΔH\|×Δξ/Δt` > 阈值 | `PacketDistributor` 发送 `ClientboundSoundPacket` |
-| **气体颜色（烧杯）** | 顶空气体存在 | 叠加半透明 `FluidRenderer` 渲染层 |
-| **气体颜色（开放）** | 玩家进入气体网格 | 生成飘动 `Particle`，颜色加权平均 |
-| **化学中毒** | 有毒气体分压 > 阈值 | `LivingTickEvent` 施加 `POISON` + 自定义伤害 |
-| **缺氧窒息** | pO₂ < 0.1 atm | 清空氧气条 + 视野黑晕（Vignette）+ 心跳声 |
-| **热畸变（Heat Shimmer）** | 温度 > 80°C | `RenderLevelStageEvent` 叠加自定义着色器 |
-| **结露/冷霜** | 温度远低于露点 | 动态切换 `BakedModel` 覆层或粒子系统 |
+| **环境氛围** | 热畸变（着色器扭曲）、结露与冷霜（模型覆层） | 温度 > 80°C / 远低于露点 |
+| **物理触感** | 烫手/冰手反馈（伤害+屏幕效果）、阀门阻尼感（进度条） | 手持空手右键高温/低温容器 |
+| **化学奇观** | 化学发光（动态光照）、焰色反应（粒子颜色）、沸腾暴沸 | 反应放热强度、气体点燃、温度近沸点 |
+| **动态事件** | 热失控（正反馈爆炸）、管道泄漏（白色水雾粒子） | `dT/dt` 持续为正且加速、压力过高 |
+| **UI/UX** | 分析护目镜（AR 数据浮窗）、工业仪表盘（指针旋转） | 佩戴物品后准星对准容器 |
 
-### 6.2 高阶沉浸感（可选，已预留接口）
-- **热失控（Thermal Runaway）**：检测 `dT/dt` 持续为正且加速，触发爆炸与焦黑方块痕迹。
-- **AR 护目镜 HUD**：实现 `RenderGameOverlayEvent`，显示准星所对准容器的温度/压强/组分。
+### 11.2 性能节流（LOD）
 
-### 6.3 性能节流（LOD）
 - 音效/粒子仅作用于距离玩家 64 格以内的对象。
 - 同容器音效最短间隔 1 秒；粒子频率与浓度挂钩。
 
----
 
-## 第七部分：有机化学扩展路径（官能团级别）
+## 第十二部分：有机化学扩展路径
 
-### 7.1 核心改动：引入标签系统（Tag System）
-- 为 `IonType` 增加 `Set<ResourceLocation> tags` 字段（如 `trainees:alcohol`、`trainees:carboxylic_acid`）。
+### 12.1 核心改动：标签系统（Tag System）
+
+- 为 `IonType` 增加 `Set<ResourceLocation> tags` 字段（如 `trainees:alcohol`）。
 - `ReactionRule` 新增字段：`Map<Tag, Integer> tagReactants`（与 `exactReactants` 并存）。
 
-### 7.2 匹配逻辑升级（兼容并包）
+### 12.2 匹配逻辑
+
 ```java
-// 伪代码：引擎匹配顺序
-1. 检查 exactReactants（精确匹配，原有逻辑）。
+1. 检查 exactReactants（精确匹配，无机反应）。
 2. 检查 tagReactants：遍历容器中所有粒子，若任意粒子包含指定 Tag 且累计摩尔数足够，则匹配成功。
 3. 若均满足，执行反应。
 ```
 
-### 7.3 产物生成策略
+### 12.3 产物生成
+
 - **固定产物**：直接生成具体节点（如“乙酸乙酯”）。
-- **动态模板（可选高级）**：利用 `ProductInheritance` 规则，将反应物中的碳链继承给产物（需配合字符串替换引擎，初期可暂不实现，直接注册 C1~C8 常见有机物节点）。
+- **动态模板**：利用 `ProductInheritance` 规则，将反应物中的碳链继承给产物（配合字符串替换引擎）。
 
----
 
-## 第八部分：数据生成器（DataGen）策略
+## 第十三部分：数据生成器策略
 
-### 8.1 人工输入（最小化）
+### 13.1 人工输入（最小化）
+
 - 仅手写约 200 种基础物质的物理属性（比热、ΔHf°、ΔGf°、摩尔质量、毒性、颜色）。
 - 预定义基团（Group）：`ACIDS`、`BASES`、`HALIDES`、`ALCOHOLS_C1_TO_C8` 等。
 
-### 8.2 自动生成规则（循环嵌套）
-- 遍历基团组合，为每一对生成标准的 `ReactionRule`，并自动调用 `graph.addBidirectionalEdges(source, target, rule)` 完成双向边的注册。
-- 为所有分解反应自动生成自环边（利用基团内的单物质列表）。
-- 所有催化反应（如 H₂O₂ 分解）单独定义模板，复制两份（有/无催化剂）并分别设置不同的 `Ea` 和 `preconditions`。
+### 13.2 自动生成规则（循环嵌套）
 
-### 8.3 能量守恒保障（硬约束）
-- **严格禁止**在 JSON/代码中直接给 `deltaH` 和 `deltaG` 赋值。
+- 遍历基团组合，为每一对生成标准的 `ReactionRule`，并自动调用 `graph.addBidirectionalEdges` 完成双向边注册。
+- 为所有分解反应自动生成自环边。
+- 催化反应模板复制两份（有/无催化剂），分别设置不同 `Ea` 和 `preconditions`。
+
+### 13.3 能量守恒保障（硬约束）
+
+- **严格禁止**在代码中直接给 `deltaH` 和 `deltaG` 赋值。
 - 必须通过 `ΔH = Σ(ΔHf°_products) - Σ(ΔHf°_reactants)` 由生成器计算得出，杜绝刷能漏洞。
 
----
 
-## 第九部分：性能基线、存档与调试
+## 第十四部分：性能基线、存档与调试
 
-### 9.1 性能预估
+### 14.1 性能预估
+
 - 单容器（50 种离子）：< 0.1ms / Tick。
-- 开放网格（1000 个格子扩散）：< 1ms / Tick（菲克定律 O(n)）。
+- 开放网格（1000 个格子扩散）：< 1ms / Tick。
 
-### 9.2 调试工具
+### 14.2 调试工具
+
+- **调试命令**：`/chemtester add <ionId> <moles>`（向准星对准的烧杯添加离子）、`/chemtester info`（查看烧杯状态）、`/chemtester clear`（清空烧杯）。
+- **命令权限**：仅 OP/创造模式玩家可用（`requires(source -> source.hasPermission(2))`）。
 - **环形缓冲区**：引擎维护最近 20 条反应记录（执行规则 + 转化量）。
-- **开发命令**：`/chemistry debug`（查看容器状态）、`/chemistry last`（查看最近反应）。
 
-### 9.3 可配置开关（尊重玩家硬件）
-- 配置文件提供：`enableHeatShimmer`、`enableGasParticles`、`enableThermalRunaway`、`pollingInterval` 等选项。
+### 14.3 可配置开关
 
----
+配置文件提供：`enableHeatShimmer`、`enableGasParticles`、`enableThermalRunaway`、`pollingInterval` 等选项。
 
-## 第十部分：开发路线图（建议编码顺序）
 
-| 阶段 | 核心任务 | 关键产出物 |
-| :--- | :--- | :--- |
-| **Phase 1** | 数据模型搭建 | `IonType` 注册表、`ReactionRule`、`ReactionGraph`、`Phase` 枚举。 |
-| **Phase 2** | 容器与接口 | `IChemicalContainer` 接口、`ContainerEntity`（烧杯基础功能）。 |
-| **Phase 3** | 引擎核心 | `ReactionEngine`（事件队列、Tick 轮询、PendingRules、Epsilon 截断）。 |
-| **Phase 4** | 热力学集成 | 温度/压强计算、物态区分浓度、阿伦尼乌斯/范特霍夫修正。 |
-| **Phase 5** | 数据生成器 | 编写基团循环、自动生成规则 JSON（或内存注册）。 |
-| **Phase 6** | 开放网格 | `GasGridManager`（菲克扩散）、存档抹平策略、泄漏接口。 |
-| **Phase 7** | 游戏性表现 | 音效、粒子、中毒/缺氧判定、护目镜 HUD。 |
-| **Phase 8** | 有机扩展（标签） | 为 `IonType` 增加 `tags` 字段，升级引擎匹配逻辑。 |
-| **Phase 9** | 优化与测试 | LOD 节流、环形缓冲区、配置开关落地。 |
+## 第十五部分：开发路线图
 
----
+| 阶段 | 核心任务 | 关键产出物 | 状态 |
+| :--- | :--- | :--- | :--- |
+| **Phase 1** | 数据模型搭建 | `IonType` 注册表、`ReactionRule`、`ReactionGraph`、`Phase` 枚举 | ✅ 已完成 |
+| **Phase 2** | 容器与接口 | `IChemicalContainer` 接口、`BeakerBlockEntity`（烧杯基础功能） | ✅ 已完成 |
+| **Phase 3** | 引擎核心 | `ReactionEngine`（事件队列、Tick轮询、PendingRules、Epsilon截断） | ✅ 已完成 |
+| **Phase 4** | 热力学集成 | 温度/压强计算、物态区分浓度、阿伦尼乌斯/范特霍夫修正 | ✅ 已完成 |
+| **Phase 5** | 物质基类系统 | `IMaterial`、`SubstanceBlueprint`、`SubstanceItem` | ✅ 已完成 |
+| **Phase 6** | 配置系统 | `ChemConfig`、难度预设、GUI 配置界面 | ✅ 已完成 |
+| **Phase 7** | 反应注册 | 中和、分解、沉淀、催化、可逆、多反应物、浓度依赖、电解（理论验证完成） | ✅ 已完成 |
+| **Phase 8** | 数据生成器 | 基团循环、自动生成规则 | ⬜ 进行中 |
+| **Phase 9** | 开放网格 | `GasGridManager`、菲克扩散、存档抹平策略、泄漏接口 | ⬜ 待开始 |
+| **Phase 10** | 游戏性表现 | 音效、粒子、中毒/缺氧判定、护目镜 HUD | ⬜ 待开始 |
+| **Phase 11** | 有机扩展（标签） | `IonType.tags`、`tagReactants`、`ProductInheritance` | ⬜ 待开始 |
+| **Phase 12** | 优化与测试 | LOD 节流、环形缓冲区、配置开关落地 | ⬜ 待开始 |
 
-## 第十一部分：蓝本总结
 
-本蓝本构建了一套 **“规则驱动、事件-轮询双模、图论承载、热力学闭环”** 的化学引擎。它规避了配方系统的僵硬性，通过 **有向图的触发语义**、**反应规则对象的完整封装**、**气相/液相/固相的物态区分**，以及 **标签系统对官能团的支持**，实现了从无机到官能团级有机的统一模拟。
+## 第十六部分：蓝本总结
 
-**此即终版开发蓝本。编码启动后，若遇到本蓝本未覆盖的边界情况，遵循“先补数据、后改架构、绝对不动核心图语义”的原则进行修复。**
+本蓝本构建了一套 **“规则驱动、事件-轮询双模、图论承载、热力学闭环”** 的化学引擎，并融合了以下关键设计：
+
+1. **科技树与难度解耦**：容器参数由材料决定，难度仅影响资源获取、污染和能源效率。
+2. **64进制对齐**：所有摩尔数映射（桶/锭/粒/容器上限）均为 64 的因数，与游戏堆叠机制完美契合。
+3. **Supplier 懒加载**：反应参数支持配置热加载，同时保证启动安全。
+4. **复杂反应拟合**：通过经验函数 + 竞争规则处理硝酸浓度等复杂场景，而非拆解基元反应。
+5. **物质基类系统**：蓝图（静态配方）+ 动态混合物（玩家配制）双模式，兼顾性能和灵活性。
+6. **沉浸感五重境**：从环境氛围到 UI/UX 的全方位感官反馈。
+
+**此即修订版终极开发蓝本。编码过程中，遵循“先补数据、后改架构、绝对不动核心图语义”的原则。**
+
+
+## 第十七部分：能源与流体开发计划（未来落地，当前不实现）
+
+> 本节为 2026-08-04 与作者讨论确定的未来开发计划。**当前阶段不实现**：先完成反应系统理论，再落地科技树、能源与流体桥接。同步记录于项目记忆 `development-plan`。
+
+### 17.1 双能源体系：魔力（魔法线）与电力（化学线）
+
+| 能源 | 所属玩法线 | 定位 | 存储接口 |
+| :--- | :--- | :--- | :--- |
+| **魔力（Mana）** | 魔法（祭坛为代表） | 增强层：基础配方免费，强力配方用魔力限制；提供强力物品的第二获取路径 | 独立 `IManaStorage`，形状对齐 `IEnergyStorage` |
+| **电力（Electricity）** | 化学（反应系统） | 做功：改变反应环境（升/降温）或作为电解前置；**不是反应驱动者** | 标准 `IEnergyStorage`（FE） |
+
+**魔力要点**
+- 存储方块独立于祭坛 4 个 KunAltar 子块（名称/表现形式待定）。
+- 来源串联养鸡资源循环（练习鸡/金鸡 → 提炼魔力），具体形式开发时定。
+- 魔力独立于化学理论，可并行开发。
+
+**电力要点**
+- 电加热/降温：通过 `addThermalEnergy(joules)`，FE↔焦耳换算。
+- 电解：`ReactionRule` 新增数据字段 `electricalWorkPerMol`（kJ/mol，由 `n·F·E` 折算），与 ΔH/ΔG 并列；运行时供电状态属容器 `IEnergyStorage`，**不进反应图**。
+- 引擎执行：规则 `electricalWorkPerMol > 0` 且容器带电 → `ΔG_eff = ΔG - electricalWorkPerMol` 参与 K 与优先级；按 Δξ 消耗 `electricalWorkPerMol × Δξ`。
+- 时序：引擎层电化学属理论，优先；机器发电/电耗属玩法，缓一缓。理论阶段用配置开关/调试命令提供无限电（不建发电方块）。
+
+### 17.2 流体兼容（化学线）
+
+- **映射（游戏优先统一）**：所有流体固定 mB↔mol 速率，默认 `64 mol / 1000mB`（与 §7.3 严格映射 `BUCKET_TO_MOL_WATER = 64` 一致）；摩尔质量、密度降为次要属性（展示/浮力/热学），**不参与换算**。
+- **气体表示**：气体可注册为 Forge 流体。兼容对象 = 反应容器粒子 ↔ Forge 流体（液/气方块）↔ 开放气体网格（§10）。实体化气体为旧化学遗留，保留但不扩展（性能）。
+- **桥梁**：`FluidIonMapper`（液体）扩展出气体版本；烧杯暴露 `IFluidHandler` 接入 Forge 流体系统。
+
+### 17.3 通用原则
+
+- 存储契约统一走标准能力（`IManaStorage` / `IEnergyStorage` / `IFluidHandler`），便于调试命令、AE2、管道互操作（`AbsorbBlockEntity` 为现成模板）。
+- 不破坏现有内容：魔力/电力均为加法层，不是卡点。
+- `IMachine` 当前为空标记接口，未来机器应暴露能量 + 流体能力。

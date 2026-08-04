@@ -41,36 +41,30 @@ public class SubstanceBlueprint {
     }
 
     /**
-     * 根据份数创建成分映射（带难度缩放）
+     * 根据份数创建成分映射（带难度缩放）。
+     * 每种成分的摩尔数 = 比例 × 每份总摩尔数 × 乘数 × 份数。
      * @param units 份数
      */
     public Map<IonType, Double> createComposition(double units) {
-        Map<IonType, Double> result = new HashMap<>();
         double valuableMultiplier = ChemConfig.ORE_VALUABLE_RATIO_MULTIPLIER.get();
         double gangueMultiplier = ChemConfig.ORE_GANGUE_RATIO_MULTIPLIER.get();
-        for (Map.Entry<IonType, Double> entry : composition.entrySet()) {
-            IonType ion = entry.getKey();
-            double baseRatio = entry.getValue();
-            double multiplier = valuableComponents.contains(ion) ? valuableMultiplier : gangueMultiplier;
-            result.put(ion, baseRatio * multiplier * units);
-        }
-        return result;
+        return createComposition(units, valuableMultiplier, gangueMultiplier);
     }
 
     /**
-     * 根据份数创建成分映射（带难度缩放）
+     * 根据份数创建成分映射（带难度缩放）。
+     * 每种成分的摩尔数 = 比例 × 每份总摩尔数 × 乘数 × 份数。
      * @param units 份数
-     * @param valuableMultiplier 有效成分乘数（从ChemConfig读取）
-     * @param gangueMultiplier 脉石乘数（从ChemConfig读取）
+     * @param valuableMultiplier 有效成分乘数
+     * @param gangueMultiplier 脉石乘数
      */
-    @Deprecated
     public Map<IonType, Double> createComposition(double units, double valuableMultiplier, double gangueMultiplier) {
         Map<IonType, Double> result = new HashMap<>();
         for (Map.Entry<IonType, Double> entry : composition.entrySet()) {
             IonType ion = entry.getKey();
             double baseRatio = entry.getValue();
             double multiplier = valuableComponents.contains(ion) ? valuableMultiplier : gangueMultiplier;
-            result.put(ion, baseRatio * multiplier * units);
+            result.put(ion, baseRatio * totalMolesPerUnit * multiplier * units);
         }
         return result;
     }

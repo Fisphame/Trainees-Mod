@@ -10,7 +10,6 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 
 public interface IHoverText {
@@ -29,6 +28,7 @@ public interface IHoverText {
     String Down = "--[ ↓ ]--";
     String Lose = "--?--";
     String Warn = "--- ! ---";
+    String K = "§k-------";
     MutableComponent SuccessC = Component.literal(Success).withStyle(ChatFormatting.GREEN);
     MutableComponent Success2C = Component.literal(Success2).withStyle(ChatFormatting.GREEN);
     MutableComponent FailC = Component.literal(Fail).withStyle(ChatFormatting.RED);
@@ -39,7 +39,7 @@ public interface IHoverText {
     MutableComponent DownC = Component.literal(Down);
     MutableComponent LoseC = Component.literal(Lose).withStyle(ChatFormatting.RED);
     MutableComponent WarnC = Component.literal(Warn);
-
+    MutableComponent KC = Component.literal(K);
 
     default void addHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
                               TooltipFlag flag, String id) {

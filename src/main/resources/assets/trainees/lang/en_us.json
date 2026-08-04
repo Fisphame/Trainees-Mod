@@ -55,6 +55,7 @@
   "block.trainees.myblock": "Block of Kun",
   "block.trainees.two_half_ingot_block": "Block of 2.5",
   "block.trainees.waxed_two_half_ingot_block": "Waxed Block of 2.5",
+  "block.trainees.anti_two_half_ingot_block": "Anti Block of 2.5",
   "block.trainees.auriversite_block": "Block of Auriversite",
   "block.trainees.selenaurite_ore": "Selenaurite Ore",
   "block.trainees.deepslate_selenaurite_ore": "Deepslate Selenaurite Ore",
@@ -193,6 +194,10 @@
   "hint.target_block_must_absorb_block_or_air_above": "Target block must be Absorb Block or Air above",
   "hint.altar_invalid_setting_canceled": "Altar is invalid, setting canceled",
   "hint.enter_drop_pos_setting_right_click_block_set_pos": "Enter drop-pos setting: right-click block to set drop-pos",
+  "tooltip.trainees.tenebris_plume_clarion": "§lSummon Clarion",
+  "tooltip.trainees.tenebris_plume_clarion.2": "Play at night to summon what is behind...",
+  "message.trainees.tenebris_plume_clarion.too_dark": "The night is dark and full of terrors... It's not the right time.",
+  
   
   "enchantment.trainees.ten_thousand_sword": "Wanjian Guizong",
   "enchantment.trainees.sprint": "Sprint",
@@ -203,8 +208,10 @@
   "enchantment.trainees.lithe": "Lithe",
   
   "entity.trainees.kun_trainees": "Kun Chicken",
-  "entity.trainees.kun_anti": "Anti-fan",
+  "entity.trainees.kun_anti": "Anti Fan",
   "entity.trainees.gold_chicken": "Golden Chicken",
+  "entity.trainees.kun_anti_boss": "Behind the Anti",
+  
   
   
   "itemGroup.trainees.chemistry_tab": "Chemistry Lecture",

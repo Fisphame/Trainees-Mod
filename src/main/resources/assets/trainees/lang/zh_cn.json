@@ -196,6 +196,10 @@
   "hint.target_block_must_absorb_block_or_air_above": "目标方块必须是汲取方块或其上方为空气",
   "hint.altar_invalid_setting_canceled": "祭坛失效，配置取消",
   "hint.enter_drop_pos_setting_right_click_block_set_pos": "进入输出物品掉落位置配置模式，右键方块设置位置",
+  "tooltip.trainees.tenebris_plume_clarion": "§l召唤号角",
+  "tooltip.trainees.tenebris_plume_clarion.2": "在夜晚奏响，召唤幕后之物……",
+  "message.trainees.tenebris_plume_clarion.too_dark": "夜色漆黑，恐怖暗藏……还不是时候。",
+  
   
   "enchantment.trainees.ten_thousand_sword": "万剑归宗",
   "enchantment.trainees.sprint": "冲刺",
@@ -208,6 +212,8 @@
   "entity.trainees.kun_trainees": "练习鸡",
   "entity.trainees.kun_anti": "黑粉",
   "entity.trainees.gold_chicken": "金鸡",
+  "entity.trainees.kun_anti_boss": "幕后黑粉",
+  
   
   
   "itemGroup.trainees.chemistry_tab": "化学讲堂",
