@@ -1,5 +1,6 @@
 package com.pha.trainees.chemistry.particle;
 
+import com.pha.trainees.chemistry.util.IonDisplay;
 import com.pha.trainees.util.math.MathT;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +52,14 @@ public class IonType {
 
     public boolean isStableAt(double temperatureKelvin) {
         return MathT.isInInterval(temperatureKelvin, minStableTemp, maxStableTemp);
+    }
+
+    /**
+     * 化学式显示名（原子数下标、价态上标），用于指令回复与反应图等玩家可见文本。
+     * 例：so4_2minus → SO₄²⁻、h2o → H₂O、fe_3 → Fe³⁺
+     */
+    public String getDisplayName() {
+        return IonDisplay.format(id.getPath());
     }
 
     // 判断是否匹配标签（用于有机官能团匹配）

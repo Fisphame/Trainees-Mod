@@ -7,6 +7,7 @@ import com.pha.trainees.command.DebugCommand;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.event.*;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
+import com.pha.trainees.network.ModNetwork;
 import com.pha.trainees.registry.*;
 import com.pha.trainees.util.game.chemistry.ChemicalReaction;
 import com.pha.trainees.util.game.chemistry.ReactionConditions;
@@ -67,6 +68,7 @@ public class Main {
 //        ModChemistry.ModFluids.FLUIDS.register(bus);
 //        ModChemistry.ModFluids.FLUID_BLOCKS.register(bus);
         ModCommand.register();
+        ModNetwork.register();
         ebus.register(ModCommand.AskCommand.class);  // 注册命令
 //        bus.addListener(this::onClientSetup);
 

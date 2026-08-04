@@ -663,6 +663,17 @@ public class ModChemistry {
                 .build()
         );
 
+        public static final IonType SO3 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "so3"), Phase.GAS)
+                .molarMass(80.07)
+                .specificHeat(50.0)
+                .formationEnthalpy(-395.7)
+                .formationGibbs(-371.1)
+                .toxicityLevel(2)
+                .tag(IonTags.ACID)
+                .build()
+        );
+
         public static final IonType NH3 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "nh3"), Phase.GAS)
                 .molarMass(17.03)
@@ -1188,6 +1199,91 @@ public class ModChemistry {
                     .selfLoop(true)
                     .build();
             GRAPH.addEdge(ModIons.NaCl_MOLTEN, ModIons.NaCl_MOLTEN, naclElectrolysis);
+
+            // ====== 硫磺燃烧：S + O₂ → SO₂ ======
+            ReactionRule sulfurBurn = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "sulfur_burn"))
+                    .reactant(ModIons.SULFUR, 1)
+                    .reactant(ModIons.O2, 1)
+                    .product(ModIons.SO2, 1)
+                    .deltaHComputed()   // ΔH = -296.8 kJ（放热）
+                    .deltaGComputed()   // ΔG = -300.1 kJ（自发）
+                    .equilibriumConstant(1e20)  // 燃烧近乎完成
+                    .activationEnergy(40.0)
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.SULFUR, ModIons.O2, sulfurBurn);
+
+            // ====== 接触法：2SO₂ + O₂ ⇌ 2SO₃（可逆工业平衡） ======
+            ReactionRule so2ToSo3 = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "so2_to_so3"))
+                    .reactant(ModIons.SO2, 2)
+                    .reactant(ModIons.O2, 1)
+                    .product(ModIons.SO3, 2)
+                    .deltaHComputed()   // ΔH = -197.8 kJ（放热）
+                    .deltaGComputed()   // ΔG = -142 kJ（自发）
+                    .equilibriumConstant(10.0)     // 中等，可逆
+                    .activationEnergy(50.0)
+                    .preExponentialFactor(1e8)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.SO2, ModIons.O2, so2ToSo3);
+
+            ReactionRule so3ToSo2 = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "so3_to_so2"))
+                    .reactant(ModIons.SO3, 2)
+                    .product(ModIons.SO2, 2)
+                    .product(ModIons.O2, 1)
+                    .deltaHComputed()   // ΔG = +142 kJ（非自发，K_rev = 1/K_fwd）
+                    .deltaGComputed()
+                    .equilibriumConstant(0.1)      // 与正反应 K 互为倒数
+                    .activationEnergy(50.0)
+                    .preExponentialFactor(1e8)
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.SO3, ModIons.SO3, so3ToSo2);
+
+            // ====== 硫酸吸收：SO₃ + H₂O → H₂SO₄ ======
+            ReactionRule so3Absorb = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "so3_absorb"))
+                    .reactant(ModIons.SO3, 1)
+                    .reactant(ModIons.H2O, 1)
+                    .product(ModIons.H2SO4, 1)
+                    .deltaHComputed()   // ΔH = -132.5 kJ（放热）
+                    .deltaGComputed()   // ΔG = -81.8 kJ（自发）
+                    .equilibriumConstant(1e20)
+                    .activationEnergy(40.0)
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.SO3, ModIons.H2O, so3Absorb);
+
+            // ====== 电解水：2H₂O → 2H₂ + O₂（自环，需通电） ======
+            ReactionRule waterElectrolysis = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "water_electrolysis"))
+                    .reactant(ModIons.H2O, 2)
+                    .product(ModIons.H2, 2)
+                    .product(ModIons.O2, 1)
+                    .deltaHComputed()          // ΔH = +571.6 kJ（吸热）
+                    .deltaGComputed()          // ΔG = +474.2 kJ（非自发，需通电）
+                    .electricalWorkComputed()  // W = ΔG
+                    .activationEnergy(50.0)
+                    .preExponentialFactor(1e8)
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.H2O, ModIons.H2O, waterElectrolysis);
+
+            // ====== 合成盐酸：Cl₂ + H₂ → 2HCl ======
+            ReactionRule hclSynthesis = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "hcl_synthesis"))
+                    .reactant(ModIons.Cl2, 1)
+                    .reactant(ModIons.H2, 1)
+                    .product(ModIons.HCl, 2)
+                    .deltaHComputed()   // ΔH = -184.6 kJ（放热）
+                    .deltaGComputed()   // ΔG = -190.6 kJ（自发）
+                    .equilibriumConstant(1e20)
+                    .activationEnergy(50.0)
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.Cl2, ModIons.H2, hclSynthesis);
 
             Main.LOGGER.info("[Chemistry] Reaction graph ready: {} nodes, {} edges",
                     GRAPH.getAllNodes().size(), GRAPH.getAllEdges().size());

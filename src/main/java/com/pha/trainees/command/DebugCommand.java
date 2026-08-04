@@ -12,21 +12,30 @@ import com.pha.trainees.chemistry.block.BeakerBlock;
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
 import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.particle.IonType;
+import com.pha.trainees.chemistry.reaction.ReactionEdge;
+import com.pha.trainees.chemistry.reaction.ReactionGraph;
+import com.pha.trainees.network.ModNetwork;
+import com.pha.trainees.network.OpenGraphPacket;
 import com.pha.trainees.registry.ModChemistry.ModIons;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DebugCommand {
 
@@ -56,6 +65,9 @@ public class DebugCommand {
                 )
                 .then(Commands.literal("last")
                         .executes(DebugCommand::printRecentReactions)
+                )
+                .then(Commands.literal("graph")
+                        .executes(DebugCommand::openGraph)
                 )
         );
     }
@@ -181,7 +193,7 @@ public class DebugCommand {
         } else {
             for (var entry : beaker.getContents().entrySet()) {
                 context.getSource().sendSuccess(() ->
-                                Component.literal("  §f" + entry.getKey().getId().getPath() + "§7: §f" + DF.format(entry.getValue()) + " mol"),
+                                Component.literal("  §f" + entry.getKey().getDisplayName() + "§7: §f" + DF.format(entry.getValue()) + " mol"),
                         false
                 );
             }
@@ -218,6 +230,33 @@ public class DebugCommand {
                                 + " | heat=" + String.format("%.1f", r.heatKj()) + "kJ"), false);
             }
         }
+        return 1;
+    }
+
+    /**
+     * 把反应图发送到客户端打开可视化界面（趣味调试功能）
+     */
+    private static int openGraph(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        Player player = context.getSource().getPlayerOrException();
+        if (!(player instanceof ServerPlayer serverPlayer)) return 0;
+
+        List<ReactionEdge> edges = ReactionGraph.getInstance().getAllEdges();
+        Map<String, String> nodePhase = new HashMap<>();
+        List<String> edgeStrs = new ArrayList<>();
+        for (ReactionEdge e : edges) {
+            String src = e.getSource().getId().getPath();
+            String tgt = e.getTarget().getId().getPath();
+            nodePhase.putIfAbsent(src, e.getSource().getPhase().name());
+            nodePhase.putIfAbsent(tgt, e.getTarget().getPhase().name());
+            edgeStrs.add(src + ">" + tgt + ">" + e.getRule().getId().getPath());
+        }
+        List<String> nodeStrs = new ArrayList<>(nodePhase.size());
+        nodePhase.forEach((id, phase) -> nodeStrs.add(id + ">" + phase));
+
+        ModNetwork.get().send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                new OpenGraphPacket(nodeStrs, edgeStrs));
+        context.getSource().sendSuccess(
+                () -> Component.literal("§a反应图已发送（" + edges.size() + " 条边）"), true);
         return 1;
     }
 
