@@ -38,6 +38,7 @@ import net.minecraftforge.fluids.FluidUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BeakerBlock extends BaseEntityBlock {
@@ -170,8 +171,32 @@ public class BeakerBlock extends BaseEntityBlock {
             return InteractionResult.FAIL;
         }
 
-
-
+        // ====== 空瓶取液（返回 IMaterial 样本，按比例抽取，开发计划 §8.4） ======
+        if (heldItem.getItem() == Items.GLASS_BOTTLE) {
+            Map<IonType, Double> contents = beaker.getContents();
+            if (contents.isEmpty()) {
+                player.displayClientMessage(Component.literal("§7烧杯是空的"), true);
+                return InteractionResult.FAIL;
+            }
+            double total = contents.values().stream().mapToDouble(Double::doubleValue).sum();
+            double sampleTotal = Math.min(total, 1.0);
+            // 按比例抽取最多 1 mol 样本
+            Map<IonType, Double> sample = new HashMap<>();
+            for (Map.Entry<IonType, Double> e : contents.entrySet()) {
+                sample.put(e.getKey(), e.getValue() * (sampleTotal / total));
+            }
+            // 从烧杯移除样本量
+            for (Map.Entry<IonType, Double> e : sample.entrySet()) {
+                beaker.removeIon(e.getKey(), e.getValue());
+            }
+            ItemStack sampleItem = SubstanceItem.fromComposition(sample);
+            heldItem.shrink(1);
+            if (!player.getInventory().add(sampleItem)) {
+                player.drop(sampleItem, false);
+            }
+            player.displayClientMessage(Component.literal("§a取出一份样本（" + String.format("%.3f", sampleTotal) + " mol）"), true);
+            return InteractionResult.CONSUME;
+        }
 
         // ====== 处理物质基类物品 ======
         if (heldItem.getItem() instanceof SubstanceItem) {

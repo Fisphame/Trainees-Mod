@@ -3,6 +3,7 @@ package com.pha.trainees.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -27,8 +28,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.text.DecimalFormat;
@@ -68,6 +73,18 @@ public class DebugCommand {
                 )
                 .then(Commands.literal("graph")
                         .executes(DebugCommand::openGraph)
+                )
+                .then(Commands.literal("fluid")
+                        .then(Commands.literal("fill")
+                                .then(Commands.argument("mb", IntegerArgumentType.integer(1, 100000))
+                                        .executes(ctx -> fluidTest(ctx, true))
+                                )
+                        )
+                        .then(Commands.literal("drain")
+                                .then(Commands.argument("mb", IntegerArgumentType.integer(1, 100000))
+                                        .executes(ctx -> fluidTest(ctx, false))
+                                )
+                        )
                 )
         );
     }
@@ -257,6 +274,35 @@ public class DebugCommand {
                 new OpenGraphPacket(nodeStrs, edgeStrs));
         context.getSource().sendSuccess(
                 () -> Component.literal("§a反应图已发送（" + edges.size() + " 条边）"), true);
+        return 1;
+    }
+
+    /**
+     * 通过 IFluidHandler 能力测试烧杯流体桥接（fill/drain 水，开发计划 §17.2）
+     */
+    private static int fluidTest(CommandContext<CommandSourceStack> context, boolean fill) throws CommandSyntaxException {
+        Player player = context.getSource().getPlayerOrException();
+        BlockHitResult hit = getTargetBlock(player);
+        if (hit == null || !(player.level().getBlockEntity(hit.getBlockPos()) instanceof BeakerBlockEntity beaker)) {
+            context.getSource().sendFailure(Component.literal("§c请将准星对准一个烧杯"));
+            return 0;
+        }
+        int mb = IntegerArgumentType.getInteger(context, "mb");
+        IFluidHandler handler = beaker.getCapability(ForgeCapabilities.FLUID_HANDLER, null).orElse(null);
+        if (handler == null) {
+            context.getSource().sendFailure(Component.literal("§c烧杯没有流体能力"));
+            return 0;
+        }
+        double mbPerMol = 1000.0 / ChemConfig.BUCKET_TO_MOL_WATER.get();
+        if (fill) {
+            int filled = handler.fill(new FluidStack(Fluids.WATER, mb), IFluidHandler.FluidAction.EXECUTE);
+            context.getSource().sendSuccess(() -> Component.literal("§a灌入水 " + filled + " mB（"
+                    + String.format("%.3f", filled / mbPerMol) + " mol H₂O）"), true);
+        } else {
+            FluidStack drained = handler.drain(mb, IFluidHandler.FluidAction.EXECUTE);
+            context.getSource().sendSuccess(() -> Component.literal("§a抽出水 " + drained.getAmount() + " mB（"
+                    + String.format("%.3f", drained.getAmount() / mbPerMol) + " mol）"), true);
+        }
         return 1;
     }
 

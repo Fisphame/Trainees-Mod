@@ -6,10 +6,12 @@ import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
+import com.pha.trainees.chemistry.util.FluidIonMapper;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.registry.ModChemistry.ModIons;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -23,6 +25,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -31,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer {
+public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer, IFluidHandler {
 
     private static final double DEFAULT_TEMPERATURE = ChemConfig.DEFAULT_TEMPERATURE.get();
     private static final double DEFAULT_VOLUME = ChemConfig.DEFAULT_VOLUME.get();
@@ -410,5 +417,96 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
             balancedRules.clear();
             Main.LOGGER.debug("[Beaker] Balanced rules reset due to container change");
         }
+    }
+
+    // ==================== IFluidHandler（Forge 流体桥接，开发计划 §17.2） ====================
+
+    private final LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> this);
+
+    /** 1 mol 对应的 mB：1 桶(1000mB) = BUCKET_TO_MOL_WATER mol（严格映射） */
+    private static double mbPerMol() {
+        return 1000.0 / ChemConfig.BUCKET_TO_MOL_WATER.get();
+    }
+
+    @Override
+    public int getTanks() { return 1; }
+
+    @Override
+    public FluidStack getFluidInTank(int tank) {
+        IonType best = null;
+        double bestMoles = 0;
+        for (Map.Entry<IonType, Double> e : contents.entrySet()) {
+            if (FluidIonMapper.getFluidForIon(e.getKey()) != null && e.getValue() > bestMoles) {
+                best = e.getKey();
+                bestMoles = e.getValue();
+            }
+        }
+        if (best == null) return FluidStack.EMPTY;
+        return new FluidStack(FluidIonMapper.getFluidForIon(best), (int) (bestMoles * mbPerMol()));
+    }
+
+    @Override
+    public int getTankCapacity(int tank) {
+        return (int) (ChemConfig.MAX_MOLES_PER_COMPONENT.get() * mbPerMol());
+    }
+
+    @Override
+    public boolean isFluidValid(int tank, FluidStack stack) {
+        return FluidIonMapper.getIonForFluid(stack.getFluid()) != null;
+    }
+
+    @Override
+    public int fill(FluidStack resource, FluidAction action) {
+        if (resource.isEmpty()) return 0;
+        IonType ion = FluidIonMapper.getIonForFluid(resource.getFluid());
+        if (ion == null) return 0;
+        double maxAdd = ChemConfig.MAX_MOLES_PER_COMPONENT.get() - getAmount(ion);
+        double toAdd = Math.min(resource.getAmount() / mbPerMol(), maxAdd);
+        if (toAdd <= 0) return 0;
+        if (action == FluidAction.EXECUTE) {
+            addIon(ion, toAdd);
+        }
+        return (int) (toAdd * mbPerMol());
+    }
+
+    @Override
+    public FluidStack drain(FluidStack resource, FluidAction action) {
+        if (resource.isEmpty()) return FluidStack.EMPTY;
+        IonType ion = FluidIonMapper.getIonForFluid(resource.getFluid());
+        if (ion == null) return FluidStack.EMPTY;
+        int toDrain = (int) Math.min(resource.getAmount(), getAmount(ion) * mbPerMol());
+        if (toDrain <= 0) return FluidStack.EMPTY;
+        if (action == FluidAction.EXECUTE) {
+            removeIon(ion, toDrain / mbPerMol());
+        }
+        return new FluidStack(resource.getFluid(), toDrain);
+    }
+
+    @Override
+    public FluidStack drain(int maxDrain, FluidAction action) {
+        IonType best = null;
+        double bestMoles = 0;
+        for (Map.Entry<IonType, Double> e : contents.entrySet()) {
+            if (FluidIonMapper.getFluidForIon(e.getKey()) != null && e.getValue() > bestMoles) {
+                best = e.getKey();
+                bestMoles = e.getValue();
+            }
+        }
+        if (best == null) return FluidStack.EMPTY;
+        return drain(new FluidStack(FluidIonMapper.getFluidForIon(best), maxDrain), action);
+    }
+
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+            return fluidHandler.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        fluidHandler.invalidate();
     }
 }
