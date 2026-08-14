@@ -3,7 +3,6 @@ package com.pha.trainees.client;
 import com.pha.trainees.Main;
 
 import com.pha.trainees.registry.ModBlocks;
-import com.pha.trainees.registry.ModMenus;
 import com.pha.trainees.registry.ModRecipes;
 import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -23,15 +22,8 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        // 注册GUI屏幕和流体渲染
+        // 注册GUI屏幕和流体渲染（净化站/反应机菜单尚未实现，见开发蓝本 TODO）
         event.enqueueWork(() -> {
-//            MenuScreens.register(ModMenus.PURIFICATION_STATION_MENU.get(), PurificationStationScreen::new);
-//            MenuScreens.register(ModMenus.REACTION_MACHINE.get(), ReactionMachineScreen::new);
-
-//            // 设置流体渲染为半透明
-//            ItemBlockRenderTypes.setRenderLayer(ModFluid.SOURCE_CHE_HBP.get(), RenderType.translucent());
-//            ItemBlockRenderTypes.setRenderLayer(ModFluid.FLOWING_CHE_HBP.get(), RenderType.translucent());
-//            ItemBlockRenderTypes.setRenderLayer(ModBlocks.CHE_HBP_BLOCK.get(), RenderType.translucent());
         });
 
         event.enqueueWork(() -> {

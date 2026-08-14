@@ -105,6 +105,14 @@ public class ChemConfig {
     // ============================================================
     public static final ForgeConfigSpec.BooleanValue ELECTROLYZER_FREE_POWER;
 
+    // ============================================================
+    // 十四、引擎调度（原 ReactionEngine 硬编码常量，蓝本 §14.3）
+    // ============================================================
+    public static final ForgeConfigSpec.IntValue ENGINE_POLLING_INTERVAL;
+    public static final ForgeConfigSpec.IntValue ENGINE_MAX_RULES_PER_POLL;
+    public static final ForgeConfigSpec.IntValue ENGINE_MAX_CHAIN_REACTIONS_PER_TICK;
+    public static final ForgeConfigSpec.DoubleValue ENGINE_EPSILON;
+
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
@@ -371,6 +379,29 @@ public class ChemConfig {
                 .comment("电解理论阶段：容器是否视为无限通电（不消耗电能、恒可电解）",
                         "true = 理论调试用，不依赖真实发电；接入能量系统后设为 false")
                 .define("electrolyzerFreePower", true);
+
+        builder.pop();
+
+        // ============================================================
+        // 十四、引擎调度（原 ReactionEngine 硬编码常量，蓝本 §14.3）
+        // ============================================================
+        builder.push("engine");
+
+        ENGINE_POLLING_INTERVAL = builder
+                .comment("Tick 轮询间隔（每 N Tick 执行一次完整轮询）")
+                .defineInRange("pollingInterval", 5, 1, 100);
+
+        ENGINE_MAX_RULES_PER_POLL = builder
+                .comment("单次轮询最多执行的规则数量")
+                .defineInRange("maxRulesPerPoll", 20, 1, 200);
+
+        ENGINE_MAX_CHAIN_REACTIONS_PER_TICK = builder
+                .comment("每 Tick 最多处理的连锁反应数量（防止栈溢出）")
+                .defineInRange("maxChainReactionsPerTick", 10, 1, 100);
+
+        ENGINE_EPSILON = builder
+                .comment("反应进度截断阈值（防 Zeno 悖论）")
+                .defineInRange("epsilon", 1e-6, 1e-12, 1.0);
 
         builder.pop();
 

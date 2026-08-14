@@ -1,5 +1,6 @@
 package com.pha.trainees.util.game.physics;
 
+import com.pha.trainees.util.game.EnchantmentCalculator;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.math.MathT;
 import net.minecraft.nbt.CompoundTag;
@@ -32,7 +33,7 @@ public class KineticEnergySystem {
         }
 
         // 获取附魔后的最大动能值
-        float maxEnergy = Tools.Enchantment.getEffectiveMaxKineticEnergy(stack);
+        float maxEnergy = EnchantmentCalculator.getEffectiveMaxKineticEnergy(stack);
 
         // 获取当前动能
         float currentEnergy = getKineticEnergy(tag);
@@ -46,7 +47,7 @@ public class KineticEnergySystem {
         float energyGain = calculateEnergyGain(player, lastPos, lastMotion, lastY, stack);
 
         // 获取附魔后的衰减速率
-        float decayRate = Tools.Enchantment.getEffectiveDecayRate(stack);
+        float decayRate = EnchantmentCalculator.getEffectiveDecayRate(stack);
 
         // 应用衰减（如果静止）
         if (isPlayerStationary(player)) {
@@ -109,7 +110,7 @@ public class KineticEnergySystem {
         double deltaEk = 0.5 * MASS * (v2 * v2 - v1 * v1);
 
         // 获取应用附魔后的线性转换系数
-        float effectiveFactor = Tools.Enchantment.getEffectiveLinearFactor(stack);
+        float effectiveFactor = EnchantmentCalculator.getEffectiveLinearFactor(stack);
 
         // 取绝对值并应用转换系数
         float gain = (float)(Math.abs(deltaEk) * effectiveFactor);
@@ -129,7 +130,7 @@ public class KineticEnergySystem {
         }
 
         // 获取应用附魔后的重力转换系数
-        float effectiveGravityFactor = Tools.Enchantment.getEffectiveGravityFactor(stack);
+        float effectiveGravityFactor = EnchantmentCalculator.getEffectiveGravityFactor(stack);
 
         // 使用公式：△动能% = (m * g * k * h) / 100
         float gain = MASS * GRAVITY * effectiveGravityFactor / 100.0f * (float)fallDistance;
@@ -193,8 +194,8 @@ public class KineticEnergySystem {
         stack.setTag(tag);
 
         // 获取附魔后的最大动能值和伤害转化系数
-        float maxEnergy = Tools.Enchantment.getEffectiveMaxKineticEnergy(stack);
-        float damageFactor = Tools.Enchantment.getEffectiveDamageFactor(stack);
+        float maxEnergy = EnchantmentCalculator.getEffectiveMaxKineticEnergy(stack);
+        float damageFactor = EnchantmentCalculator.getEffectiveDamageFactor(stack);
 
         // 返回伤害倍率
         if (kineticEnergy > 0 && maxEnergy > 0) {
@@ -250,7 +251,7 @@ public class KineticEnergySystem {
         }
 
         float energy = getKineticEnergy(stack.getTag());
-        float maxEnergy = Tools.Enchantment.getEffectiveMaxKineticEnergy(stack);
+        float maxEnergy = EnchantmentCalculator.getEffectiveMaxKineticEnergy(stack);
 
         if (maxEnergy <= 0) {
             return 0.0f;
@@ -263,7 +264,7 @@ public class KineticEnergySystem {
      * 获取附魔后的最大动能值（用于显示）
      */
     public static float getEffectiveMaxKineticEnergy(ItemStack stack) {
-        return Tools.Enchantment.getEffectiveMaxKineticEnergy(stack);
+        return EnchantmentCalculator.getEffectiveMaxKineticEnergy(stack);
     }
 
     /*

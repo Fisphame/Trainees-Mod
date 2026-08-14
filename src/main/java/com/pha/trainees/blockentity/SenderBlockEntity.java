@@ -4,6 +4,8 @@ import com.pha.trainees.Main;
 import com.pha.trainees.item.StoneStickItem;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.util.game.BlockCourse;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.ActiveStructureManager;
 import net.minecraft.core.BlockPos;
@@ -92,10 +94,10 @@ public class SenderBlockEntity extends ItemHandlerBlockEntity {
 
             // 存入祭坛
             altar.setStoredItem(toSend);
-            Tools.Particle.spawnArcParticle(level,
+            ParticleHelper.spawnArcParticle(level,
                     Tools.randomInRange(level, 1, 2) == 1 ? ParticleTypes.FLAME : ParticleTypes.SOUL_FIRE_FLAME,
-                    Tools.BlockCourse.getCenter(pos),
-                    Tools.BlockCourse.getCenter(altarPos),
+                    BlockCourse.getCenter(pos),
+                    BlockCourse.getCenter(altarPos),
                     5,
                     5
             );

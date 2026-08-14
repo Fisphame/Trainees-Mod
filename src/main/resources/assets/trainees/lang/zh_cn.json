@@ -49,6 +49,8 @@
   "advancements.trainees.powder_anti_99.description": "9^9=387,420,489………………！",
   "advancements.trainees.altar.title": "魔法祭坛",
   "advancements.trainees.altar.description": "激活一个只因祭坛。",
+  "advancements.trainees.altar_core_block.title": "祭坛主方块",
+  "advancements.trainees.altar_core_block.description": "合成祭坛核心立方，解锁全部祭坛配方。",
 
 
   "itemGroup.trainees.kun_tab": "练习生",
@@ -83,8 +85,6 @@
   "block.trainees.deepslate_placium_ore":"深层鈚矿",
   "block.trainees.placium_block":"鈚块",
   "block.trainees.feather_block": "羽毛块",
-  "block.trainees.purification_station": "提纯台",
-  "block.trainees.reacting_furnace": "反应炉",
   "block.trainees.basketball_anti_block": "[方块]反相篮球",
   "block.trainees.basketball_anti_block_rgt": "反相篮球",
   "block.trainees.altar_core_block": "祭坛核心立方",
@@ -199,6 +199,7 @@
   "tooltip.trainees.tenebris_plume_clarion": "§l召唤号角",
   "tooltip.trainees.tenebris_plume_clarion.2": "在夜晚奏响，召唤幕后之物……",
   "message.trainees.tenebris_plume_clarion.too_dark": "夜色漆黑，恐怖暗藏……还不是时候。",
+  "message.trainees.ability.cooldown": "...!",
   
   
   "enchantment.trainees.ten_thousand_sword": "万剑归宗",
@@ -284,7 +285,6 @@
   "itemGroup.trainees.prank_tab":"整蛊",
   
   "block.trainees.powder_anti_99": "黑粉块",
-  "block.trainees.black_hole": "黑洞",
 
   "item.trainees.left_half_diamond_pickaxe":"左半镐",
   "item.trainees.right_half_diamond_pickaxe":"右半镐",
@@ -306,7 +306,6 @@
   "item.trainees.powder_anti_97": "一小块黑粉",
   "item.trainees.powder_anti_98": "一块黑粉",
   "item.trainees.powder_anti_99_scythe": "黑化镰刀",
-  "item.trainees.black_hole": "黑洞",
   
   "item.trainees.gun_mu":" ",
 
@@ -315,15 +314,14 @@
   "subtitles.trainees.mining_sound_2": "你",
   "subtitles.trainees.mining_sound_3": "太",
   "subtitles.trainees.mining_sound_4": "美",
+  "subtitles.trainees.releasing_sword_wind_1": "剑风",
+  "subtitles.trainees.releasing_sword_wind_2": "剑风",
+  "subtitles.trainees.releasing_sword_wind_3": "剑风",
+  "subtitles.trainees.releasing_sword_wind_4": "剑风",
   "subtitles.trainees.hit": "突进",
   "subtitles.trainees.hit_reset": "突进",
   "subtitles.trainees.heavy_hit": "突进",
   "subtitles.trainees.heavy_hit_reset": "突进",
-  
-  "container.trainees.purification_station": "提纯台",
-  "container.trainees.purification_station.input_slot": "材料",
-  "container.trainees.purification_station.fuel_slot": "升级/提纯物……",
-  "button.trainees.purify": "提升",
   
   "jei.trainees.trainer_altar": "土申祭坛",
 

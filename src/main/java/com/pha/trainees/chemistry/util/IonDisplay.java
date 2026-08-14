@@ -36,10 +36,18 @@ public final class IonDisplay {
             "sulfur", "S"
     );
 
+    // 完整特殊显示名（含物态后缀、无法由通用解析得到的化学式）
+    private static final Map<String, String> EXTRA_FORMATS = Map.of(
+            "hcl_aq", "HCl(aq)"
+    );
+
     private IonDisplay() {}
 
     public static String format(String id) {
         if (id == null || id.isEmpty()) return id;
+
+        // 特殊显示名（如 hcl_aq → HCl(aq)）
+        if (EXTRA_FORMATS.containsKey(id)) return EXTRA_FORMATS.get(id);
 
         // 整词名特殊处理（如 sulfur）
         if (NAME_TO_SYMBOL.containsKey(id)) return NAME_TO_SYMBOL.get(id);

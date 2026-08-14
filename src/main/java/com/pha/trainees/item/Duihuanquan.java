@@ -35,7 +35,8 @@ public class Duihuanquan extends Item implements IHoverText {
         BlockPos blockpos = context.getClickedPos();
         BlockState blockstate = level.getBlockState(blockpos);
         Block block = blockstate.getBlock();
-        if (player != null && (block == ModBlocks.MYBLOCK.get() || true)) {
+        // 仅允许在只因方块（myblock）上兑换（与 tooltip 描述一致）
+        if (player != null && block == ModBlocks.MYBLOCK.get()) {
             itemStack.shrink(1);
             ItemStack spawnStack = new ItemStack(ModItems.UPGRADE_THEME.get(), 1);
             ItemEntity itemEntity = new ItemEntity(level, blockpos.getX(), blockpos.getY() + 1, blockpos.getZ(), spawnStack);

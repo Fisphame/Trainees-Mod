@@ -1,5 +1,7 @@
 package com.pha.trainees.entity;
 
+import com.pha.trainees.util.game.BlockCourse;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -81,7 +83,7 @@ public class CalledSwordEntity extends Entity {
 
         if (Tools.chance(level(), 0.5f)){
             // 1. 基础轨迹粒子（服务器广播）
-            Tools.Particle.send(
+            ParticleHelper.send(
                     level(),
                     ParticleTypes.SOUL_FIRE_FLAME,
                     getX(), getY(), getZ(),
@@ -94,7 +96,7 @@ public class CalledSwordEntity extends Entity {
 
 //        // 2. 本地增强轨迹（客户端生成）
 //        // 圆形轨迹
-//        Tools.Particle.spawnCircle(
+//        ParticleHelper.spawnCircle(
 //                level(),
 //                ParticleTypes.ENCHANT,
 //                getX(), getY() + 0.5, getZ(),
@@ -104,7 +106,7 @@ public class CalledSwordEntity extends Entity {
 //        );
 //
 //        // 自定义颜色粒子
-//        Tools.Particle.spawnColoredDust(
+//        ParticleHelper.spawnColoredDust(
 //                level(),
 //                getX(), getY(), getZ(),
 //                0.2f, 0.8f, 1.0f,  // 青色
@@ -122,7 +124,7 @@ public class CalledSwordEntity extends Entity {
             entity.hurt(this.damageSources().magic(), damage);
             if (Tools.chance(level(), 0.5f)){
                 for (int i = 0; i < Tools.randomInRange(level(), 1, 3); i++){
-                    Tools.Particle.sendGradientDust(
+                    ParticleHelper.sendGradientDust(
                             level(),
                             this.getX() + Tools.randomInRange(level(), -1f, 1f),
                             this.getY() + Tools.randomInRange(level(), -1f, 1f),
@@ -131,12 +133,12 @@ public class CalledSwordEntity extends Entity {
                             this.getY() + Tools.randomInRange(level(), -0.5f, 0.5f),
                             this.getZ() + Tools.randomInRange(level(), -0.5f, 0.5f),
                             Tools.randomInRange(level(), 5, 10),
-                            Tools.Particle.getRandomColor().x,
-                            Tools.Particle.getRandomColor().y,
-                            Tools.Particle.getRandomColor().z,
-                            Tools.Particle.getRandomColor().x,
-                            Tools.Particle.getRandomColor().y,
-                            Tools.Particle.getRandomColor().z,
+                            ParticleHelper.getRandomColor().x,
+                            ParticleHelper.getRandomColor().y,
+                            ParticleHelper.getRandomColor().z,
+                            ParticleHelper.getRandomColor().x,
+                            ParticleHelper.getRandomColor().y,
+                            ParticleHelper.getRandomColor().z,
                             1.5f,
                             0.5f
                     );
@@ -154,10 +156,10 @@ public class CalledSwordEntity extends Entity {
                     pos.set(xn, yn, zn);
                     BlockState blockState = level().getBlockState(pos);
                     Block block = blockState.getBlock();
-                    if (enchantBreakBlock && Tools.BlockCourse.canBreak(block)) {
+                    if (enchantBreakBlock && BlockCourse.canBreak(block)) {
                         this.level().destroyBlock(pos, enchantBrokenBlockDrop); // 生成掉落物
                         if (Tools.chance(level(), 0.2f)){
-                            Tools.Particle.spawnExplosionEffect(
+                            ParticleHelper.spawnExplosionEffect(
                                     level(),
                                     xn, yn, zn,
                                     0.05f

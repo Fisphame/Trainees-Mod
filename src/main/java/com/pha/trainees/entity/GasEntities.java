@@ -1,5 +1,6 @@
 package com.pha.trainees.entity;
 
+import com.pha.trainees.util.game.BlockCourse;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.math.MathT;
 import com.pha.trainees.util.math.Pair;
@@ -146,7 +147,7 @@ public class GasEntities {
                 return false;
             }
 
-            return Tools.BlockCourse.isInFire(level(), pos);
+            return BlockCourse.isInFire(level(), pos);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.pha.trainees.util.interfaces;
 
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.math.MathT;
 import net.minecraft.core.particles.ParticleTypes;
@@ -39,7 +40,7 @@ public interface IScythe {
             entity.hurt(player.damageSources().playerAttack(player), sweepDamage);
         }
 
-        Tools.Particle.send(serverLevel, ParticleTypes.SWEEP_ATTACK,
+        ParticleHelper.send(serverLevel, ParticleTypes.SWEEP_ATTACK,
                 target.getX(), target.getY(), target.getZ(),
                 SWEEP_PARTICLE_NUM[index], SWEEP_PARTICLE_AREA[index], SWEEP_PARTICLE_AREA[index], SWEEP_PARTICLE_AREA[index], 0
         );

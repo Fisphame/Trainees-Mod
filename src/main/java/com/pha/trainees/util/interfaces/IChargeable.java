@@ -1,6 +1,7 @@
 package com.pha.trainees.util.interfaces;
 
 import com.pha.trainees.registry.ModEnchantments;
+import com.pha.trainees.util.game.SoundCourse;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -35,7 +36,7 @@ public interface IChargeable {
         if (consumesDurabilityOnCharge(player)) {
             stack.hurtAndBreak(1, player, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
         }
-        SoundEvent sound = Tools.SoundCourse.getIndexSound(Tools.SoundCourse.HIT_SOUNDS.get(), level);
+        SoundEvent sound = SoundCourse.getIndexSound(SoundCourse.HIT_SOUNDS.get(), level);
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 sound, SoundSource.PLAYERS, 1.5F, 1.0F);
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());

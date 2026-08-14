@@ -1,5 +1,6 @@
 package com.pha.trainees.entity;
 
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -121,25 +122,25 @@ public class ParticleEntity extends Entity {
 
 
         // 基础轨迹粒子（服务器广播）
-        Tools.Particle.send(
+        ParticleHelper.send(
                 level(), ParticleTypes.FALLING_LAVA,
                 getX(), getY(), getZ(), 3, 0.0, 0.0, 0.0, 0.0
         );
 
-        Tools.Particle.send(
+        ParticleHelper.send(
                 level(), type,
                 getX(), getY(), getZ(), 3, 0.0, 0.0, 0.0, 0.01
         );
 
         if (type == ParticleTypes.FLAME && Tools.chance(level(), 0.05)) {
-            Tools.Particle.send(
+            ParticleHelper.send(
                     level(), ParticleTypes.LAVA,
                     getX(), getY(), getZ(), 1, 0.0, 0.0, 0.0, 0.1
             );
         }
 
 
-        Tools.Particle.send(
+        ParticleHelper.send(
                 level(), ParticleTypes.ENCHANT,
                 getX(), getY(), getZ(), 3, 0.3, 0.3, 0.3, 0.5
         );
@@ -147,7 +148,7 @@ public class ParticleEntity extends Entity {
 //
 //        // 2. 本地增强轨迹（客户端生成）
 //        // 圆形轨迹
-//        Tools.Particle.spawnCircle(
+//        ParticleHelper.spawnCircle(
 //                level(),
 //                ParticleTypes.ENCHANT,
 //                getX(), getY() + 0.5, getZ(),
@@ -157,7 +158,7 @@ public class ParticleEntity extends Entity {
 //        );
 
 //        // 自定义颜色粒子
-//        Tools.Particle.spawnColoredDust(
+//        ParticleHelper.spawnColoredDust(
 //                level(),
 //                getX(), getY(), getZ(),
 //                0.2f, 0.8f, 1.0f,  // 青色

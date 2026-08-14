@@ -38,17 +38,6 @@ public class ModEntities {
                             .build("particle_entity") // 内部名称
             );
 
-    //    public static final RegistryObject<EntityType<BasketballEntity>> BASKETBALL =
-//            ENTITIES.register("kun_basketball",
-//                    () -> EntityType.Builder.<BasketballEntity>of(
-//                                    BasketballEntity::new,
-//                                    MobCategory.MISC
-//                            )
-//                            .sized(0.5F, 0.5F)
-//                            .clientTrackingRange(4)
-//                            .build("kun_basketball")
-//            );
-
     public static final RegistryObject<EntityType<KunTraineesEntity>> KUN_TRAINEES =
             ENTITIES.register("kun_trainees",
                     () -> EntityType.Builder.of(KunTraineesEntity::new, MobCategory.CREATURE)

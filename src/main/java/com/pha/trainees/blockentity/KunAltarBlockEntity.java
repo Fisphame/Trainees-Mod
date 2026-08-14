@@ -4,6 +4,7 @@ import com.pha.trainees.block.KunAltarBlock;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.util.game.enums.KunAltarType;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.interfaces.IMachine;
 import net.minecraft.core.BlockPos;
@@ -88,7 +89,7 @@ public class KunAltarBlockEntity extends ItemHandlerBlockEntity implements IMach
             }
 
             if (level != null) {
-                Tools.Particle.send(
+                ParticleHelper.send(
                         level, ParticleTypes.SOUL_FIRE_FLAME, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
                         5, 0.3, 0.3, 0.3, 0.1
                 );
@@ -112,7 +113,7 @@ public class KunAltarBlockEntity extends ItemHandlerBlockEntity implements IMach
         }
 
         if (level != null) {
-            Tools.Particle.send(
+            ParticleHelper.send(
                     level, ParticleTypes.SOUL_FIRE_FLAME,
                     worldPosition.getX() + 0.5, worldPosition.getY() + 0.2, worldPosition.getZ() + 0.5,
                     7, 0.5, 0.2, 0.5, 0.1

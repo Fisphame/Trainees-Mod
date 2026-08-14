@@ -28,10 +28,11 @@ public class DoTnt {
 
     // 3. 自定义多面爆炸
     // 所有数据下标使用 i ∈ [1,7]，可对应7个任意面
+    // 注意：surface_diffusion[i] 表示第 i 个 TNT 相对中心在 x/y/z 三个轴上的偏移量（可任意组合）
     boolean[] surface_is = new boolean[8];  //设置第i面是否生成tnt
-    double[] surface_diffusion = new int[8];  //设置第i面相对于中心的扩散距离
+    double[] surface_diffusion = new double[8];  //设置第i个TNT相对中心的偏移量（x/y/z 三轴同量）
     int[] surface_fuse = new int[8];    //设置第i面的引爆时长
-    float[] surface_power = new int[8];   //设置第i面的威力
+    float[] surface_power = new float[8];   //设置第i面的威力
 
 
     surface_is[1] = true;
@@ -124,7 +125,11 @@ public class DoTnt {
             return;
         }
 
-        if (surface_power.length != 0 && surface_fuse.length != 0 && surface_diffusion.length != 0) {
+        // 自定义多面：下标 i ∈ [1,7]，数组长度必须 ≥ 8，越界/空数组时安全跳过
+        if (surface_is != null && surface_is.length >= 8
+                && surface_diffusion != null && surface_diffusion.length >= 8
+                && surface_fuse != null && surface_fuse.length >= 8
+                && surface_power != null && surface_power.length >= 8) {
             for (int j = 1; j <= 7; j++) {
                 if (!surface_is[j]) continue;
                 double xn = x + surface_diffusion[j],

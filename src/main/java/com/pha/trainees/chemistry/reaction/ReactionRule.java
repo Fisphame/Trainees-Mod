@@ -37,6 +37,8 @@ public class ReactionRule {
     // 动态优先级函数（蓝本 §5.2）：以容器状态为自变量的优先级偏置，为空则用 gamePriorityBias
     private final Function<IChemicalContainer, Double> dynamicPriorityBias;
     private final boolean isSelfLoop;                   // 是否为自环（分解反应）
+    // 是否显式覆盖平衡常数（手设 K° × 范特霍夫）。默认 false → 物理公式 K = exp(-ΔG(T)/(R·T))。
+    private final boolean equilibriumOverridden;
 
     private ReactionRule(Builder builder) {
         this.id = builder.id;
@@ -54,6 +56,7 @@ public class ReactionRule {
         this.electricalWorkPerMol = builder.electricalWorkPerMol;
         this.dynamicPriorityBias = builder.dynamicPriorityBias;
         this.isSelfLoop = builder.isSelfLoop;
+        this.equilibriumOverridden = builder.equilibriumOverridden;
     }
 
     // ==================== Getters ====================
@@ -95,7 +98,8 @@ public class ReactionRule {
     /**
      * 计算当前温度下的实际平衡常数 K。
      * 电解反应（W>0）通电时：K 由 ΔG_eff 决定（电功等效于把平衡推向产物）。
-     * 其余情况：范特霍夫方程 ln(K/K°) = -ΔH/R * (1/T - 1/298)。
+     * 显式覆盖（equilibriumOverridden）：K = K° × exp(-ΔH/R * (1/T - 1/298))（范特霍夫）。
+     * 默认（物理公式）：K = exp(-ΔG(T)/(R·T))，ΔG(T) = ΔH - T·ΔS，ΔS 由 298K 数据反推。
      */
     public double calculateEquilibriumConstant(double temperatureKelvin, IChemicalContainer container) {
         double work = electricalWorkPerMol.get();
@@ -105,15 +109,28 @@ public class ReactionRule {
             return Math.exp(-deltaGEff * 1000 / (R * temperatureKelvin));
         }
 
-        double rawEq = equilibriumConstant.get();
         if (temperatureKelvin <= 0) {
             Main.LOGGER.warn("[Engine] calculateEquilibriumConstant: temperature {} <= 0, returning 0",
                     temperatureKelvin);
             return 0;
         }
         double R = 8.314;
-        double exponent = -deltaH.get() * 1000 / R * (1.0 / temperatureKelvin - 1.0 / 298.0);
-        return rawEq * Math.exp(exponent);
+
+        if (equilibriumOverridden) {
+            // 显式覆盖（游戏性可逆）：K° × 范特霍夫
+            double exponent = -deltaH.get() * 1000 / R * (1.0 / temperatureKelvin - 1.0 / 298.0);
+            return equilibriumConstant.get() * Math.exp(exponent);
+        }
+
+        // 物理平衡常数：K = exp(-ΔG(T)/(R·T))，ΔG(T) = ΔH - T·ΔS
+        // ΔS 由 298K 数据推出：ΔS = (ΔH - ΔG)/298（假设 ΔH、ΔS 近似恒定）。
+        // 强放热反应在高温下 K 依然巨大（真实燃烧在 1300K 仍 CO₂ 占优），
+        // 避免"手设 K°×范特霍夫"在高温塌缩导致反应被误判为平衡。
+        double deltaHkJ = deltaH.get();
+        double deltaGkJ = deltaG.get();
+        double deltaS = (deltaHkJ - deltaGkJ) * 1000.0 / 298.0;           // J/(mol·K)
+        double deltaGT = deltaHkJ * 1000.0 - temperatureKelvin * deltaS;   // J/mol
+        return Math.exp(-deltaGT / (R * temperatureKelvin));
     }
 
     /**
@@ -171,6 +188,7 @@ public class ReactionRule {
         private Supplier<Double> electricalWorkPerMol = () -> 0.0;
         private Function<IChemicalContainer, Double> dynamicPriorityBias = null;
         private boolean isSelfLoop = false;
+        private boolean equilibriumOverridden = false;
 
         public Builder(ResourceLocation id) {
             this.id = id;
@@ -194,6 +212,16 @@ public class ReactionRule {
         public Builder deltaH(double val) { this.deltaH = () -> val; return this; }
         public Builder deltaG(double val) { this.deltaG = () -> val; return this; }
         public Builder equilibriumConstant(double val) { this.equilibriumConstant = () -> val; return this; }
+
+        /**
+         * 显式覆盖平衡常数（可逆玩法）：以手设 K° × 范特霍夫计算 K。
+         * 不调用则走物理公式 K = exp(-ΔG(T)/(R·T))，ΔG(T) = ΔH - T·ΔS（由生成数据推出）。
+         * 供 N₂O₄、SO₂/SO₃ 接触法、哈伯等作者手调平衡点的可逆反应使用。
+         */
+        public Builder equilibriumOverridden() {
+            this.equilibriumOverridden = true;
+            return this;
+        }
         public Builder activationEnergy(double val) { this.activationEnergy = () -> val; return this; }
         public Builder preExponentialFactor(double val) { this.preExponentialFactor = () -> val; return this; }
         public Builder gamePriorityBias(double val) { this.gamePriorityBias = () -> val; return this; }

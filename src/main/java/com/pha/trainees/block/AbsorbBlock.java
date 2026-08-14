@@ -2,6 +2,7 @@ package com.pha.trainees.block;
 
 import com.pha.trainees.blockentity.AbsorbBlockEntity;
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.util.game.EntityWay;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.interfaces.IMachine;
 import net.minecraft.core.BlockPos;
@@ -63,11 +64,11 @@ public class AbsorbBlock extends BaseEntityBlock implements IMachine {
                     if (!tag.isEmpty()) {
                         itemStack.addTagElement("BlockEntityTag", tag);
                     }
-                    Tools.EntityWay.spawnItemEntity(level, pos, itemStack);
+                    EntityWay.spawnItemEntity(level, pos, itemStack);
 
                     return;
                 }
-                Tools.EntityWay.spawnItemEntity(level, pos, storedItem.copy());
+                EntityWay.spawnItemEntity(level, pos, storedItem.copy());
             }
         }
         super.playerDestroy(level, player, pos, state, blockEntity, tool);

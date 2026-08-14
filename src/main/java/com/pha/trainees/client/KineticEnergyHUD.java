@@ -2,6 +2,7 @@ package com.pha.trainees.client;
 
 import com.mojang.blaze3d.platform.Window;
 import com.pha.trainees.item.AuriversiteRapierItem;
+import com.pha.trainees.util.game.EnchantmentCalculator;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.physics.KineticEnergySystem;
 import net.minecraft.client.Minecraft;
@@ -92,7 +93,7 @@ public class KineticEnergyHUD {
         guiGraphics.drawString(Minecraft.getInstance().font, text, textX, textY, 0xFFFFFF);
 
         // 获取实际的最大动能值
-        float actualMaxEnergy = Tools.Enchantment.getEffectiveMaxKineticEnergy(kineticSword);
+        float actualMaxEnergy = EnchantmentCalculator.getEffectiveMaxKineticEnergy(kineticSword);
 
         String valueText = String.format("%.0f/%.0f", energyValue, actualMaxEnergy);
         int valueTextWidth = Minecraft.getInstance().font.width(valueText);

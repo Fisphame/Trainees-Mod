@@ -174,8 +174,10 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
                 .sum();
         if (gasMoles < 1e-9 || volume < 1e-9) return 0;
         double R = 8.314;
-        double pressurePa = (gasMoles * R * temperature) / volume;
-        return pressurePa / ChemConfig.PRESSURE_STANDARD_ATMOSPHERE.get();
+        // 注意单位：V 以升(L)计，nRT/V 得到的是 kPa（1 J/L = 1 kPa）。
+        // 除以 101.325 才得到标准大气压（atm）。（此前误除以 101325，结果小 1000 倍）
+        double pressureKpa = (gasMoles * R * temperature) / volume;
+        return pressureKpa / 101.325;
     }
 
     @Override
@@ -317,17 +319,17 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
         ReactionEngine.tick(beaker);
 
-        // 每 20 tick（1秒）清理忽略阈值下的残渣，并输出烧杯内容物与温度（日志调试用，稳定后可移除）
+        // 每 20 tick（1秒）清理忽略阈值下的残渣，并输出烧杯内容物与温度（调试用）
         if (level.getGameTime() % 20 == 0) {
             beaker.sweepNegligibleSpecies();
-            Main.LOGGER.info("[Beaker] {} contents: {} | T={}K",
+            Main.LOGGER.debug("[Beaker] {} contents: {} | T={}K",
                     pos, beaker.formatContents(), String.format("%.1f", beaker.temperature));
         }
 
         // 临界温度警告节流：每 100 tick（5秒）最多输出一次，避免持续刷屏
         if (beaker.temperature >= ChemConfig.MAX_SAFE_TEMPERATURE.get() * ChemConfig.CRITICAL_TEMPERATURE_RATIO.get()
                 && level.getGameTime() % 100 == 0) {
-            Main.LOGGER.warn("[Beaker] Beaker at {} is reaching critical temperature! {:.1f}K",
+            Main.LOGGER.warn("[Beaker] Beaker at {} is reaching critical temperature! {}K",
                     pos, String.format("%.1f", beaker.temperature));
         }
     }

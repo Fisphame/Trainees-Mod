@@ -28,7 +28,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 public class PullusionPortalBlock extends Block {
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
@@ -36,7 +41,8 @@ public class PullusionPortalBlock extends Block {
             16.0D, 12.0D, 16.0D);
 
     private static final long COOLDOWN_MS = 1000; // 1秒冷却
-    private long lastUseTime = 0;
+    // 按传送门方块位置记录上次使用时间（Block 是单例，不能把冷却放实例字段）
+    private static final Map<BlockPos, Long> LAST_USE = new HashMap<>();
 
     public PullusionPortalBlock(Properties properties) {
         super(properties);
@@ -56,12 +62,13 @@ public class PullusionPortalBlock extends Block {
             return InteractionResult.SUCCESS;
         }
 
-        // 冷却检查
+        // 冷却检查（按传送门位置）
         long currentTime = System.currentTimeMillis();
-        if (currentTime - lastUseTime < COOLDOWN_MS) {
+        Long lastUse = LAST_USE.get(pos);
+        if (lastUse != null && currentTime - lastUse < COOLDOWN_MS) {
             return InteractionResult.PASS;
         }
-        lastUseTime = currentTime;
+        LAST_USE.put(pos, currentTime);
 
         // 检查玩家是否可以传送
         if (!player.canChangeDimensions()) {
@@ -104,41 +111,30 @@ public class PullusionPortalBlock extends Block {
             return false;
         }
 
-
         // 计算安全的目标位置
         BlockPos destPos = findSafeSpawnLocation(destinationLevel, portalPos);
 
-        System.out.println("传送: " + currentDim.location() + " -> " + destination.location());
-        System.out.println("目标位置: " + destPos);
+        Main.LOGGER.debug("传送: {} -> {}", currentDim.location(), destination.location());
+        Main.LOGGER.debug("目标位置: {}", destPos);
 
         // 使用自定义传送器
         player.changeDimension(destinationLevel, new Teleporter(destPos));
 
-//        // 在目标维度也放置传送门（可选）
-//        if (!destinationLevel.getBlockState(destPos).isAir()) {
-//            destPos = destPos.above();
-//        }
-
-//        // 确保目标维度有对应的传送门
-//        if (destinationLevel.isEmptyBlock(destPos)) {
-//            destinationLevel.setBlock(destPos, this.defaultBlockState().setValue(ACTIVE, false), 3);
-//        }
-
         return true;
     }
 
-    private static final Queue<BlockPos> queue = new ArrayDeque<>();
     private static final int[] dx = {0, 0, 0, 0, -1, 1};  // X方向
     private static final int[] dy = {1, -1, 0, 0, 0, 0};  // Y方向（上下）
     private static final int[] dz = {0, 0, -1, 1, 0, 0};  // Z方向
-    private static final Set<BlockPos> visited = new HashSet<>();
-    private static Pair pairX;
-    private static Pair pairY;
-    private static Pair pairZ;
 
-    public static BlockPos find(Level level, BlockPos pos) {
-        queue.clear(); visited.clear();
-        queue.offer(pos); visited.add(pos);
+    /**
+     * 在指定范围内搜索安全的落脚点（BFS，状态均为局部变量，避免跨调用共享）
+     */
+    public static BlockPos find(Level level, BlockPos pos, Pair xRange, Pair yRange, Pair zRange) {
+        Queue<BlockPos> queue = new ArrayDeque<>();
+        Set<BlockPos> visited = new HashSet<>();
+        queue.offer(pos);
+        visited.add(pos);
         while (!queue.isEmpty()) {
             BlockPos uPos = queue.poll();
             int ux = uPos.getX();
@@ -151,7 +147,7 @@ public class PullusionPortalBlock extends Block {
                 int vz = uz + dz[i];
                 BlockPos vPos = new BlockPos(vx, vy, vz);
 
-                if (isAllowed(vPos)){
+                if (isAllowed(vPos, xRange, yRange, zRange, visited)) {
                     visited.add(vPos);
                     if (isTarget(vPos, level)) {
                         return vPos;
@@ -163,8 +159,10 @@ public class PullusionPortalBlock extends Block {
         return null;
     }
 
-    public static Boolean isAllowed(BlockPos pos) {
-        return MathT.isInInterval(pos.getX(), pairX) && MathT.isInInterval(pos.getY(), pairY) && MathT.isInInterval(pos.getZ(), pairZ)
+    public static Boolean isAllowed(BlockPos pos, Pair xRange, Pair yRange, Pair zRange, Set<BlockPos> visited) {
+        return MathT.isInInterval(pos.getX(), xRange)
+                && MathT.isInInterval(pos.getY(), yRange)
+                && MathT.isInInterval(pos.getZ(), zRange)
                 && !visited.contains(pos);
     }
 
@@ -176,10 +174,10 @@ public class PullusionPortalBlock extends Block {
      * 寻找安全的生成位置
      */
     private BlockPos findSafeSpawnLocation(ServerLevel level, BlockPos pos) {
-        pairX = new Pair(pos.getX() - 8, pos.getX() + 8);
-        pairY = new Pair(level.getMinBuildHeight() + 1, level.getMaxBuildHeight() - 2);
-        pairZ = new Pair(pos.getZ() - 8, pos.getZ() + 8);
-        BlockPos newPos =  find(level, pos);
+        Pair xRange = new Pair(pos.getX() - 8, pos.getX() + 8);
+        Pair yRange = new Pair(level.getMinBuildHeight() + 1, level.getMaxBuildHeight() - 2);
+        Pair zRange = new Pair(pos.getZ() - 8, pos.getZ() + 8);
+        BlockPos newPos = find(level, pos, xRange, yRange, zRange);
         if (newPos != null) {
             return newPos;
         }
@@ -197,4 +195,3 @@ public class PullusionPortalBlock extends Block {
         return this.defaultBlockState().setValue(ACTIVE, false);
     }
 }
-

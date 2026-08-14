@@ -20,20 +20,28 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ReactionEngine {
 
     // ============================================================
-    // 一、常量配置
+    // 一、常量配置（可配置化，见 ChemConfig.engine 组）
     // ============================================================
 
-    /** 每 Tick 最多处理的连锁反应数量，防止栈溢出 */
-    private static final int MAX_CHAIN_REACTIONS_PER_TICK = 10;
+    /** 每 Tick 最多处理的连锁反应数量，防止栈溢出（ChemConfig.ENGINE_MAX_CHAIN_REACTIONS_PER_TICK） */
+    private static int getMaxChainReactionsPerTick() {
+        return ChemConfig.ENGINE_MAX_CHAIN_REACTIONS_PER_TICK.get();
+    }
 
-    /** 反应进度截断阈值，防止 Zeno 悖论 */
-    private static final double EPSILON = 1e-6;
+    /** 反应进度截断阈值，防止 Zeno 悖论（ChemConfig.ENGINE_EPSILON） */
+    private static double getEpsilon() {
+        return ChemConfig.ENGINE_EPSILON.get();
+    }
 
-    /** Tick 轮询间隔（每 N Tick 执行一次完整轮询） */
-    private static final int POLLING_INTERVAL = 5;
+    /** Tick 轮询间隔（每 N Tick 执行一次完整轮询）（ChemConfig.ENGINE_POLLING_INTERVAL） */
+    private static int getPollingInterval() {
+        return ChemConfig.ENGINE_POLLING_INTERVAL.get();
+    }
 
-    /** 单次轮询最多处理的规则数量 */
-    private static final int MAX_RULES_PER_POLL = 20;
+    /** 单次轮询最多处理的规则数量（ChemConfig.ENGINE_MAX_RULES_PER_POLL） */
+    private static int getMaxRulesPerPoll() {
+        return ChemConfig.ENGINE_MAX_RULES_PER_POLL.get();
+    }
 
     // ============================================================
     // 二、状态管理（线程安全）
@@ -116,7 +124,7 @@ public class ReactionEngine {
         // 只处理属于当前容器的队列项；其他容器的项保留在队列中，由其自身的 tick 处理
         int processed = 0;
         var iterator = PENDING_QUEUE.iterator();
-        while (iterator.hasNext() && processed < MAX_CHAIN_REACTIONS_PER_TICK) {
+        while (iterator.hasNext() && processed < getMaxChainReactionsPerTick()) {
             QueuedEntry entry = iterator.next();
             if (entry.container() != container) continue;
             iterator.remove();
@@ -126,8 +134,8 @@ public class ReactionEngine {
         }
 
         // ====== 2. 定期执行 Tick 轮询（慢速反应 + 挂起规则重检） ======
-        if (gameTime % POLLING_INTERVAL == 0) {
-//            Main.LOGGER.info("[Engine] 🔄 Polling triggered (gameTime % {} == 0)", POLLING_INTERVAL);
+        if (gameTime % getPollingInterval() == 0) {
+//            Main.LOGGER.info("[Engine] 🔄 Polling triggered (gameTime % {} == 0)", getPollingInterval());
             processPolling(container);
         }
     }
@@ -197,7 +205,8 @@ public class ReactionEngine {
         // 故让所有可执行规则（含非自环）随轮询持续推进至平衡。
         // 注意必须按优先级排序：对共享反应物的竞争规则只执行最高优先级者，
         // 否则轮询会按边的迭代顺序误选产物（如碳酸盐的 HCO₃⁻/CO₂ 选择）。
-        if (executed < MAX_RULES_PER_POLL) {
+        int maxRulesPerPoll = getMaxRulesPerPoll();
+        if (executed < maxRulesPerPoll) {
             // 1. 收集所有可执行规则（同一规则经多条边只算一次）
             List<ReactionEdge> candidates = new ArrayList<>();
             Set<ReactionRule> seen = new HashSet<>();
@@ -222,7 +231,7 @@ public class ReactionEngine {
             // 3. 贪心执行：共享反应物的竞争规则只执行最高优先级者；不相交的独立规则可并行
             Set<IonType> touched = new HashSet<>();
             for (ReactionEdge edge : candidates) {
-                if (executed >= MAX_RULES_PER_POLL) break;
+                if (executed >= maxRulesPerPoll) break;
                 ReactionRule rule = edge.getRule();
                 boolean conflicts = false;
                 for (IonType reactant : rule.getReactants().keySet()) {
@@ -251,6 +260,7 @@ public class ReactionEngine {
      */
     private static boolean executeRule(IChemicalContainer container, ReactionEdge edge) {
         ReactionRule rule = edge.getRule();
+        double epsilon = getEpsilon();
 
         // 再次验证所有条件（安全）
         if (!rule.checkPreconditions(container)) return false;
@@ -302,7 +312,7 @@ public class ReactionEngine {
         // ====== 9. 进度截断（防 Zeno） ======
         // 注意：不在此标记 BALANCED——Δξ 过小可能只是低温等暂态，
         // 标记会导致加热后反应无法恢复（平衡标记仅由 Q>=K 与 addThermalEnergy 管理）
-        if (deltaXi < EPSILON) {
+        if (deltaXi < epsilon) {
             return false;
         }
 
@@ -310,7 +320,7 @@ public class ReactionEngine {
         for (Map.Entry<IonType, Integer> entry : rule.getReactants().entrySet()) {
             IonType ion = entry.getKey();
             double required = entry.getValue() * deltaXi;
-            if (container.getAmount(ion) < required - EPSILON) {
+            if (container.getAmount(ion) < required - epsilon) {
                 // 反应物不足，调整 deltaXi
                 double maxDelta = container.getAmount(ion) / entry.getValue();
                 deltaXi = Math.min(deltaXi, maxDelta);
@@ -318,7 +328,7 @@ public class ReactionEngine {
         }
 
         // 如果调整后太小，放弃
-        if (deltaXi < EPSILON) {
+        if (deltaXi < epsilon) {
             return false;
         }
 
@@ -338,7 +348,7 @@ public class ReactionEngine {
                     }
                 }
                 deltaXi = lo;
-                if (deltaXi < EPSILON) {
+                if (deltaXi < epsilon) {
                     return false;
                 }
             }
@@ -405,7 +415,7 @@ public class ReactionEngine {
             denominator *= Math.pow(conc, entry.getValue());
         }
 
-        if (denominator < EPSILON) return Double.MAX_VALUE;
+        if (denominator < getEpsilon()) return Double.MAX_VALUE;
         return numerator / denominator;
     }
 

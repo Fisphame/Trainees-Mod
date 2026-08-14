@@ -1,5 +1,6 @@
 package com.pha.trainees.util.interfaces;
 
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.math.MathT;
 import com.pha.trainees.util.game.physics.KineticEnergySystem;
@@ -41,7 +42,7 @@ public interface IKineticWeapon {
 
     default void applyParticle(ItemStack stack, LivingEntity target, LivingEntity attacker, float damage){
         if (IKineticWeapon.isKineticUpdateEnabled(stack) && attacker instanceof Player player) {
-            Tools.Particle.send(player.level(), ParticleTypes.LAVA, target.getX(), target.getY(), target.getZ(),
+            ParticleHelper.send(player.level(), ParticleTypes.LAVA, target.getX(), target.getY(), target.getZ(),
                     MathT.inInterval((int) (damage * 3f), 10, 500), 0.1, 0.1, 0.1, 0.1);
         }
     }

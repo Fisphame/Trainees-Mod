@@ -2,6 +2,7 @@ package com.pha.trainees.chemistry.item;
 
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
 import com.pha.trainees.chemistry.particle.IonType;
+import com.pha.trainees.config.ChemConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
@@ -74,7 +75,7 @@ public class AnalyzerItemCreative extends AnalyzerItem {
         }
 
         // ====== 安全状态 ======
-        double maxTemp = 1800.0;
+        double maxTemp = ChemConfig.MAX_SAFE_TEMPERATURE.get();
         double ratio = tempK / maxTemp;
         if (ratio > 0.9) {
             lines.add(Component.translatable("gui.trainees.analyzer.warning.critical", DF_SIMPLE.format(ratio * 100)));

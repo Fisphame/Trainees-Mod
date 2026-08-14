@@ -2,6 +2,8 @@ package com.pha.trainees.util.game.chemistry;
 
 import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.registry.ModTags;
+import com.pha.trainees.util.game.Burning;
+import com.pha.trainees.util.game.ItemClassifier;
 import com.pha.trainees.util.game.Tools;
 
 import net.minecraft.tags.TagKey;
@@ -26,7 +28,7 @@ public class ReactionConditions {
      * 检查物品是否有指定标签
      */
     public static RCondition hasTag(TagKey<Item> tag) {
-        return (stack, entity) -> Tools.isInstanceof.tag(stack.getItem(), tag);
+        return (stack, entity) -> ItemClassifier.tag(stack.getItem(), tag);
     }
 
     // Ji相关条件（Ji有多种形态）
@@ -191,6 +193,6 @@ public class ReactionConditions {
      * 检测是否即将因燃烧消失
      */
     public static final RCondition isAboutToVanishFromFire = (stack, entity) ->
-            Tools.Burning.isAboutToVanishFromFire(entity, 5);
+            Burning.isAboutToVanishFromFire(entity, 5);
 
 }

@@ -4,6 +4,7 @@ import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModEntities;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.registry.ModTags;
+import com.pha.trainees.util.game.ItemClassifier;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -62,38 +63,30 @@ public class KunAntiEntity extends Chicken {
     @Override
     public boolean isFood(ItemStack stack) {
         var item = stack.getItem();
-        return Tools.isInstanceof.tag(item, ModTags.POWDER_ANTI_2);
+        return ItemClassifier.tag(item, ModTags.POWDER_ANTI_2);
     }
 
-    // 重写环境音效方法（需要替换为自定义音效）
+    // 重写环境音效方法（自定义音效待补充：ogg 资源后续添加后在此返回专属音效）
     @Override
     protected SoundEvent getAmbientSound() {
-        // 返回自定义环境音效，需要先创建
-        // return ModSounds.KUN_ANTI_AMBIENT.get();
         return SoundEvents.CHICKEN_AMBIENT;
     }
 
-    // 重写受伤音效方法（需要替换为自定义音效）
+    // 重写受伤音效方法（自定义音效待补充）
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        // 返回自定义受伤音效，需要先创建
-        // return ModSounds.KUN_ANTI_HURT.get();
         return SoundEvents.CHICKEN_HURT;
     }
 
-    // 重写死亡音效方法（需要替换为自定义音效）
+    // 重写死亡音效方法（自定义音效待补充）
     @Override
     protected SoundEvent getDeathSound() {
-        // 返回自定义死亡音效，需要先创建
-        // return ModSounds.KUN_ANTI_DEATH.get();
         return SoundEvents.CHICKEN_DEATH;
     }
 
-    // 重写踏步音效方法（需要替换为自定义音效）
+    // 重写踏步音效方法（自定义音效待补充）
     @Override
     protected void playStepSound(BlockPos pos, BlockState blockState) {
-        // 播放自定义踏步音效，需要先创建
-        // this.playSound(ModSounds.KUN_ANTI_STEP.get(), 0.15F, 1.0F);
         this.playSound(SoundEvents.CHICKEN_STEP, 0.15F, 1.0F);
     }
 

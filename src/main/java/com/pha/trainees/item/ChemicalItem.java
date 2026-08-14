@@ -1,5 +1,6 @@
 package com.pha.trainees.item;
 
+import com.pha.trainees.util.game.ChemistryTools;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.interfaces.IChemistry;
 import com.pha.trainees.util.interfaces.IHoverText;
@@ -193,7 +194,7 @@ public class ChemicalItem {
             super(properties);
             this.id = id;
             this.formula = formula;
-            this.molarMass = Tools.Chemistry.calculateMolarMassApproximation(formula, ELEMENT_MASS);
+            this.molarMass = ChemistryTools.calculateMolarMassApproximation(formula, ELEMENT_MASS);
         }
 
         public String getFormula() {

@@ -4,6 +4,7 @@ import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.registry.ModEntities;
 import com.pha.trainees.util.types.NumedItemEntities;
+import com.pha.trainees.util.game.CommandTools;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -212,7 +213,7 @@ public class ChemicalReaction {
                     hydrogen.setPos(x, y, z);
                     level.addFreshEntity(hydrogen);
 
-                    if (Tools.Command.isReactionExplode(level)){
+                    if (CommandTools.isReactionExplode(level)){
                         Tools.DoTnt_center(level, x, y, z);
                     }
                 })
@@ -248,7 +249,7 @@ public class ChemicalReaction {
                     level.playSound(null, entity.blockPosition(), SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS,
                             0.7f, 0.8f);
 //                    Tools.DoTnt_center(level, entity.getX(), entity.getY(), entity.getZ(), 2.0f);
-                    if (Tools.Command.isReactionExplode(level)){
+                    if (CommandTools.isReactionExplode(level)){
                         level.explode(null, entity.getX(), entity.getY(), entity.getZ(),
                                 0.5f, Level.ExplosionInteraction.MOB);
                     }

@@ -1,14 +1,10 @@
 {
-    "type": "forge:add_item",
+    "type": "trainees:duihuanquan",
     "conditions": [
         {
             "condition": "forge:loot_table_id",
             "loot_table_id": "#forge:chests/village"
-        },
-        {
-            "condition": "minecraft:random_chance",
-            "chance": 1
         }
     ],
-    "item": "trainees:duihuanquan"
+    "chance": 1.0
 }

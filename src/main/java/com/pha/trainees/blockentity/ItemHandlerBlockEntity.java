@@ -39,7 +39,7 @@ public abstract class ItemHandlerBlockEntity extends BlockEntity {
 
         @Override
         public int getSlotLimit(int slot) {
-            // 槽位容量无限（不限制堆叠数量）
+            // 槽位容量由子类 getLimit() 决定（汲取方块=无限堆叠，祭坛=1）
             return getLimit();
         }
 
@@ -51,7 +51,7 @@ public abstract class ItemHandlerBlockEntity extends BlockEntity {
 
             ItemStack existing = getStackInSlot(slot);
             if (!existing.isEmpty()) {
-                // 非空槽：严格匹配，直接合并（无限堆叠）
+                // 非空槽：严格匹配，直接合并（继承槽位容量语义）
                 if (!ItemStack.isSameItemSameTags(existing, stack)) {
                     return stack;
                 }
@@ -61,8 +61,12 @@ public abstract class ItemHandlerBlockEntity extends BlockEntity {
                 }
                 return ItemStack.EMPTY;
             } else {
-                // 空槽：必须遵守槽位容量和物品最大堆叠
-                int limit = Math.min(getSlotLimit(slot), stack.getMaxStackSize());
+                // 空槽：若子类槽位上限超过物品最大堆叠（如汲取方块的无限堆叠语义），
+                // 空槽首插也按槽位上限；否则遵守物品自身最大堆叠（Forge 惯例）
+                int limit = getSlotLimit(slot);
+                if (limit <= stack.getMaxStackSize()) {
+                    limit = Math.min(limit, stack.getMaxStackSize());
+                }
                 int insertCount = Math.min(stack.getCount(), limit);
                 if (!simulate) {
                     ItemStack toInsert = stack.copy();

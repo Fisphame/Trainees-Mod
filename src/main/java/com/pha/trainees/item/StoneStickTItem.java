@@ -6,9 +6,11 @@ import com.pha.trainees.block.SenderBlock;
 import com.pha.trainees.blockentity.SenderBlockEntity;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.ActiveStructureManager;
 import com.pha.trainees.util.interfaces.IHoverText;
+import com.pha.trainees.util.interfaces.TextSignals;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -59,7 +61,7 @@ public class StoneStickTItem extends Item implements IHoverText {
 
         Vector3f color = new Vector3f(0, 255, 0);
         DustParticleOptions options = new DustParticleOptions(color, 1.0f);
-        Tools.Particle.sendSurfaces(level, options, clickedPos, 15, 0.25, 0.25, 0.25, 0.0);
+        ParticleHelper.sendSurfaces(level, options, clickedPos, 15, 0.25, 0.25, 0.25, 0.0);
 
         // ========== 1. 切换模式（Shift + 右键） ==========
         if (player.isShiftKeyDown()) {
@@ -169,7 +171,7 @@ public class StoneStickTItem extends Item implements IHoverText {
                     configData.remove(SETTING_MODE_KEY);
                     configData.remove(SETTING_ALTAR_POS_KEY);
                     persistentData.put(CONFIG_KEY, configData);
-                    player.displayClientMessage(Success2C, true);
+                    player.displayClientMessage(TextSignals.SUCCESS2.component(), true);
                 } else {
                     player.displayClientMessage(tr("hint.invalid_drop_pos_out_of_range_or_block_unavailable")
                                     .withStyle(ChatFormatting.RED), true

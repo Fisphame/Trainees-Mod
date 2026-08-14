@@ -1,5 +1,6 @@
 package com.pha.trainees.util.interfaces;
 
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -29,7 +30,7 @@ public interface IHoneycomb {
         if (itemInHand.getItem() == Items.HONEYCOMB) {
 
             level.setBlock(pos, targetBlock.defaultBlockState(), 3);
-            Tools.Particle.sendSurfaces(level, ParticleTypes.WAX_ON, pos, 5, 0.25, 0.25, 0.25, 0.03);
+            ParticleHelper.sendSurfaces(level, ParticleTypes.WAX_ON, pos, 5, 0.25, 0.25, 0.25, 0.03);
             level.playSound(null, pos,
                     SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS,
                     1.0F, 1.0F
@@ -51,7 +52,7 @@ public interface IHoneycomb {
         }
         if (itemInHand.getItem() instanceof AxeItem) {
             level.setBlock(pos, targetBlock.defaultBlockState(), 3);
-            Tools.Particle.sendSurfaces(level, ParticleTypes.WAX_OFF, pos, 5, 0.25, 0.25, 0.25, 0.03);
+            ParticleHelper.sendSurfaces(level, ParticleTypes.WAX_OFF, pos, 5, 0.25, 0.25, 0.25, 0.03);
             level.playSound(null, pos,
                     SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS,
                     1.0F, 1.0F

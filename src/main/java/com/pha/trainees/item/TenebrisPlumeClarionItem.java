@@ -2,6 +2,7 @@ package com.pha.trainees.item;
 
 import com.pha.trainees.registry.ModEntities;
 import com.pha.trainees.util.interfaces.IHoverText;
+import com.pha.trainees.util.interfaces.TextSignals;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -61,7 +62,7 @@ public class TenebrisPlumeClarionItem extends Item implements IHoverText {
 
         // 检查玩家是否已有待召唤任务
         if (PENDING_SUMMONS.containsKey(player.getUUID())) {
-            player.displayClientMessage(Fail3C, true);
+            player.displayClientMessage(TextSignals.FAIL3.component(), true);
             return InteractionResultHolder.fail(stack);
         }
 
@@ -79,7 +80,7 @@ public class TenebrisPlumeClarionItem extends Item implements IHoverText {
         PENDING_SUMMONS.put(player.getUUID(), data);
 
         // 提示玩家
-        player.displayClientMessage(CooldownC.withStyle(ChatFormatting.GRAY), true);
+        player.displayClientMessage(TextSignals.COOLDOWN.component().withStyle(ChatFormatting.GRAY), true);
 
         // 设置物品冷却（防止短时间内多次使用）
         player.getCooldowns().addCooldown(stack.getItem(), SUMMON_COOLDOWN);
@@ -148,7 +149,7 @@ public class TenebrisPlumeClarionItem extends Item implements IHoverText {
                     );
 
                     // 通知玩家
-                    player.displayClientMessage(KC.withStyle(ChatFormatting.RED), true);
+                    player.displayClientMessage(TextSignals.K.component().withStyle(ChatFormatting.RED), true);
                 }
                 // 移除任务
                 return true;

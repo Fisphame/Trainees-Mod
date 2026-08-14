@@ -104,11 +104,15 @@ public class BeakerBlock extends BaseEntityBlock {
                 if (fluid != Fluids.EMPTY) {
                     IonType ion = FluidIonMapper.getIonForFluid(fluid);
                     if (ion != null) {
-                        double added = beaker.addIon(ion, ChemConfig.BEAKER_DEFAULT_FLUID_ADD_AMOUNT.get());
+                        // 严格映射（蓝本 §7.3）：1 桶(1000mB) = BUCKET_TO_MOL_WATER mol
+                        double bucketMoles = ChemConfig.BUCKET_TO_MOL_WATER.get();
+                        double added = beaker.addIon(ion, bucketMoles);
                         if (added > 0) {
-                            // 消耗桶，返回空桶
-                            ItemStack emptyBucket = new ItemStack(Items.BUCKET);
-                            player.setItemInHand(hand, emptyBucket);
+                            // 消耗桶，返回空桶（创造模式不消耗）
+                            if (!player.isCreative()) {
+                                ItemStack emptyBucket = new ItemStack(Items.BUCKET);
+                                player.setItemInHand(hand, emptyBucket);
+                            }
                             Main.LOGGER.info("[Beaker] Added {} mol of {} to beaker at {}", added, ion.getId().getPath(), pos);
                             return InteractionResult.CONSUME;
                         }
@@ -247,7 +251,11 @@ public class BeakerBlock extends BaseEntityBlock {
         // ====== 固体物品（溶解/添加） ======
         IonType ion = SolidIonMapper.getIonForItem(heldItem.getItem());
         if (ion != null) {
-            double added = beaker.addIon(ion, ChemConfig.SOLID_INGOT_TO_MOL.get());
+            // 粒按 1/9 mol 折算（9 粒 = 1 锭），其余固体按 1 mol/个
+            double moles = heldItem.getItem() == Items.IRON_NUGGET
+                    ? ChemConfig.SOLID_NUGGET_TO_MOL.get()
+                    : ChemConfig.SOLID_INGOT_TO_MOL.get();
+            double added = beaker.addIon(ion, moles);
             if (added > 0) {
                 heldItem.shrink(1);
                 Main.LOGGER.info("[Beaker] Added {} mol of {} from solid item to beaker at {}", added, ion.getId().getPath(), pos);

@@ -158,7 +158,7 @@ public class ChemConfigScreen extends Screen implements IHoverText {
                 new SliderEntry(tr("gui","max_per_component","config", "slider"),
                         "max_per_component", ChemConfig.MAX_MOLES_PER_COMPONENT, 0.1, 640.0),
                 new SliderEntry(tr("gui","max_total","config", "slider"),
-                        "max_total", ChemConfig.MAX_MOLES_PER_COMPONENT, 0.1, 640.0)
+                        "max_total", ChemConfig.MAX_TOTAL_MOLES, 0.1, 640.0)
         );
 
         contentHeight = y + 30;
@@ -258,6 +258,9 @@ public class ChemConfigScreen extends Screen implements IHoverText {
             double value = getPresetValue(preset, key);
             if (!Double.isNaN(value)) {
                 slider.setValue(value);
+                // 立即把预设值写入配置（内存），使分数显示实时更新；
+                // 落盘仍由「保存」按钮触发（与拖动滑块行为一致）
+                slider.commitValue();
             }
         }
 

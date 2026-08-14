@@ -28,10 +28,6 @@
     }
   },
   "rewards": {
-    "experience": 5,
-    "recipes": [
-      "trainees:kun_axemace",
-      "trainees:kun_compound_scythe"
-    ]
+    "experience": 5
   }
 }

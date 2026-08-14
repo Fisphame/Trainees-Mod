@@ -1,7 +1,6 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
-import com.pha.trainees.block.BlackHoleBlock;
 import com.pha.trainees.block.PowderAnti99Block;
 import com.pha.trainees.item.*;
 import com.pha.trainees.util.math.MathT;
@@ -40,14 +39,6 @@ public class Something {
                         BlockBehaviour.Properties.of()
                                 .strength(0.5f, 250f)
                                 .sound(SoundType.SAND)
-                ));
-
-        public static final RegistryObject<Block> BLACK_HOLE = BLOCKS.register("black_hole",
-                () -> new BlackHoleBlock(
-                        BlockBehaviour.Properties.of()
-                                .strength(20f, 2000f)
-                                .sound(SoundType.NETHER_BRICKS)
-                                .requiresCorrectToolForDrops()
                 ));
 
     }
@@ -205,12 +196,6 @@ public class Something {
         public static final RegistryObject<Item> POWDER_ANTI_99_BLOCK_ITEM = ITEMS.register("powder_anti_99",
                 () -> new BlockItem(PrankBlocks.POWDER_ANTI_99_BLOCK.get(),
                         new Item.Properties()));
-        //黑洞
-        public static final RegistryObject<Item> BLACK_HOLE = ITEMS.register("black_hole",
-                () -> new BlockItem(PrankBlocks.BLACK_HOLE.get(),
-                        new Item.Properties()
-                                .stacksTo(1)
-                ));
 
 
         //配方块

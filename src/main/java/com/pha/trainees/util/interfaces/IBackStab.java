@@ -1,5 +1,7 @@
 package com.pha.trainees.util.interfaces;
 
+import com.pha.trainees.util.game.EntityWay;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -15,11 +17,11 @@ public interface IBackStab {
 
     default @NotNull InteractionResultHolder<ItemStack> useIt(@NotNull Level level, @NotNull Player player,
                                                             @NotNull InteractionHand interaction) {
-        Entity nearestEntity = Tools.EntityWay.getNearestEntityInFront(player, 2.0, 15.0f);
-        Tools.Particle.visualizeSector(level, player, 2., 30.0f, 30);
+        Entity nearestEntity = EntityWay.getNearestEntityInFront(player, 2.0, 15.0f);
+        ParticleHelper.visualizeSector(level, player, 2., 30.0f, 30);
         if (nearestEntity != null) {
             if (nearestEntity instanceof LivingEntity living) {
-                if (Tools.EntityWay.getYawDiffer(living, player) <= 30.0f){
+                if (EntityWay.getYawDiffer(living, player) <= 30.0f){
                     living.hurt(player.damageSources().playerAttack(player), 20.0f);
                 }
             }

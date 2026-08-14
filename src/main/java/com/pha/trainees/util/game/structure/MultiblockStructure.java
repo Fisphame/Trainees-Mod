@@ -68,9 +68,9 @@ public class MultiblockStructure {
             return new Booleanf(false, 2);
         }
 
-        // 检查是否已激活
+        // 检查是否已激活（存储的 matchPos 就是传入的 pos，不能用 pos.above()，否则永远匹配不上）
         ActiveStructureManager manager = ActiveStructureManager.get(level);
-        if (manager.isPositionActive(level, structureId, pos.above())) {
+        if (manager.isPositionActive(level, structureId, pos)) {
             return new Booleanf(false, 4);
         }
 

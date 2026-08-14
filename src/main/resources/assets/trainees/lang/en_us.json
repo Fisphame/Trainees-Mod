@@ -49,6 +49,8 @@
   "advancements.trainees.powder_anti_99.description": "9⁹ = 387,420,489....................!",
   "advancements.trainees.altar.title": "Magic Altar",
   "advancements.trainees.altar.description": "Activate a Kun Altar.",
+  "advancements.trainees.altar_core_block.title": "Altar Core Block",
+  "advancements.trainees.altar_core_block.description": "Craft the Altar Core Block and unlock all altar recipes.",
   
   "itemGroup.trainees.kun_tab": "Trainees",
   
@@ -82,8 +84,6 @@
   "block.trainees.deepslate_placium_ore": "Deepslate Placium Ore",
   "block.trainees.placium_block": "Block of Placium",
   "block.trainees.feather_block": "Block of Feathers",
-  "block.trainees.purification_station": "Purification Station",
-  "block.trainees.reacting_furnace": "Reacting Furnace",
   "block.trainees.basketball_anti_block": "[Block] Anti-basketball",
   "block.trainees.basketball_anti_block_rgt": "Anti-basketball",
   "block.trainees.altar_core_block": "Altar Core Block",
@@ -197,6 +197,7 @@
   "tooltip.trainees.tenebris_plume_clarion": "§lSummon Clarion",
   "tooltip.trainees.tenebris_plume_clarion.2": "Play at night to summon what is behind...",
   "message.trainees.tenebris_plume_clarion.too_dark": "The night is dark and full of terrors... It's not the right time.",
+  "message.trainees.ability.cooldown": "...!",
   
   
   "enchantment.trainees.ten_thousand_sword": "Wanjian Guizong",
@@ -294,7 +295,6 @@
   "itemGroup.trainees.prank_tab": "Prank",
   
   "block.trainees.powder_anti_99": "Block of Black Powder",
-  "block.trainees.black_hole": "Black Hole",
   
   "item.trainees.left_half_diamond_pickaxe": "Left Half of a Diamond Pickaxe",
   "item.trainees.right_half_diamond_pickaxe": "Right Half of a Diamond Pickaxe",
@@ -316,7 +316,6 @@
   "item.trainees.powder_anti_97": "Small Block of Black Powder",
   "item.trainees.powder_anti_98": "Block of Black Powder",
   "item.trainees.powder_anti_99_scythe": "Blekified Scythe",
-  "item.trainees.black_hole": "Black Hole",
   
   "item.trainees.gun_mu": " ",
   
@@ -325,15 +324,14 @@
   "subtitles.trainees.mining_sound_2": "You",
   "subtitles.trainees.mining_sound_3": "Too",
   "subtitles.trainees.mining_sound_4": "Beautiful",
+  "subtitles.trainees.releasing_sword_wind_1": "Sword wind",
+  "subtitles.trainees.releasing_sword_wind_2": "Sword wind",
+  "subtitles.trainees.releasing_sword_wind_3": "Sword wind",
+  "subtitles.trainees.releasing_sword_wind_4": "Sword wind",
   "subtitles.trainees.hit": "Charging",
   "subtitles.trainees.hit_reset": "Charging",
   "subtitles.trainees.heavy_hit": "Charging",
   "subtitles.trainees.heavy_hit_reset": "Charging",
-  
-  "container.trainees.purification_station": "Purification Station",
-  "container.trainees.purification_station.input_slot": "Material",
-  "container.trainees.purification_station.fuel_slot": "Upgrade/Refining Agent...",
-  "button.trainees.purify": "Purify",
   
   "jei.trainees.trainer_altar": "Kun Altar"
 }

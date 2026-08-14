@@ -609,6 +609,18 @@ public class ModChemistry {
                 .build()
         );
 
+        // 盐酸水溶液（强电解质，溶于水后完全电离为 H⁺ + Cl⁻）
+        public static final IonType HCL_AQ = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "hcl_aq"), Phase.AQUEOUS)
+                .molarMass(36.46)
+                .specificHeat(74.0)
+                .formationEnthalpy(-167.2)
+                .formationGibbs(-131.2)
+                .toxicityLevel(2)
+                .tag(IonTags.ACID)
+                .build()
+        );
+
         public static final IonType Cl2 = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "cl2"), Phase.GAS)
                 .molarMass(70.90)
@@ -629,6 +641,36 @@ public class ModChemistry {
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .tag(IonTags.OXIDIZER)
+                .build()
+        );
+
+        public static final IonType N2 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "n2"), Phase.GAS)
+                .molarMass(28.01)
+                .specificHeat(29.1)
+                .formationEnthalpy(0)
+                .formationGibbs(0)
+                .build()
+        );
+
+        public static final IonType CO = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "co"), Phase.GAS)
+                .molarMass(28.01)
+                .specificHeat(29.1)
+                .formationEnthalpy(-110.5)
+                .formationGibbs(-137.2)
+                .toxicityLevel(2)
+                .tag(IonTags.REDUCER)
+                .build()
+        );
+
+        public static final IonType C = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "c"), Phase.SOLID)
+                .molarMass(12.01)
+                .specificHeat(8.5)
+                .formationEnthalpy(0)
+                .formationGibbs(0)
+                .tag(IonTags.REDUCER)
                 .build()
         );
 
@@ -785,6 +827,36 @@ public class ModChemistry {
                 .formationEnthalpy(-1207.6)
                 .formationGibbs(-1128.8)
                 .tag(IonTags.PRECIPITATE)
+                .build()
+        );
+
+        public static final IonType CaO = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "cao"), Phase.SOLID)
+                .molarMass(56.08)
+                .specificHeat(42.8)
+                .formationEnthalpy(-635.1)
+                .formationGibbs(-604.0)
+                .tag(IonTags.OXIDE)
+                .build()
+        );
+
+        public static final IonType Ca_OH_2 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "caoh2"), Phase.SOLID)
+                .molarMass(74.09)
+                .specificHeat(87.5)
+                .formationEnthalpy(-986.1)
+                .formationGibbs(-898.5)
+                .tag(IonTags.BASE)
+                .build()
+        );
+
+        public static final IonType NaHSO4 = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "nahso4"), Phase.SOLID)
+                .molarMass(120.06)
+                .specificHeat(120.0)
+                .formationEnthalpy(-1125.5)
+                .formationGibbs(-992.8)
+                .tag(IonTags.ACID)
                 .build()
         );
 
@@ -1013,7 +1085,6 @@ public class ModChemistry {
                     .product(ModIons.H2O, 1)
                     .deltaHComputed()   // ΔH = ΔHf(H2O) - ΔHf(H+) - ΔHf(OH-) = -55.8 kJ/mol
                     .deltaGComputed()   // ΔG = ΔGf(H2O) - ΔGf(H+) - ΔGf(OH-) = -79.9 kJ/mol
-                    .equilibriumConstant(1e14)  // 非常彻底
                     .activationEnergy(5.0)      // 极低能垒
                     .preExponentialFactor(1e11)
                     .build();
@@ -1034,7 +1105,6 @@ public class ModChemistry {
                     .product(ModIons.O2, 1)
                     .deltaHComputed()   // ΔH = 2ΔHf(H2O) - 2ΔHf(H2O2) = -196.0 kJ/mol
                     .deltaGComputed()   // ΔG = 2ΔGf(H2O) - 2ΔGf(H2O2) = -233.4 kJ/mol
-                    .equilibriumConstant(1e20)
                     .activationEnergy(75.0)   // 较高能垒，常温下几乎不反应
                     .preExponentialFactor(1e6)
                     .selfLoop(true)
@@ -1053,7 +1123,6 @@ public class ModChemistry {
                     .precondition(ModIons.MnO2, 1)   // 需要 MnO₂ 作为催化剂（不消耗）
                     .deltaHComputed()                // 与无催化剂版本相同
                     .deltaGComputed()                // 与无催化剂版本相同
-                    .equilibriumConstant(1e20)       // 与无催化剂版本相同
                     .activationEnergy(30.0)          // 低能垒，常温下快速反应
                     .preExponentialFactor(1e10)      // 比无催化剂版本高一个数量级
                     .gamePriorityBias(2.0)           // 提高优先级评分
@@ -1072,7 +1141,6 @@ public class ModChemistry {
                     .product(ModIons.CaCO3, 1)
                     .deltaHComputed()   // ΔH = ΔHf(CaCO3) - ΔHf(Ca2+) - ΔHf(CO3 2-) = +12.3 kJ/mol
                     .deltaGComputed()   // ΔG = ΔGf(CaCO3) - ΔGf(Ca2+) - ΔGf(CO3 2-) = -47.4 kJ/mol（自发）
-                    .equilibriumConstant(1e8) // 较彻底
                     .activationEnergy(10.0)   // 低能垒
                     .preExponentialFactor(1e10)
                     .build();
@@ -1090,7 +1158,7 @@ public class ModChemistry {
                     .precondition(ModIons.H2O, 1)
                     .deltaHComputed()   // ΔH = ΔHf(Na+) + ΔHf(Cl-) - ΔHf(NaCl) = +3.8 kJ/mol（微吸热，符合实际）
                     .deltaGComputed()   // ΔG = ΔGf(Na+) + ΔGf(Cl-) - ΔGf(NaCl) = -9.0 kJ/mol（自发）
-                    .equilibriumConstant(1e20)      // 强电解质，几乎完全电离
+                    // 物理 K(298)≈38（≈NaCl 溶解度积 Ksp）。常规用量下 Q=[Na⁺][Cl⁻] < 38 仍几乎完全电离。
                     .activationEnergy(5.0)          // 极低能垒，遇水即电离
                     .preExponentialFactor(1e11)
                     .selfLoop(true)
@@ -1108,6 +1176,8 @@ public class ModChemistry {
                     .product(ModIons.NO2, 2)
                     .deltaHComputed()   // ΔH = 2ΔHf(NO2) - ΔHf(N2O4) = +57.2 kJ/mol（吸热）
                     .deltaGComputed()   // ΔG = 2ΔGf(NO2) - ΔGf(N2O4) = +4.8 kJ/mol（常温偏向 N₂O₄）
+                    .equilibriumConstant(1.0)   // 显式覆盖（可逆玩法）：K°=1.0，约293K时 K≈0.676 与实测平衡一致
+                    .equilibriumOverridden()
                     .activationEnergy(60.0)
                     .preExponentialFactor(1e8)
                     .selfLoop(true)
@@ -1120,6 +1190,8 @@ public class ModChemistry {
                     .product(ModIons.N2O4, 1)
                     .deltaHComputed()   // ΔG = -4.8 kJ/mol（自发），优先级略高于正反应
                     .deltaGComputed()
+                    .equilibriumConstant(1.0)   // 显式覆盖：与正反应同锚点，维持可逆平衡
+                    .equilibriumOverridden()
                     .activationEnergy(60.0)
                     .preExponentialFactor(1e8)
                     .selfLoop(true)
@@ -1137,7 +1209,6 @@ public class ModChemistry {
                     .product(ModIons.HCO3_minus, 1)
                     .deltaHComputed()   // ΔH = -99.1 kJ/mol（放热）
                     .deltaGComputed()   // ΔG = -18.2 kJ/mol（自发）
-                    .equilibriumConstant(1e4)
                     .activationEnergy(40.0)
                     .preExponentialFactor(1e9)
                     .build();
@@ -1155,7 +1226,6 @@ public class ModChemistry {
                     .product(ModIons.HCO3_minus, 1)
                     .deltaHComputed()   // ΔG = -59.0 kJ/mol
                     .deltaGComputed()
-                    .equilibriumConstant(1e6)
                     .activationEnergy(40.0)
                     .preExponentialFactor(1e9)
                     .dynamicPriorityBias(c -> {
@@ -1173,7 +1243,6 @@ public class ModChemistry {
                     .product(ModIons.CO2, 1)
                     .deltaHComputed()   // ΔG = -103.7 kJ/mol（更彻底）
                     .deltaGComputed()
-                    .equilibriumConstant(1e6)
                     .activationEnergy(40.0)
                     .preExponentialFactor(1e9)
                     .dynamicPriorityBias(c -> {
@@ -1208,7 +1277,7 @@ public class ModChemistry {
                     .product(ModIons.SO2, 1)
                     .deltaHComputed()   // ΔH = -296.8 kJ（放热）
                     .deltaGComputed()   // ΔG = -300.1 kJ（自发）
-                    .equilibriumConstant(1e20)  // 燃烧近乎完成
+                    // 物理公式 K = exp(-ΔG(T)/RT)：任意温度 K 巨大，燃烧自发推进，无需手设 K°
                     .activationEnergy(40.0)
                     .preExponentialFactor(1e9)
                     .build();
@@ -1222,7 +1291,8 @@ public class ModChemistry {
                     .product(ModIons.SO3, 2)
                     .deltaHComputed()   // ΔH = -197.8 kJ（放热）
                     .deltaGComputed()   // ΔG = -142 kJ（自发）
-                    .equilibriumConstant(10.0)     // 中等，可逆
+                    .equilibriumConstant(10.0)     // 显式覆盖（可逆玩法）：手调中等 K 维持接触法可逆平衡
+                    .equilibriumOverridden()
                     .activationEnergy(50.0)
                     .preExponentialFactor(1e8)
                     .build();
@@ -1235,7 +1305,8 @@ public class ModChemistry {
                     .product(ModIons.O2, 1)
                     .deltaHComputed()   // ΔG = +142 kJ（非自发，K_rev = 1/K_fwd）
                     .deltaGComputed()
-                    .equilibriumConstant(0.1)      // 与正反应 K 互为倒数
+                    .equilibriumConstant(0.1)      // 显式覆盖：与正反应 K 互为倒数
+                    .equilibriumOverridden()
                     .activationEnergy(50.0)
                     .preExponentialFactor(1e8)
                     .selfLoop(true)
@@ -1250,7 +1321,6 @@ public class ModChemistry {
                     .product(ModIons.H2SO4, 1)
                     .deltaHComputed()   // ΔH = -132.5 kJ（放热）
                     .deltaGComputed()   // ΔG = -81.8 kJ（自发）
-                    .equilibriumConstant(1e20)
                     .activationEnergy(40.0)
                     .preExponentialFactor(1e9)
                     .build();
@@ -1279,11 +1349,185 @@ public class ModChemistry {
                     .product(ModIons.HCl, 2)
                     .deltaHComputed()   // ΔH = -184.6 kJ（放热）
                     .deltaGComputed()   // ΔG = -190.6 kJ（自发）
-                    .equilibriumConstant(1e20)
+                    // 物理公式 K = exp(-ΔG(T)/RT)：任意温度 K 巨大，合成自发推进
                     .activationEnergy(50.0)
                     .preExponentialFactor(1e9)
                     .build();
             GRAPH.addBidirectionalEdges(ModIons.Cl2, ModIons.H2, hclSynthesis);
+
+            // ====== 盐酸溶解：HCl(g) + H₂O → HCl(aq) ======
+            // 气体盐酸通入水中形成盐酸水溶液（溶解放热）
+            ReactionRule hclDissolve = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "hcl_dissolve"))
+                    .reactant(ModIons.HCl, 1)
+                    .reactant(ModIons.H2O, 1)
+                    .product(ModIons.HCL_AQ, 1)
+                    .deltaHComputed()   // ΔH ≈ ΔHf(HCl·aq) - ΔHf(HCl,g) ≈ -75 kJ（溶解放热）
+                    .deltaGComputed()   // 自发溶解
+                    .activationEnergy(5.0)
+                    .preExponentialFactor(1e10)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.HCl, ModIons.H2O, hclDissolve);
+
+            // ====== 盐酸电离：HCl(aq) → H⁺ + Cl⁻（强电解质，完全电离） ======
+            // 水作为电离介质（前置条件：检测存在但不消耗）
+            ReactionRule hclIonize = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "hcl_ionize"))
+                    .reactant(ModIons.HCL_AQ, 1)
+                    .product(ModIons.H_plus, 1)
+                    .product(ModIons.Cl_minus, 1)
+                    .precondition(ModIons.H2O, 1)
+                    .deltaHComputed()   // 电离吸热（≈ -ΔHf(HCl·aq) 部分抵消）
+                    .deltaGComputed()   // 强酸完全电离
+                    .activationEnergy(3.0)   // 极低能垒，即电离
+                    .preExponentialFactor(1e12)
+                    .selfLoop(true)
+                    .build();
+            // 自环：分解/电离类反应，由 Tick 轮询驱动
+            GRAPH.addEdge(ModIons.HCL_AQ, ModIons.HCL_AQ, hclIonize);
+
+            // ====== 哈伯法：N₂ + 3H₂ ⇌ 2NH₃（可逆合成氨） ======
+            ReactionRule haberSynthesis = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "haber_synthesis"))
+                    .reactant(ModIons.N2, 1)
+                    .reactant(ModIons.H2, 3)
+                    .product(ModIons.NH3, 2)
+                    .deltaHComputed()   // ΔH = -92.2 kJ（放热）
+                    .deltaGComputed()   // ΔG = -32.8 kJ（自发，常温可逆）
+                    .equilibriumConstant(10.0)     // 显式覆盖（可逆玩法）：手调中等 K 维持合成氨可逆平衡
+                    .equilibriumOverridden()
+                    .activationEnergy(110.0)   // 高Ea：室温几乎不反应，需高温（工业合成氨）
+                    .preExponentialFactor(1e8)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.N2, ModIons.H2, haberSynthesis);
+
+            ReactionRule haberDecompose = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "haber_decompose"))
+                    .reactant(ModIons.NH3, 2)
+                    .product(ModIons.N2, 1)
+                    .product(ModIons.H2, 3)
+                    .deltaHComputed()   // ΔG = +32.8 kJ（K_rev = 1/K_fwd）
+                    .deltaGComputed()
+                    .equilibriumConstant(0.1)   // 显式覆盖：与正反应 K 互为倒数
+                    .equilibriumOverridden()
+                    .activationEnergy(110.0)   // 与正反应一致的高Ea
+                    .preExponentialFactor(1e8)
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.NH3, ModIons.NH3, haberDecompose);
+
+            // ====== 铜氢还原：Cu₂O + H₂ → 2Cu + H₂O（需加热，室温动力学几乎不发生） ======
+            ReactionRule copperReduce = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "copper_reduce"))
+                    .reactant(ModIons.Cu2O, 1)
+                    .reactant(ModIons.H2, 1)
+                    .product(ModIons.Cu, 2)
+                    .product(ModIons.H2O, 1)
+                    .deltaHComputed()   // ΔH = -117.2 kJ（放热）
+                    .deltaGComputed()   // ΔG = -91.1 kJ（自发但动力学需加热）
+                    .activationEnergy(120.0)   // 高Ea：室温速率可忽略，加热后Arrhenius加速
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.Cu2O, ModIons.H2, copperReduce);
+
+            // ====== 钠遇水（剧烈）：2Na + 2H₂O → 2NaOH + H₂（再生 H₂，形成循环） ======
+            ReactionRule sodiumWater = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "sodium_water"))
+                    .reactant(ModIons.Na, 2)
+                    .reactant(ModIons.H2O, 2)
+                    .product(ModIons.NaOH, 2)
+                    .product(ModIons.H2, 1)
+                    .deltaHComputed()   // ΔH = -279.6 kJ（剧烈放热）
+                    .deltaGComputed()   // ΔG = -285.2 kJ（极自发）
+                    // 物理公式 K = exp(-ΔG(T)/RT)：任意温度 K 巨大，遇水剧烈反应
+                    .activationEnergy(25.0)   // 极低能垒，几乎瞬间
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.Na, ModIons.H2O, sodiumWater);
+
+            // ====== 石灰煅烧：CaCO₃ → CaO + CO₂↑（需高温窑） ======
+            ReactionRule limeCalcination = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "lime_calcination"))
+                    .reactant(ModIons.CaCO3, 1)
+                    .product(ModIons.CaO, 1)
+                    .product(ModIons.CO2, 1)
+                    .deltaHComputed()   // ΔH = +179 kJ（强吸热）
+                    .deltaGComputed()   // ΔG = +130 kJ（常温不自发）
+                    // 物理公式：常温 K≈4e-23 冻结，1300K 时 K≈25 推进（吸热反应高温有利，物理温度依赖）
+                    .activationEnergy(140.0)   // 高Ea：室温忽略，石灰窑高温煅烧
+                    .preExponentialFactor(1e8)
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.CaCO3, ModIons.CaCO3, limeCalcination);
+
+            // ====== 石灰消化：CaO + H₂O → Ca(OH)₂（室温放热快） ======
+            ReactionRule limeSlake = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "lime_slake"))
+                    .reactant(ModIons.CaO, 1)
+                    .reactant(ModIons.H2O, 1)
+                    .product(ModIons.Ca_OH_2, 1)
+                    .deltaHComputed()   // ΔH = -65.2 kJ（放热）
+                    .deltaGComputed()   // ΔG = -57.4 kJ（自发）
+                    .activationEnergy(35.0)
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.CaO, ModIons.H2O, limeSlake);
+
+            // ====== 实验室制盐酸：NaCl + H₂SO₄ → NaHSO₄ + HCl↑（需加热） ======
+            ReactionRule hclPrepare = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "hcl_prepare"))
+                    .reactant(ModIons.NaCl, 1)
+                    .reactant(ModIons.H2SO4, 1)
+                    .product(ModIons.NaHSO4, 1)
+                    .product(ModIons.HCl, 1)
+                    .deltaHComputed()   // ΔH = +7.3 kJ（微吸热）
+                    .deltaGComputed()   // ΔG = -14.0 kJ（自发但需加热启动）
+                    .activationEnergy(80.0)   // 高Ea：室温忽略，需加热（约200°C）
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.NaCl, ModIons.H2SO4, hclPrepare);
+
+            // ====== 焦炭燃烧：C + O₂ → CO₂（需点火/加热） ======
+            ReactionRule carbonBurn = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "carbon_burn"))
+                    .reactant(ModIons.C, 1)
+                    .reactant(ModIons.O2, 1)
+                    .product(ModIons.CO2, 1)
+                    .deltaHComputed()   // ΔH = -393.5 kJ（放热）
+                    .deltaGComputed()   // ΔG = -394.4 kJ（自发但需点火）
+                    // 物理公式 K = exp(-ΔG(T)/RT)：1300K 时 K 仍 ~1e16（修复此前高温 K 坍缩导致 C+O₂ 卡死）
+                    .activationEnergy(90.0)   // 需点火加热
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.C, ModIons.O2, carbonBurn);
+
+            // ====== 布多尔反应：C + CO₂ → 2CO（制CO，需高温，强吸热） ======
+            ReactionRule boudouard = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "boudouard"))
+                    .reactant(ModIons.C, 1)
+                    .reactant(ModIons.CO2, 1)
+                    .product(ModIons.CO, 2)
+                    .deltaHComputed()   // ΔH = +172.5 kJ（强吸热）
+                    .deltaGComputed()   // ΔG = +120 kJ（室温不自发，高温 K 增大）
+                    // 物理公式：常温 K 冻结，1300K 时 K≈187 制 CO（吸热反应高温有利，物理温度依赖）
+                    .activationEnergy(140.0)   // 高Ea，需高温
+                    .preExponentialFactor(1e8)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.C, ModIons.CO2, boudouard);
+
+            // ====== 高炉炼铁：Fe₂O₃ + 3CO → 2Fe + 3CO₂（需高温） ======
+            ReactionRule ironBlast = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "iron_blast"))
+                    .reactant(ModIons.Fe2O3, 1)
+                    .reactant(ModIons.CO, 3)
+                    .product(ModIons.Fe, 2)
+                    .product(ModIons.CO2, 3)
+                    .deltaHComputed()   // ΔH = -24.8 kJ
+                    .deltaGComputed()   // ΔG = -29.4 kJ（自发但动力学需高温）
+                    .activationEnergy(120.0)   // 高Ea，高炉温度
+                    .preExponentialFactor(1e8)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.Fe2O3, ModIons.CO, ironBlast);
 
             Main.LOGGER.info("[Chemistry] Reaction graph ready: {} nodes, {} edges",
                     GRAPH.getAllNodes().size(), GRAPH.getAllEdges().size());

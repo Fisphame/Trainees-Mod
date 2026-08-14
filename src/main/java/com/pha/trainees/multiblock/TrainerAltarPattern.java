@@ -8,10 +8,14 @@ import com.pha.trainees.recipe.TrainerAltarRecipe;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModRecipes;
 import com.pha.trainees.util.game.enums.AbsorbWorkModel;
+import com.pha.trainees.util.game.BlockCourse;
+import com.pha.trainees.util.game.EntityWay;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.*;
 import com.pha.trainees.util.interfaces.IHoverText;
 import com.pha.trainees.util.interfaces.ITraversal;
+import com.pha.trainees.util.interfaces.TextSignals;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -148,12 +152,16 @@ public class TrainerAltarPattern implements IHoverText {
      */
     private static class TrainerAltarActivationHandler implements IActivationHandler, ITraversal {
 
+        // 祭坛配方缓存：datapack reload 会替换 RecipeManager 实例，故以实例引用判断失效
+        private static List<TrainerAltarRecipe> cachedRecipes = null;
+        private static RecipeManager cachedRecipeManager = null;
+
         @Override
         public void onActivate(Level level, BlockPos matchPos) {
             if (level.isClientSide) return;
             Main.LOGGER.info("Trainer Altar activated at {}", matchPos);
             double x = matchPos.getX(); double y = matchPos.getY(); double z = matchPos.getZ();
-            Vec3 center = Tools.BlockCourse.getCenter(matchPos);
+            Vec3 center = BlockCourse.getCenter(matchPos);
             double cx = center.x; double cy = center.y; double cz = center.z;
 
             // 记录激活状态
@@ -162,8 +170,8 @@ public class TrainerAltarPattern implements IHoverText {
             manager.addActiveStructure(level, STRUCTURE_ID, matchPos, defaultDrop);
 
             level.playSound(null, matchPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 1.0F, 1.0F);
-            Tools.Particle.send(level, ParticleTypes.SOUL_FIRE_FLAME, cx, cy, cz, 200, 0.5, 0, 0.5, 0.15);
-            Tools.Particle.send(level, ParticleTypes.FLAME, cx, cy, cz, 200, 0.5, 0, 0.5, 0.15);
+            ParticleHelper.send(level, ParticleTypes.SOUL_FIRE_FLAME, cx, cy, cz, 200, 0.5, 0, 0.5, 0.15);
+            ParticleHelper.send(level, ParticleTypes.FLAME, cx, cy, cz, 200, 0.5, 0, 0.5, 0.15);
 
 
 
@@ -203,9 +211,14 @@ public class TrainerAltarPattern implements IHoverText {
             };
 
             RecipeManager recipeManager = Objects.requireNonNull(level.getServer()).getRecipeManager();
-            List<TrainerAltarRecipe> recipes = recipeManager.getAllRecipesFor(ModRecipes.TRAINER_ALTAR_TYPE.get())
-                    .stream()
-                    .toList();
+            // 缓存配方列表，避免每 tick 全量拉取（RecipeManager 实例变化时重新加载）
+            if (cachedRecipes == null || cachedRecipeManager != recipeManager) {
+                cachedRecipeManager = recipeManager;
+                cachedRecipes = recipeManager.getAllRecipesFor(ModRecipes.TRAINER_ALTAR_TYPE.get())
+                        .stream()
+                        .toList();
+            }
+            List<TrainerAltarRecipe> recipes = cachedRecipes;
 
             // 遍历配方
             for (TrainerAltarRecipe recipe : recipes) {
@@ -272,11 +285,22 @@ public class TrainerAltarPattern implements IHoverText {
                     } else if (model == AbsorbWorkModel.DROPPING) {
                         if (!stored.isEmpty()) {
                             if (ItemStack.isSameItemSameTags(stored, resultItem)) {
+                                // 合并同类，按最大堆叠封顶，超出部分掉落（避免合成后超 64 堆叠）
+                                int maxStack = stored.getMaxStackSize();
                                 int newCount = stored.getCount() + resultItem.getCount();
-                                if (newCount < 0) newCount = Integer.MAX_VALUE;
+                                int overflow = 0;
+                                if (newCount > maxStack) {
+                                    overflow = newCount - maxStack;
+                                    newCount = maxStack;
+                                }
                                 ItemStack combined = stored.copy();
                                 combined.setCount(newCount);
                                 absorb.setStoredItem(combined);
+                                if (overflow > 0) {
+                                    ItemStack drop = resultItem.copy();
+                                    drop.setCount(overflow);
+                                    EntityWay.spawnItemEntity(level, dropPos, drop);
+                                }
                             } else {
                                 absorb.dropStoredItem();
                                 absorb.setStoredItem(resultItem);
@@ -288,18 +312,18 @@ public class TrainerAltarPattern implements IHoverText {
                     int[] random = {Tools.randomInRange(level, 1, 2), Tools.randomInRange(level, 1, 2),
                             Tools.randomInRange(level, 1, 2), Tools.randomInRange(level, 1, 2)};
                     for (int i = 0; i <= 3; i++) {
-                        Tools.Particle.spawnArcParticle(level,
+                        ParticleHelper.spawnArcParticle(level,
                                 random[i] == 1 ? ParticleTypes.FLAME : ParticleTypes.SOUL_FIRE_FLAME,
-                                Tools.BlockCourse.getCenter(altarPos[i]),
-                                Tools.BlockCourse.getCenter(dropPos)
+                                BlockCourse.getCenter(altarPos[i]),
+                                BlockCourse.getCenter(dropPos)
                         );
                     }
                 }
             } else { // isAir
-                Tools.EntityWay.spawnItemEntity(level, dropPos, resultItem);
-                Vec3 center = Tools.BlockCourse.getCenter(matchPos);
+                EntityWay.spawnItemEntity(level, dropPos, resultItem);
+                Vec3 center = BlockCourse.getCenter(matchPos);
                 double cx = center.x; double cy = center.y; double cz = center.z;
-                Tools.Particle.send(level, ParticleTypes.FLAME, cx, cy, cz, 25, 0.5, 0.5, 0.5, 0.1);
+                ParticleHelper.send(level, ParticleTypes.FLAME, cx, cy, cz, 25, 0.5, 0.5, 0.5, 0.1);
             }
             clearStoredItems(entities);
             level.playSound(null, matchPos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.6F, 1.0F);
@@ -329,12 +353,12 @@ public class TrainerAltarPattern implements IHoverText {
         @Override
         public void onEffectTick(Level level, BlockPos matchPos, long activeTime) {
             if (level.isClientSide) return;
-            Vec3 pos = Tools.BlockCourse.getCenter(matchPos);
+            Vec3 pos = BlockCourse.getCenter(matchPos);
             double x = pos.x; double y = pos.y; double z = pos.z;
-            Tools.Particle.send(
+            ParticleHelper.send(
                     level, ParticleTypes.SOUL_FIRE_FLAME, x, y, z, 5, 3, 1, 3, 0.01
             );
-            Tools.Particle.send(
+            ParticleHelper.send(
                     level, ParticleTypes.FLAME, x, y, z, 5, 3, 1, 3, 0.01
             );
         }
@@ -362,7 +386,7 @@ public class TrainerAltarPattern implements IHoverText {
             // 通知玩家
             Player nearestPlayer = level.getNearestPlayer(matchPos.getX(), matchPos.getY(), matchPos.getZ(), 10, false);
             if (nearestPlayer != null) {
-                nearestPlayer.displayClientMessage(KC.withStyle(ChatFormatting.RED), true);
+                nearestPlayer.displayClientMessage(TextSignals.K.component().withStyle(ChatFormatting.RED), true);
             }
         }
 

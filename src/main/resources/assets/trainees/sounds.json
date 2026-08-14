@@ -100,5 +100,29 @@
       "trainees:heavy_hits"
     ],
     "subtitle": "subtitles.trainees.heavy_hits"
+  },
+  "releasing_sword_wind_1": {
+    "sounds": [
+      "trainees:releasing_sword_wind_1"
+    ],
+    "subtitle": "subtitles.trainees.releasing_sword_wind_1"
+  },
+  "releasing_sword_wind_2": {
+    "sounds": [
+      "trainees:releasing_sword_wind_2"
+    ],
+    "subtitle": "subtitles.trainees.releasing_sword_wind_2"
+  },
+  "releasing_sword_wind_3": {
+    "sounds": [
+      "trainees:releasing_sword_wind_3"
+    ],
+    "subtitle": "subtitles.trainees.releasing_sword_wind_3"
+  },
+  "releasing_sword_wind_4": {
+    "sounds": [
+      "trainees:releasing_sword_wind_4"
+    ],
+    "subtitle": "subtitles.trainees.releasing_sword_wind_4"
   }
 }

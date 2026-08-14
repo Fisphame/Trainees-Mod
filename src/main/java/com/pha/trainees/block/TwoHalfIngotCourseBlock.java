@@ -2,6 +2,7 @@ package com.pha.trainees.block;
 
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModChemistry;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.interfaces.IHoneycomb;
 import net.minecraft.core.BlockPos;
@@ -55,7 +56,7 @@ public class TwoHalfIngotCourseBlock {
                 level.setBlock(pos, targetBlock.defaultBlockState(), 3);
 
                 level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 1.0F);
-                Tools.Particle.send(level, ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                ParticleHelper.send(level, ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                         25, 1.0, 1.0, 1.0, 0);
             }
         }

@@ -4,7 +4,9 @@ import com.pha.trainees.Main;
 import com.pha.trainees.multiblock.TrainerAltarPattern;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.util.interfaces.IHoverText;
+import com.pha.trainees.util.interfaces.TextSignals;
 import com.pha.trainees.util.types.Booleanf;
+import com.pha.trainees.util.game.Achievement;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.game.structure.MultiblockStructure;
 import net.minecraft.ChatFormatting;
@@ -50,9 +52,9 @@ public class StoneStickItem extends Item implements IHoverText {
 
         if (activated.bool()) {
             Main.LOGGER.info("Trainer Altar activated success");
-            player.displayClientMessage(SuccessC, true);
+            player.displayClientMessage(TextSignals.SUCCESS.component(), true);
             if (player instanceof ServerPlayer serverPlayer) {
-                Tools.Achievement.grantSpecificAchievement(
+                Achievement.grantSpecificAchievement(
                         serverPlayer,
                         "trainees:structure/altar"  // altar.json
                 );
@@ -63,11 +65,11 @@ public class StoneStickItem extends Item implements IHoverText {
             player.displayClientMessage(
                     Component.literal(
                             switch (activated.num()) {
-                                case 0 -> Fail;
-                                case 1 -> Lose;
-                                case 2 -> Cooldown;
-                                case 3 -> Fail2;
-                                case 4 -> Success;
+                                case 0 -> TextSignals.FAIL.text();
+                                case 1 -> TextSignals.LOSE.text();
+                                case 2 -> TextSignals.COOLDOWN.text();
+                                case 3 -> TextSignals.FAIL2.text();
+                                case 4 -> TextSignals.SUCCESS.text();
                                 default -> "Unexpected";
                             }
                     ).withStyle(

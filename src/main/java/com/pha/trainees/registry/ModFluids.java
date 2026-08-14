@@ -86,19 +86,6 @@ public class ModFluids {
 //                }
 //            }
 
-
-//    public static final FlowingFluid FLOWING_JI = register("flowing_ji", new JiFluid.Flowing());
-//    public static final FlowingFluid JI = register("ji_fluid", new JiFluid.Source());
-
-//    static {
-//        for(Fluid fluid : BuiltInRegistries.FLUID) {
-//            for(FluidState fluidstate : fluid.getStateDefinition().getPossibleStates()) {
-//                Fluid.FLUID_STATE_REGISTRY.add(fluidstate);
-//            }
-//        }
-//
-//    }
-
     private static <T extends Fluid> T register(String p_76198_, T p_76199_) {
         return Registry.register(BuiltInRegistries.FLUID, p_76198_, p_76199_);
     }
@@ -108,13 +95,6 @@ public class ModFluids {
 
     public static final RegistryObject<FlowingFluid> FLOWING_CHE_HBP = FLUIDS.register("flowing_che_hbp",
             () -> new CheHbpFluid.Flowing(ModFluids.CHE_HBP_PROPERTIES));
-
-//    public static final RegistryObject<FlowingFluid> SOURCE_JI = FLUIDS.register("ji_fluid",
-//            () -> new JiFluid());
-//
-//    public static final RegistryObject<FlowingFluid> FLOWING_JI = FLUIDS.register("flowing_ji",
-//            () -> new JiFluid());
-
 
     public static final ForgeFlowingFluid.Properties CHE_HBP_PROPERTIES = new ForgeFlowingFluid.Properties(
             CHE_HBP_FLUID_TYPE,

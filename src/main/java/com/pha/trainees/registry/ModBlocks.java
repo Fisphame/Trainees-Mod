@@ -35,14 +35,6 @@ public class ModBlocks {
                                 ModBlocks.ABSORB_BLOCK.get()
                         ).build(null));
 
-//        public static final RegistryObject<BlockEntityType<PurificationStationBlockEntity>> PURIFICATION_STATION =
-//                BLOCK_ENTITIES.register("purification_station",
-//                        () -> BlockEntityType.Builder.of(
-//                                PurificationStationBlockEntity::new,
-//                                ModBlocks.PURIFICATION_STATION.get()
-//                        ).build(null)
-//                );
-
         public static final RegistryObject<BlockEntityType<SenderBlockEntity>> SENDER_BLOCK_ENTITY =
                 BLOCK_ENTITIES.register("sender_block_entity",
                         () -> BlockEntityType.Builder.of(
@@ -50,14 +42,6 @@ public class ModBlocks {
                                 ModBlocks.SENDER_BLOCK.get()
                         ).build(null)
                 );
-
-//        public static final RegistryObject<BlockEntityType<ReactionMachineBlockEntity>> REACTION_MACHINE =
-//                BLOCK_ENTITIES.register("reaction_machine",
-//                        () -> BlockEntityType.Builder.of(
-//                                ReactionMachineBlockEntity::new,
-//                                ModBlocks.REACTION_MACHINE.get()
-//                        ).build(null)
-//                );
     }
 
     public static final DeferredRegister<Block> BLOCKS =
@@ -333,27 +317,6 @@ public class ModBlocks {
 
 
 
-    //提纯台
-//    public static final RegistryObject<Block> PURIFICATION_STATION = BLOCKS.register("purification_station",
-//            () -> new PurificationStationBlock(
-//                    BlockBehaviour.Properties.of()
-//                            .strength(3.0f, 6.0f)
-//                            .sound(SoundType.METAL)
-//                            .requiresCorrectToolForDrops()
-//            )
-//    );
-
-    // 化学机械
-//    public static final RegistryObject<Block> REACTION_MACHINE = BLOCKS.register("reaction_machine",
-//            () -> new ReactionMachineBlock(
-//                    BlockBehaviour.Properties.of().
-//                            strength(4.0f, 32.0f)
-//                            .sound(SoundType.STONE)
-//                            .mapColor(MapColor.STONE)
-//                            .requiresCorrectToolForDrops()
-//            )
-//    );
-
     //反相篮球
     public static final RegistryObject<Block> BASKETBALL_ANTI_BLOCK = BLOCKS.register("basketball_anti_block",
             () -> new BasketballAntiBlock(
@@ -363,16 +326,6 @@ public class ModBlocks {
                             .mapColor(MapColor.COLOR_BLUE)
             )
     );
-
-//    //高爆炸抗性的反相篮球
-//    public static final RegistryObject<Block> BASKETBALL_ANTI_BLOCK_RGT = BLOCKS.register("basketball_anti_block_rgt",
-//            () -> new BasketballAntiBlock(
-//                    BlockBehaviour.Properties.of()
-//                            .strength(0.5f,1200f)
-//                            .sound(SoundType.WOOL)
-//                            .mapColor(MapColor.COLOR_BLUE)
-//            )
-//    );
 
     public static final RegistryObject<Block> ALTAR_CORE_BLOCK = BLOCKS.register("altar_core_block",
             () -> new AltarCoreBlock(
@@ -397,14 +350,6 @@ public class ModBlocks {
                             .noOcclusion() // 允许相邻方块渲染其背面，对透明方块很重要
             )
     );
-//
-//    public static final RegistryObject<Block> REACTING_FURNACE = BLOCKS.register("reacting_furnace",
-//            () -> new ReactingFurnaceBlock(
-//                    BlockBehaviour.Properties.of()
-//                            .strength(1.0f, 2.0f)
-//                            .sound(SoundType.STONE)
-//                            .requiresCorrectToolForDrops()
-//            ));
 
     public static final RegistryObject<Block> ABSORB_BLOCK = BLOCKS.register("absorb_block",
             () -> new AbsorbBlock(

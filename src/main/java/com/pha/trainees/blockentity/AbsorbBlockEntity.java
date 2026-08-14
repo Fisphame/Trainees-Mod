@@ -14,6 +14,7 @@ import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.util.game.enums.AbsorbWorkModel;
+import com.pha.trainees.util.game.ParticleHelper;
 import com.pha.trainees.util.game.Tools;
 import com.pha.trainees.util.interfaces.IMachine;
 import com.pha.trainees.util.interfaces.ITraversal;
@@ -138,7 +139,7 @@ public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements ITraver
             // 如果方块中已有物品，将其掉落
             dropStoredItem();
             if (level != null) {
-                Tools.Particle.send(
+                ParticleHelper.send(
                         level, ParticleTypes.SOUL_FIRE_FLAME, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
                         15, 0.3, 0.3, 0.3, 0.1
                 );
