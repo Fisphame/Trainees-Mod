@@ -1,6 +1,7 @@
 package com.pha.trainees.chemistry.container;
 
 import com.pha.trainees.chemistry.engine.ReactionEngine;
+import com.pha.trainees.chemistry.engine.ReactionFailure;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
@@ -164,4 +165,21 @@ public interface IChemicalContainer {
      * 当容器成分发生变化时（添加/移除粒子），应调用此方法
      */
     void resetBalancedRules();
+
+    // ==================== 失败诊断记录（§19.6/19.7） ====================
+
+    /**
+     * 记录一次规则执行失败（供失败反馈/反应预测器使用）。
+     * 默认实现不记录；烧杯等容器可覆写为保留最近 N 条（仅运行时，不存 NBT）。
+     */
+    default void recordFailure(ReactionFailure failure) {
+    }
+
+    /**
+     * 获取本容器最近的失败记录（最旧在前）。
+     * 默认实现返回空列表。
+     */
+    default java.util.List<ReactionFailure> getRecentFailures() {
+        return java.util.List.of();
+    }
 }

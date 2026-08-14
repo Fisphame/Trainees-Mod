@@ -12,6 +12,7 @@ import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.chemistry.block.BeakerBlock;
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
 import com.pha.trainees.chemistry.engine.ReactionEngine;
+import com.pha.trainees.chemistry.engine.ReactionFailure;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.reaction.ReactionEdge;
 import com.pha.trainees.chemistry.reaction.ReactionGraph;
@@ -70,6 +71,9 @@ public class DebugCommand {
                 )
                 .then(Commands.literal("last")
                         .executes(DebugCommand::printRecentReactions)
+                )
+                .then(Commands.literal("failures")
+                        .executes(DebugCommand::printRecentFailures)
                 )
                 .then(Commands.literal("graph")
                         .executes(DebugCommand::openGraph)
@@ -245,6 +249,25 @@ public class DebugCommand {
                         "  §ftick " + r.gameTime() + "§7 | §f" + r.ruleId()
                                 + "§7 | Δξ=" + String.format("%.4f", r.deltaXi())
                                 + " | heat=" + String.format("%.1f", r.heatKj()) + "kJ"), false);
+            }
+        }
+        return 1;
+    }
+
+    /**
+     * 打印全局最近失败记录（诊断收集器，§19.6/19.7）
+     */
+    private static int printRecentFailures(CommandContext<CommandSourceStack> context) {
+        List<ReactionFailure> failures = ReactionEngine.getRecentFailures();
+        context.getSource().sendSuccess(() -> Component.literal("§c=== 最近失败记录（最多20条） ==="), false);
+        if (failures.isEmpty()) {
+            context.getSource().sendSuccess(() -> Component.literal("  §7(暂无失败记录)"), false);
+        } else {
+            for (ReactionFailure f : failures) {
+                context.getSource().sendSuccess(() -> Component.literal(
+                        "  §ftick " + f.gameTime() + "§7 | §c" + f.type().name()
+                                + "§7 | §f" + f.ruleId()
+                                + "§7 | " + f.detail()), false);
             }
         }
         return 1;

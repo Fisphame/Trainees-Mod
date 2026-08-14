@@ -3,6 +3,7 @@ package com.pha.trainees.chemistry.blockentity;
 import com.pha.trainees.Main;
 import com.pha.trainees.chemistry.container.IChemicalContainer;
 import com.pha.trainees.chemistry.engine.ReactionEngine;
+import com.pha.trainees.chemistry.engine.ReactionFailure;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
@@ -33,7 +34,10 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -277,6 +281,8 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         // 客户端在加载时调用的更新标签
         CompoundTag tag = super.getUpdateTag();
         saveAdditional(tag);
+        // 附送最近一条失败诊断（仅同步，不写存档）
+        writeFailureToTag(tag, "LastFailure", lastFailure);
         return tag;
     }
 
@@ -284,6 +290,7 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     public void handleUpdateTag(CompoundTag tag) {
         // 客户端接收更新标签时调用，直接加载数据
         load(tag);
+        this.lastFailure = readFailureFromTag(tag, "LastFailure");
     }
 
     @Nullable
@@ -510,5 +517,68 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     public void invalidateCaps() {
         super.invalidateCaps();
         fluidHandler.invalidate();
+    }
+
+    // ==================== 失败诊断记录（§19.6/19.7） ====================
+
+    /** 容器侧保留的最近失败记录条数（仅运行时，不存 NBT） */
+    private static final int MAX_RECENT_FAILURES = 10;
+
+    private final ArrayDeque<ReactionFailure> recentFailures = new ArrayDeque<>();
+
+    /** 最近一条失败（客户端同步用，仅运行时；供分析仪 HUD 常驻显示） */
+    private ReactionFailure lastFailure;
+
+    @Override
+    public void recordFailure(ReactionFailure failure) {
+        if (failure == null) return;
+        this.lastFailure = failure;
+        synchronized (recentFailures) {
+            if (recentFailures.size() >= MAX_RECENT_FAILURES) {
+                recentFailures.removeFirst();
+            }
+            recentFailures.addLast(failure);
+        }
+        setChanged(); // 标记脏，促使下一次更新包把 lastFailure 同步给客户端
+    }
+
+    @Override
+    public List<ReactionFailure> getRecentFailures() {
+        synchronized (recentFailures) {
+            return new ArrayList<>(recentFailures);
+        }
+    }
+
+    /** 客户端读取最近一条失败（HUD 用） */
+    @Nullable
+    public ReactionFailure getLastFailure() {
+        return lastFailure;
+    }
+
+    // ---- 失败记录序列化（仅走 BE 更新包同步，不写入存档） ----
+
+    private static void writeFailureToTag(CompoundTag tag, String key, ReactionFailure f) {
+        if (f == null) return;
+        CompoundTag sub = new CompoundTag();
+        sub.putString("type", f.type().name());
+        sub.putString("rule", f.ruleId());
+        sub.putString("detail", f.detail());
+        sub.putLong("time", f.gameTime());
+        tag.put(key, sub);
+    }
+
+    @Nullable
+    private static ReactionFailure readFailureFromTag(CompoundTag tag, String key) {
+        if (!tag.contains(key)) return null;
+        CompoundTag sub = tag.getCompound(key);
+        try {
+            return new ReactionFailure(
+                    ReactionFailure.Type.valueOf(sub.getString("type")),
+                    sub.getString("rule"),
+                    sub.getString("detail"),
+                    sub.getLong("time"));
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

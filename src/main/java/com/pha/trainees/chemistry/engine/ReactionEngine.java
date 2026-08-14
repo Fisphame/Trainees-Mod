@@ -63,6 +63,10 @@ public class ReactionEngine {
     private static final int MAX_RECENT_REACTIONS = 20;
     private static final ArrayDeque<ReactionRecord> RECENT_REACTIONS = new ArrayDeque<>(MAX_RECENT_REACTIONS);
 
+    // 全局失败诊断记录（§19.6/19.7）：所有容器共享一份最近失败，供 /chemtester 等调试查看
+    private static final int MAX_RECENT_FAILURES = 20;
+    private static final ArrayDeque<ReactionFailure> RECENT_FAILURES = new ArrayDeque<>(MAX_RECENT_FAILURES);
+
     /** 一次成功执行的反应记录 */
     public record ReactionRecord(String ruleId, double deltaXi, double heatKj, long gameTime) {}
 
@@ -80,6 +84,90 @@ public class ReactionEngine {
         synchronized (RECENT_REACTIONS) {
             return new ArrayList<>(RECENT_REACTIONS);
         }
+    }
+
+    /**
+     * 记录一次规则执行失败：写入所属容器（供分析仪/预测器按容器读取）+ 全局缓冲（供调试命令）。
+     */
+    private static void recordFailure(IChemicalContainer container, ReactionFailure.Type type,
+                                      ReactionRule rule, String detail) {
+        long gameTime = 0;
+        try {
+            gameTime = container.getLevel() != null ? container.getLevel().getGameTime() : 0;
+        } catch (Exception ignored) {
+        }
+        ReactionFailure failure = new ReactionFailure(type, rule.getId().toString(), detail, gameTime);
+        container.recordFailure(failure);
+        synchronized (RECENT_FAILURES) {
+            if (RECENT_FAILURES.size() >= MAX_RECENT_FAILURES) {
+                RECENT_FAILURES.removeFirst();
+            }
+            RECENT_FAILURES.addLast(failure);
+        }
+    }
+
+    /** 获取全局最近失败记录（最旧在前），用于调试命令 */
+    public static List<ReactionFailure> getRecentFailures() {
+        synchronized (RECENT_FAILURES) {
+            return new ArrayList<>(RECENT_FAILURES);
+        }
+    }
+
+    /**
+     * 反应预测查询（§19.6 反应预测器 / 失败反馈的正向版数据源）：
+     * 遍历容器内所有可达规则，返回每条规则当前状态（可执行 / 缺什么条件）。
+     * 纯查询，不修改容器状态，与执行路径解耦。
+     */
+    public static List<PredictedRule> predictReactions(IChemicalContainer container) {
+        List<PredictedRule> result = new ArrayList<>();
+        Set<ReactionRule> seen = new HashSet<>();
+        double temp = container.getTemperature();
+        for (IonType ion : container.getPresentIons()) {
+            for (ReactionEdge edge : ReactionGraph.getInstance().getEdgesFrom(ion)) {
+                ReactionRule rule = edge.getRule();
+                if (!seen.add(rule)) continue;
+                String ruleId = rule.getId().getPath();
+
+                // 1. 电解/电功未通电
+                if (rule.getElectricalWorkPerMol() > 0 && !container.isElectricallyPowered()) {
+                    result.add(new PredictedRule(rule, PredictedRule.Status.NOT_POWERED, "电解/电功反应未通电"));
+                    continue;
+                }
+                // 2. 温度不足
+                if (temp < rule.getMinTemperature()) {
+                    result.add(new PredictedRule(rule, PredictedRule.Status.TEMPERATURE_TOO_LOW,
+                            String.format("温度 %.1fK < 最低 %.1fK", temp, rule.getMinTemperature())));
+                    continue;
+                }
+                // 3. 前置条件缺失
+                if (!rule.checkPreconditions(container)) {
+                    result.add(new PredictedRule(rule, PredictedRule.Status.MISSING_PRECONDITION, "缺前置条件（催化剂/介质等）"));
+                    continue;
+                }
+                // 4. 反应物种类不齐
+                if (!container.containsAll(rule.getReactants())) {
+                    result.add(new PredictedRule(rule, PredictedRule.Status.MISSING_REACTANT,
+                            "缺反应物: " + missingReactants(container, rule)));
+                    continue;
+                }
+                // 5. 已达平衡（引擎已标记或 Q≥K）
+                if (container.isRuleBalanced(rule)) {
+                    result.add(new PredictedRule(rule, PredictedRule.Status.ALREADY_BALANCED, "已被引擎标记为平衡"));
+                    continue;
+                }
+                double Q = calculateQ(container, rule);
+                double K = rule.calculateEquilibriumConstant(temp, container);
+                if (Q >= K) {
+                    result.add(new PredictedRule(rule, PredictedRule.Status.ALREADY_BALANCED,
+                            String.format("已达平衡 Q=%.3e ≥ K=%.3e", Q, K)));
+                    continue;
+                }
+                // 6. 可执行
+                result.add(new PredictedRule(rule, PredictedRule.Status.EXECUTABLE,
+                        String.format("Q=%.3e < K=%.3e，可执行", Q, K)));
+            }
+        }
+        return result;
     }
 
     // ============================================================
@@ -263,12 +351,28 @@ public class ReactionEngine {
         double epsilon = getEpsilon();
 
         // 再次验证所有条件（安全）
-        if (!rule.checkPreconditions(container)) return false;
-        if (container.getTemperature() < rule.getMinTemperature()) return false;
-        if (!container.containsAll(rule.getReactants())) return false;
+        if (!rule.checkPreconditions(container)) {
+            recordFailure(container, ReactionFailure.Type.PRECONDITION_MISSING, rule,
+                    "前置条件未满足（催化剂/介质等）");
+            return false;
+        }
+        if (container.getTemperature() < rule.getMinTemperature()) {
+            recordFailure(container, ReactionFailure.Type.TEMPERATURE_TOO_LOW, rule,
+                    String.format("温度 %.1fK < 最低 %.1fK", container.getTemperature(), rule.getMinTemperature()));
+            return false;
+        }
+        if (!container.containsAll(rule.getReactants())) {
+            recordFailure(container, ReactionFailure.Type.REACTANT_MISSING, rule,
+                    "反应物种类不齐（缺少 " + missingReactants(container, rule) + "）");
+            return false;
+        }
 
         // 电解反应（需电功）未通电时不可运行
-        if (rule.getElectricalWorkPerMol() > 0 && !container.isElectricallyPowered()) return false;
+        if (rule.getElectricalWorkPerMol() > 0 && !container.isElectricallyPowered()) {
+            recordFailure(container, ReactionFailure.Type.NOT_POWERED, rule,
+                    "电解/电功反应未通电");
+            return false;
+        }
 
         // ====== 1. 计算当前浓度 ======
         Map<IonType, Double> concentrations = new HashMap<>();
@@ -285,6 +389,8 @@ public class ReactionEngine {
         // ====== 4. 如果 Q >= K，反应已经处于平衡或逆向，不执行 ======
         if (Q >= K) {
             container.markRuleBalanced(rule);
+            recordFailure(container, ReactionFailure.Type.ALREADY_BALANCED, rule,
+                    String.format("已达平衡 Q=%.3e ≥ K=%.3e", Q, K));
             return false;
         }
 
@@ -302,6 +408,8 @@ public class ReactionEngine {
         double netRate = forwardRate * (1.0 - Q / K);
         // Q>=K 已被步骤4拦截，此处 netRate<0 不应发生（防御性返回，但不标记平衡）
         if (netRate < 0) {
+            recordFailure(container, ReactionFailure.Type.NET_RATE_NEGATIVE, rule,
+                    String.format("净速率非正（Q/K=%.3e）", Q / K));
             return false;
         }
 
@@ -313,6 +421,8 @@ public class ReactionEngine {
         // 注意：不在此标记 BALANCED——Δξ 过小可能只是低温等暂态，
         // 标记会导致加热后反应无法恢复（平衡标记仅由 Q>=K 与 addThermalEnergy 管理）
         if (deltaXi < epsilon) {
+            recordFailure(container, ReactionFailure.Type.EPSILON_TRUNCATED, rule,
+                    String.format("Δξ=%.3e 低于截断阈值（低温/低浓度暂态）", deltaXi));
             return false;
         }
 
@@ -329,6 +439,8 @@ public class ReactionEngine {
 
         // 如果调整后太小，放弃
         if (deltaXi < epsilon) {
+            recordFailure(container, ReactionFailure.Type.REACTANT_INSUFFICIENT, rule,
+                    "反应物存量不足以支撑本 Tick 进度（Δξ 被钳制后过小）");
             return false;
         }
 
@@ -349,6 +461,8 @@ public class ReactionEngine {
                 }
                 deltaXi = lo;
                 if (deltaXi < epsilon) {
+                    recordFailure(container, ReactionFailure.Type.BALANCE_CLAMPED, rule,
+                            "平衡约束二分后 Δξ 过小（接近平衡点）");
                     return false;
                 }
             }
@@ -358,6 +472,8 @@ public class ReactionEngine {
         // 消耗 electricalWorkPerMol × Δξ（kJ）；电能不足则本次不执行
         double electricalWork = rule.getElectricalWorkPerMol();
         if (electricalWork > 0 && !container.consumeElectricalEnergy(electricalWork * deltaXi)) {
+            recordFailure(container, ReactionFailure.Type.INSUFFICIENT_ENERGY, rule,
+                    String.format("电能不足（需 %.1f kJ）", electricalWork * deltaXi));
             return false;
         }
 
@@ -397,6 +513,18 @@ public class ReactionEngine {
     // ============================================================
     // 六、辅助计算函数
     // ============================================================
+
+    /** 列出规则反应物中容器内缺失（存量≈0）的种类名，用于诊断信息 */
+    private static String missingReactants(IChemicalContainer container, ReactionRule rule) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<IonType, Integer> entry : rule.getReactants().entrySet()) {
+            if (container.getAmount(entry.getKey()) <= 1e-9) {
+                if (sb.length() > 0) sb.append(", ");
+                sb.append(entry.getKey().getId().getPath());
+            }
+        }
+        return sb.length() > 0 ? sb.toString() : "未知";
+    }
 
     /**
      * 计算反应商 Q

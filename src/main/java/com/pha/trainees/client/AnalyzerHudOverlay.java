@@ -52,6 +52,14 @@ public class AnalyzerHudOverlay implements IGuiOverlay {
         // 获取分析结果
         List<Component> lines = analyzer.getAnalysisResult(beaker);
 
+        // ====== 最近失败诊断（§19.6/19.7：失败反馈的 HUD 常驻提示） ======
+        Component failureLine = null;
+        if (beaker.getLastFailure() != null) {
+            var f = beaker.getLastFailure();
+            failureLine = Component.literal("§c✗ " + friendlyType(f.type()) + " §7" + f.ruleId()
+                    + "§r§7 — " + f.detail());
+        }
+
         // ====== 绘制信息面板 ======
         int padding = 10;
         int lineHeight = mc.font.lineHeight + 2;
@@ -59,6 +67,9 @@ public class AnalyzerHudOverlay implements IGuiOverlay {
                 .mapToInt(line -> mc.font.width(line))
                 .max()
                 .orElse(200) + padding * 2;
+        if (failureLine != null) {
+            maxWidth = Math.max(maxWidth, mc.font.width(failureLine) + padding * 2);
+        }
 
         // 面板位置：屏幕右上角（但靠左一点，避免遮挡）
         int panelX = screenWidth - maxWidth - 20;
@@ -66,6 +77,9 @@ public class AnalyzerHudOverlay implements IGuiOverlay {
 
         // 背景高度（根据行数动态计算）
         int totalHeight = lines.size() * lineHeight + padding * 2;
+        if (failureLine != null) {
+            totalHeight += lineHeight + 4; // 失败区块
+        }
 
         // 绘制半透明背景
         guiGraphics.fill(panelX, panelY, panelX + maxWidth, panelY + totalHeight, 0xCC000000);
@@ -80,10 +94,33 @@ public class AnalyzerHudOverlay implements IGuiOverlay {
             textY += lineHeight;
         }
 
+        // 失败区块（红色，与上方分析区隔开）
+        if (failureLine != null) {
+            textY += 4;
+            guiGraphics.drawString(mc.font, failureLine, textX, textY, 0xFF5555, false);
+            textY += lineHeight;
+        }
+
         // 绘制小指示器：显示当前使用的分析仪类型
         String indicator = analyzer.isCreativeMode() ? "§b[C] §f创造分析仪" : "§7[A] §f分析仪";
         guiGraphics.drawString(mc.font, Component.literal(indicator),
                 panelX + padding, panelY + totalHeight + 4, 0xAAAAAA, false);
+    }
+
+    /** 失败类型的玩家可读名称（HUD 用简短版） */
+    private String friendlyType(com.pha.trainees.chemistry.engine.ReactionFailure.Type type) {
+        return switch (type) {
+            case TEMPERATURE_TOO_LOW -> "温度不足";
+            case PRECONDITION_MISSING -> "缺前置条件";
+            case REACTANT_MISSING -> "缺反应物";
+            case NOT_POWERED -> "未通电";
+            case ALREADY_BALANCED -> "已达平衡";
+            case NET_RATE_NEGATIVE -> "逆向";
+            case EPSILON_TRUNCATED -> "速率过慢";
+            case REACTANT_INSUFFICIENT -> "反应物不足";
+            case BALANCE_CLAMPED -> "近平衡";
+            case INSUFFICIENT_ENERGY -> "电能不足";
+        };
     }
 
     /**

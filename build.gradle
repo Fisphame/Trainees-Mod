@@ -117,6 +117,14 @@ dependencies {
     // GuideME 20.1.13
     implementation fg.deobf("curse.maven:guideme-1173950:7013686")
     implementation fg.deobf("curse.maven:applied-energistics-2-223794:7148487")
+
+    // ====== 单元测试（纯 JVM，不启动 MC；仅测不依赖 Forge 的纯逻辑层，见 ReactionMath） ======
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 tasks.named('processResources', ProcessResources).configure {
