@@ -359,7 +359,8 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         addThermalEnergy(heatEnergy);
     }
 
-    private double getEnvironmentTemperature(Level level, BlockPos pos) {
+    /** 环境温度（K）：基准 293K，随高度递减 0.6K/100m（子类 tick 复用） */
+    protected double getEnvironmentTemperature(Level level, BlockPos pos) {
         double base = ChemConfig.ENVIRONMENT_TEMPERATURE_BASE.get();
         double yFactor = Math.max(0, (pos.getY() - 64) / 100.0) * ChemConfig.ENVIRONMENT_TEMPERATURE_LAPSE_RATE.get();
         // 钳制非负：极端高 Y 时递减项不应把环境温度推到负值

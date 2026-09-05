@@ -234,6 +234,13 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
 
     public static void tick(Level level, BlockPos pos, BlockState state, ElectrolysisCellBlockEntity cell) {
         if (level.isClientSide) return;
+        // 环境换热（牛顿冷却，对称）：低于环境温度时回温，避免只跌不升（§19.11 修复）
+        double envTemp = cell.getEnvironmentTemperature(level, pos);
+        double heatDelta = ChemConfig.AMBIENT_HEAT_TRANSFER_COEFFICIENT.get()
+                * (envTemp - cell.getTemperature()) * 0.05;
+        if (Math.abs(heatDelta) > 1e-6) {
+            cell.addThermalEnergy(heatDelta * cell.getTotalHeatCapacity());
+        }
         // 输出槽阻塞（满且不可堆叠/堆叠满）→ 停产；否则跑引擎并尝试打包
         if (!cell.isOutputBlocked()) {
             ReactionEngine.tick(cell);

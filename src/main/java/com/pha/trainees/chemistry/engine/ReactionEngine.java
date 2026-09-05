@@ -476,11 +476,12 @@ public class ReactionEngine {
         }
 
         // ====== 10.5 电解耗电 ======
-        // 消耗 electricalWorkPerMol × Δξ（kJ）；电能不足则本次不执行
+        // 注入电功 = 每 mol 实际电功(W × 档位factor) × 本 Tick 推进量(Δξ，已含档位放大)。
+        // 档位越高：每 mol 电功越高 × 产率越高 → 注入电功按 factor² 上升（高挡更费电，现实电压升高效率下降）
         double electricalWork = rule.getElectricalWorkPerMol();
-        if (electricalWork > 0 && !container.consumeElectricalEnergy(electricalWork * deltaXi)) {
+        if (electricalWork > 0 && !container.consumeElectricalEnergy(electricalWork * voltageFactor * deltaXi)) {
             recordFailure(container, ReactionFailure.Type.INSUFFICIENT_ENERGY, rule,
-                    String.format("电能不足（需 %.1f kJ）", electricalWork * deltaXi));
+                    String.format("电能不足（需 %.1f kJ）", electricalWork * voltageFactor * deltaXi));
             return false;
         }
 
@@ -509,11 +510,12 @@ public class ReactionEngine {
 
         // ====== 12. 热力学反馈（净热账，§19.11） ======
         // 净热 = 电解注入电功 − 产物化学能需求(ΔH)：
+        //   注入 = (W × factor) × Δξ   （每 mol 实际电功 × 推进量）
         //   - 非电解规则（电功=0）→ −ΔH×Δξ（原行为：放热升温/吸热降温）
-        //   - 电解 factor=1（理论最低）→ (ΔG − ΔH)×Δξ = −TΔS < 0 → 温和吸热降温
+        //   - 电解 factor=1（理论最低）→ (W − ΔH)×Δξ = −TΔS < 0 → 温和吸热降温
         //   - factor 超过热中性点(≈ΔH/ΔG) → 净发热（过电位/电阻热，档越高越烫）
-        double workInjectedKj = rule.getElectricalWorkPerMol() > 0
-                ? rule.getElectricalWorkPerMol() * deltaXi
+        double workInjectedKj = electricalWork > 0
+                ? electricalWork * voltageFactor * deltaXi
                 : 0.0;
         double reactionHeat = workInjectedKj - rule.getDeltaH() * deltaXi; // kJ（正值为净发热）
         container.addThermalEnergy(reactionHeat * 1000); // 转为 J
