@@ -16,6 +16,7 @@
 
 | 贴图 | 物品 | 备注 |
 |---|---|---|
+| `ion_membrane.png` | 离子交换膜（电解槽隔膜） | 2026-08 新增物品 |
 | `banalium_ingot.png` | 錋锭 | 8 种金属锭中仅此 4 种缺贴图 |
 | `crucium_ingot.png` | 鋴锭 | |
 | `nivtium_ingot.png` | 金宁锭 | |
@@ -46,7 +47,13 @@
 |---|---|---|
 | `textures/gui/config_button.png` | ChemConfigScreen 暂停菜单入口按钮（20x20） | 缺失时按钮显示异常但不会崩溃 |
 
-## 5. 其他已知缺失/待定
+## 5. 方块模型/贴图（2026-08 新增方块）
+
+| 文件 | 方块 | 备注 |
+|---|---|---|
+| `blockstates/electrolysis_cell.json`、`models/block/electrolysis_cell.json`、`textures/block/electrolysis_cell*.png` | 电解槽 | 尚未制作，物品暂无方块模型（需 blockstates + 模型 + 贴图，或用父模型替代） |
+
+## 6. 其他已知缺失/待定
 
 - `block/black_hole.png` 等黑洞相关贴图已随功能删除（P0-10），无需补。
 - `purification_station*` / `reacting_furnace*` 资源已随功能删除（P2-7），无需补。

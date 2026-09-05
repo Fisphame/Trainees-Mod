@@ -489,6 +489,10 @@ public class ReactionEngine {
         for (Map.Entry<IonType, Integer> entry : rule.getProducts().entrySet()) {
             IonType ion = entry.getKey();
             double produced = entry.getValue() * deltaXi;
+            // 产物处理钩子（§19.10）：容器可自行分拣导出（如电解槽）；返回 true 则不入 contents、不触发连锁
+            if (container.onProductGenerated(rule, ion, produced)) {
+                continue;
+            }
             container.addIon(ion, produced, false);
             // 手动入队到 PENDING_QUEUE（仅当有出边时，关联所属容器）
             if (!ReactionGraph.getInstance().getEdgesFrom(ion).isEmpty()) {

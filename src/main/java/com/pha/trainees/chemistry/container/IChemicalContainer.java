@@ -182,4 +182,16 @@ public interface IChemicalContainer {
     default java.util.List<ReactionFailure> getRecentFailures() {
         return java.util.List.of();
     }
+
+    // ==================== 产物处理钩子（§19.10 电解槽） ====================
+
+    /**
+     * 引擎在应用反应产物时调用：容器可自行处理该产物（如电解槽按电极/膜分拣导出）。
+     * @return true = 容器已处理该产物（引擎不再 addIon 入 contents、不触发连锁入队）；
+     *         false = 默认行为（引擎正常 addIon 入 contents 并视出边入队）。
+     * 烧杯不覆写此方法，行为零变化。
+     */
+    default boolean onProductGenerated(ReactionRule rule, IonType ion, double moles) {
+        return false;
+    }
 }

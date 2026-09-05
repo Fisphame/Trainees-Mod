@@ -20,13 +20,5 @@
       "trigger": "minecraft:tick",
       "conditions": {}
     }
-  },
-  "rewards": {
-    "recipes": [
-      "trainees:real_apple",
-      "trainees:real_diamond_pickaxe",
-      "trainees:stone_stick",
-      "trainees:enchanted_golden_apple"
-    ]
   }
 }

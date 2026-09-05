@@ -1,31 +1,31 @@
 {
     "display": {
         "icon": {
-            "item": "trainees:gold_egg"
+            "item": "trainees:tenebris_plume_heart"
         },
         "title": {
-            "translate": "advancements.trainees.gold_chicken.title"
+            "translate": "advancements.trainees.kun_anti_boss.title"
         },
         "description": {
-            "translate": "advancements.trainees.gold_chicken.description"
+            "translate": "advancements.trainees.kun_anti_boss.description"
         },
-        "frame": "task",
+        "frame": "goal",
         "show_toast": true,
         "announce_to_chat": true,
         "hidden": true
     },
-    "parent": "trainees:root",
+    "parent": "trainees:kun_anti",
     "criteria": {
-        "killed_gold_chicken": {
+        "killed_kun_anti_boss": {
             "trigger": "minecraft:player_killed_entity",
             "conditions": {
                 "entity": {
-                    "type": "trainees:gold_chicken"
+                    "type": "trainees:kun_anti_boss"
                 }
             }
         }
     },
     "rewards": {
-        "experience": 5
+        "experience": 55
     }
 }

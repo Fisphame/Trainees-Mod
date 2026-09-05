@@ -89,6 +89,7 @@
   "block.trainees.altar_core_block": "Altar Core Block",
   "block.trainees.kun_altar": "Kun Altar",
   "block.trainees.absorb_block": "Absorb Block",
+  "block.trainees.electrolysis_cell": "Electrolysis Cell",
   
   "item.trainees.kun_axe": "Kun Axe",
   "item.trainees.kun_hoe": "Kun Hoe",
@@ -125,6 +126,7 @@
   "item.trainees.polyester": "Polyester",
   "item.trainees.elastomeric_material": "Elastomeric Material",
   "item.trainees.elastomeric_core": "Elastomeric Core",
+  "item.trainees.ion_membrane": "Ion Exchange Membrane",
   "item.trainees.upgrade_theme": "Upgrade Template",
   "item.trainees.upgrade_theme_armor": "Armor Upgrade Template",
   "item.trainees.ahkun_apple": "AhKun Apple",

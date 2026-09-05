@@ -3,7 +3,9 @@ package com.pha.trainees.registry;
 import com.pha.trainees.Main;
 import com.pha.trainees.block.CheJibpBlock;
 import com.pha.trainees.chemistry.block.BeakerBlock;
+import com.pha.trainees.chemistry.block.ElectrolysisCellBlock;
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
+import com.pha.trainees.chemistry.blockentity.ElectrolysisCellBlockEntity;
 //import com.pha.trainees.chemistry.fluid.HydrochloricAcidFluid;
 import com.pha.trainees.chemistry.item.AnalyzerItemCreative;
 import com.pha.trainees.chemistry.item.AnalyzerItemNormal;
@@ -133,6 +135,16 @@ public class ModChemistry {
                         .isSuffocating((state, level, pos) -> false)
                         .sound(SoundType.GLASS)
                 ));
+
+        // 电解槽（§19.10）：双电极接入面、双面供电、产物分拣
+        public static final RegistryObject<ElectrolysisCellBlock> ELECTROLYSIS_CELL = BLOCKS.register(
+                "electrolysis_cell",
+                () -> new ElectrolysisCellBlock(BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.METAL)
+                        .strength(3.0f, 6.0f)
+                        .requiresCorrectToolForDrops()
+                        .sound(SoundType.METAL)
+                ));
     }
 
     public static class ModChemistryBlockItems {
@@ -171,6 +183,12 @@ public class ModChemistry {
                         new Item.Properties()
                 ));
 
+        // 电解槽
+        public static final RegistryObject<Item> ELECTROLYSIS_CELL = ITEMS.register("electrolysis_cell",
+                () -> new BlockItem(ModChemistryBlocks.ELECTROLYSIS_CELL.get(),
+                        new Item.Properties()
+                ));
+
     }
 
     public static class ModChemistryBlockEntities {
@@ -181,6 +199,12 @@ public class ModChemistry {
                 BLOCK_ENTITIES.register("beaker",
                         () -> BlockEntityType.Builder.of(BeakerBlockEntity::new,
                                 ModChemistryBlocks.BEAKER.get()).build(null)
+                );
+
+        public static final RegistryObject<BlockEntityType<ElectrolysisCellBlockEntity>> ELECTROLYSIS_CELL =
+                BLOCK_ENTITIES.register("electrolysis_cell",
+                        () -> BlockEntityType.Builder.of(ElectrolysisCellBlockEntity::new,
+                                ModChemistryBlocks.ELECTROLYSIS_CELL.get()).build(null)
                 );
     }
 
@@ -216,6 +240,13 @@ public class ModChemistry {
         // ====== 物质基类物品 ======
         public static final RegistryObject<SubstanceItem> SUBSTANCE = ITEMS.register("substance",
                 () -> new SubstanceItem(new Item.Properties().stacksTo(64)));
+
+        // 离子交换膜（§19.10 电解槽：放入膜槽使产物分侧纯化；后期材料升级版后续再换材质/配方）
+        public static final RegistryObject<Item> ION_MEMBRANE = ITEMS.register("ion_membrane",
+                () -> new Item(
+                        new Item.Properties()
+                                .stacksTo(16)
+                ));
         //相酸桶
 //        public static final RegistryObject<Item> CHE_HBP_BUCKET = ITEMS.register("che_hbp_bucket",
 //                () -> new BucketItem(

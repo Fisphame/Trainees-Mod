@@ -623,7 +623,6 @@ public class ModItems {
                     0xFFFFFF,// 主颜色（蛋底色）
                     0xff7f27,// 副颜色（斑点色）
                     new Item.Properties()
-                            .stacksTo(64)
             )
     );
     //黑粉刷怪蛋
@@ -633,7 +632,6 @@ public class ModItems {
                     0x9f9f9f,
                     0x272727,
                     new Item.Properties()
-                            .stacksTo(64)
             )
     );
     //金鸡刷怪蛋
@@ -643,8 +641,16 @@ public class ModItems {
                     0xFFD700,
                     0xFFDF00,
                     new Item.Properties()
-                            .stacksTo(64)
                             .rarity(Rarity.UNCOMMON)
+            )
+    );
+    //幕后黑粉刷怪蛋
+    public static final RegistryObject<Item> KUN_ANTI_BOSS_SPAWN_EGG = ITEMS.register("kun_anti_boss_spawn_egg",
+            () -> new ForgeSpawnEggItem(
+                    ModEntities.KUN_ANTI_BOSS,
+                    0x9f9f9f,
+                    0xff7f27,
+                    new Item.Properties()
             )
     );
 

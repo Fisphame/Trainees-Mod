@@ -47,10 +47,8 @@
   "advancements.trainees.powder_anti_98.description": "9^8=43,046,721………………………………",
   "advancements.trainees.powder_anti_99.title": "你就是模组作者……",
   "advancements.trainees.powder_anti_99.description": "9^9=387,420,489………………！",
-  "advancements.trainees.altar.title": "魔法祭坛",
+  "advancements.trainees.altar.title": "祭坛！",
   "advancements.trainees.altar.description": "激活一个只因祭坛。",
-  "advancements.trainees.altar_core_block.title": "祭坛主方块",
-  "advancements.trainees.altar_core_block.description": "合成祭坛核心立方，解锁全部祭坛配方。",
 
 
   "itemGroup.trainees.kun_tab": "练习生",
@@ -90,6 +88,7 @@
   "block.trainees.altar_core_block": "祭坛核心立方",
   "block.trainees.kun_altar": "土申祭坛",
   "block.trainees.absorb_block": "汲取立方",
+  "block.trainees.electrolysis_cell": "电解槽",
   
   "item.trainees.kun_axe": "只因斧",
   "item.trainees.kun_hoe": "只因锄",
@@ -126,6 +125,7 @@
   "item.trainees.polyester": "聚酯纤维",
   "item.trainees.elastomeric_material": "弹性材料",
   "item.trainees.elastomeric_core": "弹性核心",
+  "item.trainees.ion_membrane": "离子交换膜",
   "item.trainees.upgrade_theme": "升级模版",
   "item.trainees.upgrade_theme_armor": "盔甲升级模版",
   "item.trainees.ahkun_apple": "阿只因苹果",
@@ -153,6 +153,8 @@
   "item.trainees.sertium_ingot": "鐖锭",
   "item.trainees.placium_ingot": "鈚锭",
   "item.trainees.altar_core": "祭坛核心",
+  "item.trainees.tenebris_plume_heart": "黯羽之心",
+  "item.trainees.kun_anti_boss_spawn_egg": "幕后黑粉刷怪蛋",
   
   
   "subtitles.trainees.final_mining_sound_1": "终极只因镐：挖掘",
@@ -307,7 +309,7 @@
   "item.trainees.powder_anti_98": "一块黑粉",
   "item.trainees.powder_anti_99_scythe": "黑化镰刀",
   
-  "item.trainees.gun_mu":" ",
+  "item.trainees.gun_mu":"   ",
 
   "subtitles.trainees.ahkun_sound": "只因你太美！",
   "subtitles.trainees.mining_sound_1": "鸡",

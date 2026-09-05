@@ -683,3 +683,25 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 - 19.3 流体 = §17.2 确认，无新内容。
 - 19.2 蒸馏 = §10 开放网格的玩法落地，Phase 9 之后。
 - 19.4/19.5/19.6/19.7 = 全新规划（经济层/资源层/引导层），Phase 8-12 及以后。
+
+### 19.10 电解槽设计（2026-08 讨论定稿）
+
+**现实参考**（作者询问后确立）：电解是闭合回路——外部导线电子导电 + 电解质内部离子导电；正极接阳极、负极接阴极，两电极都浸入电解质；电子↔离子在电极表面交接；**还原产物在阴极侧、氧化产物在阳极侧**，物理上分开；气体产物若无隔膜会在槽顶**同一气室混合**（氯碱工业靠离子交换膜隔离，无膜会爆炸）。**"产物隔离"的现实结论**：固体/液体产物大体可分，**气体产物无膜必然混合**。
+
+**架构（作者提出，与现有代码吻合）**：
+- `IChemicalContainer` 已是容器接口，`BeakerBlockEntity` 为烧杯实现；**电解槽实现同一接口即自动获得全部引擎能力**（反应图/热力学/失败诊断/预测），零引擎改动。
+- 新增钩子：`IChemicalContainer.onProductGenerated(rule, ion, moles) → boolean`（default false）。引擎 `executeRule` 应用产物时先调钩子：返回 true = 容器自行处理（分拣导出），不入 contents；false = 原逻辑（烧杯不变）。烧杯行为零变化。
+
+**玩法定稿**：
+- **深度 2 + 隔膜**：电解槽双电极接入面（**方向可配置**，对准放置者）；**双面供电判定（作者确认）**——两个 FE 接入面都需供电（各自 FE/t ≥ 阈值）才允许电解，模拟"正负极都接通才构成回路"。
+- **产物分侧**：阳极侧出氧化产物（O₂/Cl₂ 等），阴极侧出还原产物（H₂/金属等），各配输出口。
+- **隔膜决定纯度（作者确认）**：无膜 → 气体产物交叉混合（纯度上限或直接输出混合物质基类，复用 §8 `SubstanceItem` 动态混合物）；有膜（后期材料组件）→ 两口完全隔离、纯产物输出。
+- **输出形式（作者确认：先 3 后 2）**：电解槽 V1 **全部走物品/`SubstanceItem` 输出**（纯产物做物品样本、混合产物做动态混合物），不碰流体系统；气体流体（§17.2）作为后续独立工作，待需要管道/世界表现时再补。
+
+**✅ 已实现（2026-08，电解槽 V1 全部 4 步）**：
+- **Step 1 钩子**：`IChemicalContainer.onProductGenerated`（default false）+ `ReactionEngine.executeRule` 应用产物时先调钩子（true = 容器自处理，不入 contents/不连锁）。
+- **Step 2 方块/BE**：`ElectrolysisCellBlock`（`HORIZONTAL_FACING`，方向对准放置者）+ `ElectrolysisCellBlockEntity`（**继承 `BeakerBlockEntity`**，复用全部容器能力；新增双 FE 缓冲：facing=阳极、opposite=阴极，`isElectricallyPowered` = 配置无限电 ∨ 双面都有电，`consumeElectricalEnergy` 双面各扣一半；能量/物品/流体能力并存）。
+- **Step 3 产物分拣**：`onProductGenerated` 仅分拣电解规则产物；`classifyProduct` 离子→电极映射（阴极：h2/na/cu/fe；阳极：o2/cl2；未知 → 回 contents）；**有膜** → 阳极积累/阴极积累；**无膜** → 全部进阳极积累（打包为混合产物）。打包：每累计满 1 mol 生成 `SubstanceItem`（按当前比例切样本，同成分可堆叠）；**槽满停产**（类似熔炉）：输出槽放不下则本 tick 不跑引擎。积累上限 64 mol 防囤积（超出回退 contents）。
+- **Step 4 内容件**：`ion_membrane`（离子交换膜，弹性材料+羊毛合成）作为膜槽物品；电解槽配方（铁锭×8+玻璃）；语言键 zh/en；简易方块模型（铁块外观占位）；缺贴图/模型登记 `RESOURCES_MISSING.md`。
+- 产物→电极映射为 V1 硬编码（h2/na/cu/fe 阴极、o2/cl2 阳极），后续新电解产物需补映射。
+- 双面"FE/t ≥ 阈值"门槛：V1 判定为"双面缓冲都 > 0"（通电即回路）；按 ΔG 反推的功率门槛留待接入真实发电后调整（§19.1）。

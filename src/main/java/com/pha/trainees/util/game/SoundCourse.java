@@ -19,7 +19,7 @@ public class SoundCourse {
             MINING_SOUND_4.get(), MINING_SOUND_5.get(), MINING_SOUND_6.get()
     );
 
-    public static final Lazy<List<SoundEvent>> RELEASING_SWORD_WIND_SOUNDS =registerSoundList(
+    public static final Lazy<List<SoundEvent>> RELEASING_SWORD_WIND_SOUNDS = registerSoundList(
             RELEASING_SWORD_WIND_1.get(), RELEASING_SWORD_WIND_2.get(), RELEASING_SWORD_WIND_3.get(),
             RELEASING_SWORD_WIND_4.get()
     );

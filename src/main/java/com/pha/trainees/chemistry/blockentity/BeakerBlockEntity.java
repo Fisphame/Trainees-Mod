@@ -68,7 +68,12 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
 
     public BeakerBlockEntity(BlockPos pos, BlockState state) {
-        super(ModChemistry.ModChemistryBlockEntities.BEAKER.get(), pos, state);
+        this(ModChemistry.ModChemistryBlockEntities.BEAKER.get(), pos, state);
+    }
+
+    /** 子类（如电解槽）可传入自己的 BE 类型，复用烧杯的全部容器实现 */
+    protected BeakerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
     // ==================== IChemicalContainer 实现 ====================
