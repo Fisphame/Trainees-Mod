@@ -244,6 +244,8 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
         // 输出槽阻塞（满且不可堆叠/堆叠满）→ 停产；否则跑引擎并尝试打包
         if (!cell.isOutputBlocked()) {
             ReactionEngine.tick(cell);
+            // 开口面气体交换（Phase 9）：电解槽敞口与上方网格双向交换
+            cell.exchangeGasWithGrid(level, pos);
         }
         cell.tryPackageProducts(level);
     }

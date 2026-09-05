@@ -4,6 +4,7 @@ import com.pha.trainees.Main;
 import com.pha.trainees.chemistry.container.IChemicalContainer;
 import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.engine.ReactionFailure;
+import com.pha.trainees.chemistry.gas.GasGridManager;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
@@ -19,6 +20,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -60,6 +62,8 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     }
 
     private final Map<IonType, Double> contents = new ConcurrentHashMap<>();
+    /** 逸散缓冲：容器扣减后先在此累积，达到网格消散阈值才抛入网格（防微量尾巴格） */
+    private final Map<IonType, Double> gridLeakBuffer = new HashMap<>();
     private double temperature = DEFAULT_TEMPERATURE;
     private double volume = DEFAULT_VOLUME;
     private double totalHeatCapacity = ChemConfig.BEAKER_BASE_HEAT_CAPACITY.get();
@@ -331,6 +335,9 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
         ReactionEngine.tick(beaker);
 
+        // 开口面气体交换（Phase 9）：敞口容器与上方网格格按浓度差双向交换（逸散/回吸）
+        beaker.exchangeGasWithGrid(level, pos);
+
         // 每 20 tick（1秒）清理忽略阈值下的残渣，并输出烧杯内容物与温度（调试用）
         if (level.getGameTime() % 20 == 0) {
             beaker.sweepNegligibleSpecies();
@@ -357,6 +364,89 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         double deltaT = ChemConfig.BEAKER_HEAT_TRANSFER_COEFFICIENT.get() * (heatSourceTemp - temperature) * 0.05;
         double heatEnergy = deltaT * totalHeatCapacity;
         addThermalEnergy(heatEnergy);
+    }
+
+    /**
+     * 开口面气体交换（Phase 9 §10.3 + §9-7）：容器顶面与上方网格格按浓度差**双向**交换。
+     * 单开口胞模型：烧杯 = 五面封闭的气体胞，仅顶面与上方网格格交换。
+     * - 容器浓度 > 外部 → 逸散（泄漏）；
+     * - 外部浓度 > 容器 → 回吸（收集，受成分上限约束）。
+     * 密封/吹气等控制手段为后续扩展（改此处开口状态即可）。
+     */
+    protected void exchangeGasWithGrid(Level level, BlockPos pos) {
+        if (!ChemConfig.GAS_CONTAINER_LEAK_ENABLED.get()) return;
+        if (level.isClientSide) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        // 顶部必须开放（空气）
+        if (!level.getBlockState(pos.above()).isAir()) return;
+        double temp = getTemperature();
+        double volL = Math.max(getVolume(), 0.001);
+        double rateBase = ChemConfig.GAS_CONTAINER_LEAK_RATE.get();
+        GasGridManager manager = GasGridManager.get(serverLevel);
+        double maxPerComponent = ChemConfig.MAX_MOLES_PER_COMPONENT.get();
+        boolean changed = false;
+
+        // 1) 向外逸散（容器中气相；先入缓冲，累积足量再入网格，避免微量尾巴格）
+        for (Map.Entry<IonType, Double> e : contents.entrySet()) {
+            if (e.getKey().getPhase() != Phase.GAS) continue;
+            double n = e.getValue();
+            if (n <= 1e-9) continue;
+            double cIn = n / volL; // mol/L
+            double cOut = manager.getAmount(pos.above(), e.getKey()) / 1000.0; // 网格格 1m³ → mol/L
+            if (cIn <= cOut) continue;
+            double rate = rateBase
+                    * Math.sqrt(29.0 / Math.max(1, e.getKey().getMolarMass()))
+                    * Math.sqrt(Math.max(1, temp) / 293.0);
+            double move = rate * (cIn - cOut) * volL; // → mol
+            move = Math.min(move, n * 0.5);
+            if (move > 1e-12) {
+                removeIon(e.getKey(), move, false); // 容器持续扣减（敞口会漏光）
+                gridLeakBuffer.merge(e.getKey(), move, Double::sum);
+                changed = true;
+            }
+        }
+        // 缓冲足量 → 一次性抛给网格（消散阈值 GasGridManager.dissolveThreshold()）
+        if (!gridLeakBuffer.isEmpty()) {
+            var it = gridLeakBuffer.entrySet().iterator();
+            while (it.hasNext()) {
+                var b = it.next();
+                if (b.getValue() >= GasGridManager.dissolveThreshold()) {
+                    manager.addGas(serverLevel, pos.above(), b.getKey(), b.getValue());
+                    it.remove();
+                }
+            }
+        }
+
+        // 2) 向内回吸（收集：外部浓度高于容器，且容器未满）
+        double totalIn = getTotalMoles();
+        double totalMax = ChemConfig.MAX_TOTAL_MOLES.get();
+        for (Map.Entry<IonType, Double> e : new java.util.HashMap<>(manager.get(pos.above()) != null
+                ? manager.get(pos.above()).getContents() : java.util.Map.of()).entrySet()) {
+            if (e.getKey().getPhase() != Phase.GAS) continue;
+            double nOut = e.getValue();
+            if (nOut <= 1e-9) continue;
+            double cOut = nOut / 1000.0; // mol/L
+            double cIn = getAmount(e.getKey()) / volL; // mol/L
+            if (cOut <= cIn) continue;
+            double rate = rateBase
+                    * Math.sqrt(29.0 / Math.max(1, e.getKey().getMolarMass()))
+                    * Math.sqrt(Math.max(1, temp) / 293.0);
+            double move = rate * (cOut - cIn) * volL; // → mol（进入容器）
+            // 容量约束
+            move = Math.min(move, maxPerComponent - getAmount(e.getKey()));
+            move = Math.min(move, totalMax - totalIn);
+            move = Math.min(move, nOut * 0.5);
+            if (move > 1e-12) {
+                manager.removeGas(serverLevel, pos.above(), e.getKey(), move);
+                addIon(e.getKey(), move, false);
+                totalIn += move;
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            setChanged();
+        }
     }
 
     /** 环境温度（K）：基准 293K，随高度递减 0.6K/100m（子类 tick 复用） */

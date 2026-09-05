@@ -350,6 +350,35 @@
   "gui.trainees.config.slider.plant_penalty": "植物生长惩罚",
   "gui.trainees.config.slider.energy_consumption": "机器耗电倍数",
   "gui.trainees.config.slider.energy_generation": "机器发电倍数",
+
+  "gui.trainees.config.slider.bucket_mapping": "水桶容量（mol/桶）",
+  "gui.trainees.config.slider.ingot_mapping": "锭当量（mol/锭）",
+  "gui.trainees.config.slider.nugget_mapping": "粒当量（mol/粒）",
+  "gui.trainees.config.slider.max_per_component": "单组分上限（mol）",
+  "gui.trainees.config.slider.max_total": "总量上限（mol）",
+
+  "gui.trainees.config.group.engine": "▼ 引擎调度",
+  "gui.trainees.config.slider.engine_polling_interval": "引擎轮询间隔",
+  "gui.trainees.config.slider.engine_max_rules_per_poll": "单轮最大规则数",
+  "gui.trainees.config.slider.engine_max_chain_per_tick": "每Tick连锁反应上限",
+  "gui.trainees.config.slider.engine_epsilon": "反应进度截断阈值 ε",
+
+  "gui.trainees.config.group.gas_grid": "▼ 气体网格",
+  "gui.trainees.config.slider.gas_diffusion_interval": "扩散周期",
+  "gui.trainees.config.slider.gas_diffusion_base": "基础迁移系数",
+  "gui.trainees.config.slider.gas_precision": "精度档位",
+  "gui.trainees.config.slider.gas_active_radius": "活性半径（区块）",
+  "gui.trainees.config.slider.gas_leak_enabled": "容器气相逸散",
+  "gui.trainees.config.slider.gas_leak_rate": "容器泄漏速率",
+  "gui.trainees.config.slider.gas_dissolve_threshold": "气体湮灭阈值（mol/格）",
+
+  "gui.trainees.config.toggle.on": "开",
+  "gui.trainees.config.toggle.off": "关",
+  "gui.trainees.config.precision.a": "A · 全粗",
+  "gui.trainees.config.precision.b": "B · 半精",
+  "gui.trainees.config.precision.c": "C · 全精",
+
+  "gui.trainees.config.world": "当前存档：%s",
   
   "gui.trainees.config.button.save": "保存",
   "gui.trainees.config.button.reset": "恢复默认",

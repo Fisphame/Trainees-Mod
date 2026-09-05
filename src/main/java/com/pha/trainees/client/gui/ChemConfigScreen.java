@@ -32,6 +32,9 @@ public class ChemConfigScreen extends Screen implements IHoverText {
     private final Screen parentScreen;
     private final Map<String, ConfigSlider> sliders = new LinkedHashMap<>();
     private final List<AbstractWidget> widgets = new ArrayList<>();
+    private final List<Button> difficultyButtons = new ArrayList<>();
+
+    private StringWidget scoreWidget = null;
 
     private DifficultyLevel selectedDifficulty = DifficultyLevel.NORMAL;
     private boolean isUpdatingFromPreset = false;
@@ -91,7 +94,7 @@ public class ChemConfigScreen extends Screen implements IHoverText {
 
         // 1. 难度指标
         double score = ChemConfig.DifficultyScorer.calculateScore();
-        StringWidget scoreWidget = new StringWidget(
+        scoreWidget = new StringWidget(
                 width / 2 - 100, y, 200, 20,
                 Component.translatable("gui.trainees.config.score", DF.format(score)).withStyle(ChatFormatting.GOLD),
                 Minecraft.getInstance().font
@@ -100,37 +103,36 @@ public class ChemConfigScreen extends Screen implements IHoverText {
         y += 28;
 
         // 2. 难度按钮
+        difficultyButtons.clear();
         int buttonWidth = 60;
         int buttonSpacing = 10;
         int totalWidth = buttonWidth * 4 + buttonSpacing * 3;
         int startX = (width - totalWidth) / 2;
 
-        for (int i = 0; i < DifficultyLevel.values().length; i++) {
-            DifficultyLevel level = DifficultyLevel.values()[i];
+        DifficultyLevel[] levels = DifficultyLevel.values();
+        for (int i = 0; i < levels.length; i++) {
+            DifficultyLevel level = levels[i];
             int x = startX + i * (buttonWidth + buttonSpacing);
             Button btn = Button.builder(
                     Component.translatable("gui.trainees.config.difficulty." + level.name().toLowerCase()),
                     button -> onDifficultySelected(level)
             ).bounds(x, y, buttonWidth, 20).build();
-            if (level == selectedDifficulty) {
-                btn.active = false;
-            }
+            btn.active = level != selectedDifficulty;
+            this.difficultyButtons.add(btn);
             this.widgets.add(btn);
         }
         y += 30;
         y += 5;
 
         // 3. 滑动条组
-        y = addSliderGroup(y, String.valueOf(Component.translatable("gui.trainees.config.group.resource_getting")
-                        .withStyle(ChatFormatting.GRAY)),
+        y = addSliderGroup(y, tr("gui", "resource_getting", "config", "group"),
                 new SliderEntry(tr("gui","ore_valuable","config", "slider"),
                         "ore_valuable", ChemConfig.ORE_VALUABLE_RATIO_MULTIPLIER, 0.1, 3.0),
                 new SliderEntry(tr("gui","ore_gangue","config", "slider"),
                         "ore_gangue", ChemConfig.ORE_GANGUE_RATIO_MULTIPLIER, 0.1, 3.0)
         );
 
-        y = addSliderGroup(y, String.valueOf(Component.translatable("gui.trainees.config.group.pollution")
-                        .withStyle(ChatFormatting.GRAY)),
+        y = addSliderGroup(y, tr("gui", "pollution", "config", "group"),
                 new SliderEntry(tr("gui","pollution_speed","config", "slider"),
                         "pollution_speed", ChemConfig.POLLUTION_DIFFUSION_SPEED, 0.0, 10.0),
                 new SliderEntry(tr("gui","pollution_toxicity","config", "slider"),
@@ -139,16 +141,14 @@ public class ChemConfigScreen extends Screen implements IHoverText {
                         "plant_penalty", ChemConfig.POLLUTION_PLANT_GROWTH_PENALTY, 0.0, 1.0)
         );
 
-        y = addSliderGroup(y, String.valueOf(Component.translatable("gui.trainees.config.group.energy")
-                        .withStyle(ChatFormatting.GRAY)),
+        y = addSliderGroup(y, tr("gui", "energy", "config", "group"),
                 new SliderEntry(tr("gui","energy_consumption","config", "slider"),
                         "energy_consumption", ChemConfig.ENERGY_CONSUMPTION_MULTIPLIER, 0.1, 10.0),
                 new SliderEntry(tr("gui","energy_generation","config", "slider"),
                         "energy_generation", ChemConfig.ENERGY_GENERATION_MULTIPLIER, 0.1, 10.0)
         );
 
-        y = addSliderGroup(y, String.valueOf(Component.translatable("gui.trainees.config.group.mapping")
-                        .withStyle(ChatFormatting.GRAY)),
+        y = addSliderGroup(y, tr("gui", "strict_mapping", "config", "group"),
                 new SliderEntry(tr("gui","bucket_mapping","config", "slider"),
                         "bucket_mapping", ChemConfig.BUCKET_TO_MOL_WATER, 0.0, 640.0),
                 new SliderEntry(tr("gui","ingot_mapping","config", "slider"),
@@ -159,6 +159,36 @@ public class ChemConfigScreen extends Screen implements IHoverText {
                         "max_per_component", ChemConfig.MAX_MOLES_PER_COMPONENT, 0.1, 640.0),
                 new SliderEntry(tr("gui","max_total","config", "slider"),
                         "max_total", ChemConfig.MAX_TOTAL_MOLES, 0.1, 640.0)
+        );
+
+        // 引擎调度（§14.3 引擎参数）
+        y = addSliderGroup(y, tr("gui", "engine", "config", "group"),
+                new SliderEntry(tr("gui","engine_polling_interval","config", "slider"),
+                        "enginePollingInterval", ChemConfig.ENGINE_POLLING_INTERVAL, 1, 100),
+                new SliderEntry(tr("gui","engine_max_rules_per_poll","config", "slider"),
+                        "engineMaxRulesPerPoll", ChemConfig.ENGINE_MAX_RULES_PER_POLL, 1, 200),
+                new SliderEntry(tr("gui","engine_max_chain_per_tick","config", "slider"),
+                        "engineMaxChainPerTick", ChemConfig.ENGINE_MAX_CHAIN_REACTIONS_PER_TICK, 1, 100),
+                new SliderEntry(tr("gui","engine_epsilon","config", "slider"),
+                        "engineEpsilon", ChemConfig.ENGINE_EPSILON, -12.0, 0.0, true)
+        );
+
+        // 开放气体网格（§19.13 扩散参数）
+        y = addSliderGroup(y, tr("gui", "gas_grid", "config", "group"),
+                new SliderEntry(tr("gui","gas_diffusion_interval","config", "slider"),
+                        "gasDiffusionInterval", ChemConfig.GAS_DIFFUSION_INTERVAL, 1, 200),
+                new SliderEntry(tr("gui","gas_diffusion_base","config", "slider"),
+                        "gasDiffusionBase", ChemConfig.GAS_DIFFUSION_BASE, 0.001, 0.5),
+                new SliderEntry(tr("gui","gas_precision","config", "slider"),
+                        "gasPrecision", ChemConfig.GAS_PRECISION_MODE, 0, 2, 2),
+                new SliderEntry(tr("gui","gas_active_radius","config", "slider"),
+                        "gasActiveRadius", ChemConfig.GAS_ACTIVE_RADIUS, 1, 16),
+                new SliderEntry(tr("gui","gas_leak_enabled","config", "slider"),
+                        "gasLeakEnabled", ChemConfig.GAS_CONTAINER_LEAK_ENABLED),
+                new SliderEntry(tr("gui","gas_leak_rate","config", "slider"),
+                        "gasLeakRate", ChemConfig.GAS_CONTAINER_LEAK_RATE, 0.0001, 0.1),
+                new SliderEntry(tr("gui","gas_dissolve_threshold","config", "slider"),
+                        "gasDissolveThreshold", ChemConfig.GAS_DISSOLVE_THRESHOLD, -6.0, 0.0, true)
         );
 
         contentHeight = y + 30;
@@ -204,19 +234,16 @@ public class ChemConfigScreen extends Screen implements IHoverText {
     private int addSliderGroup(int y, String groupName, SliderEntry... entries) {
         StringWidget groupLabel = new StringWidget(
                 INDENT, y, 200, 15,
-                Component.literal(groupName),
+                Component.literal(Component.translatable(groupName).getString())
+                        .withStyle(ChatFormatting.GRAY),
                 Minecraft.getInstance().font
         );
         this.widgets.add(groupLabel);
         y += 18;
 
         for (SliderEntry entry : entries) {
-            double currentValue = entry.supplier.getAsDouble();
             ConfigSlider slider = new ConfigSlider(
-                    entry.displayName, entry.key,
-                    INDENT + 20, y, SLIDER_WIDTH, SLIDER_HEIGHT,
-                    entry.min, entry.max, currentValue,
-                    entry.consumer
+                    entry, INDENT + 20, y, SLIDER_WIDTH, SLIDER_HEIGHT
             );
             this.widgets.add(slider);
             this.sliders.put(entry.key, slider);
@@ -273,39 +300,29 @@ public class ChemConfigScreen extends Screen implements IHoverText {
 
     private double getPresetValue(ChemConfig.DifficultyPresets.ConfigValues preset, String key) {
         switch (key) {
-            case "oreValuable": return preset.oreValuableMultiplier;
-            case "oreGangue": return preset.oreGangueMultiplier;
-            case "pollutionSpeed": return preset.pollutionDiffusionSpeed;
-            case "pollutionToxicity": return preset.pollutionToxicityThreshold;
-            case "plantPenalty": return ChemConfig.POLLUTION_PLANT_GROWTH_PENALTY.get();
-            case "energyConsumption": return preset.energyConsumptionMultiplier;
-            case "energyGeneration": return preset.energyGenerationMultiplier;
+            case "ore_valuable": return preset.oreValuableMultiplier;
+            case "ore_gangue": return preset.oreGangueMultiplier;
+            case "pollution_speed": return preset.pollutionDiffusionSpeed;
+            case "pollution_toxicity": return preset.pollutionToxicityThreshold;
+            case "plant_penalty": return ChemConfig.POLLUTION_PLANT_GROWTH_PENALTY.get();
+            case "energy_consumption": return preset.energyConsumptionMultiplier;
+            case "energy_generation": return preset.energyGenerationMultiplier;
             default: return Double.NaN;
         }
     }
 
     private void refreshButtons() {
-        for (AbstractWidget widget : widgets) {
-            if (widget instanceof Button btn) {
-                for (DifficultyLevel level : DifficultyLevel.values()) {
-                    if (btn.getMessage().getString().equals(level.displayName)) {
-                        btn.active = level != selectedDifficulty;
-                    }
-                }
-            }
+        DifficultyLevel[] levels = DifficultyLevel.values();
+        for (int i = 0; i < difficultyButtons.size() && i < levels.length; i++) {
+            difficultyButtons.get(i).active = levels[i] != selectedDifficulty;
         }
     }
 
     private void refreshScoreDisplay() {
         double score = ChemConfig.DifficultyScorer.calculateScore();
-        for (AbstractWidget widget : widgets) {
-            if (widget instanceof StringWidget sw) {
-                String msg = sw.getMessage().getString();
-                if (msg.startsWith("难度指标")) {
-                    sw.setMessage(Component.translatable("gui.trainees.config.score", DF.format(score))
-                            .withStyle(ChatFormatting.GOLD));
-                }
-            }
+        if (scoreWidget != null) {
+            scoreWidget.setMessage(Component.translatable("gui.trainees.config.score", DF.format(score))
+                    .withStyle(ChatFormatting.GOLD));
         }
     }
 
@@ -402,7 +419,7 @@ public class ChemConfigScreen extends Screen implements IHoverText {
         poseStack.popPose();
 
         // 标题（不滚动）
-        String title = String.valueOf(Component.translatable("gui.trainees.config.title"));
+        String title = Component.translatable("gui.trainees.config.title").getString();
         guiGraphics.drawString(
                 Minecraft.getInstance().font,
                 title,
@@ -417,7 +434,7 @@ public class ChemConfigScreen extends Screen implements IHoverText {
             String worldName = Minecraft.getInstance().getSingleplayerServer().getWorldData().getLevelName();
             guiGraphics.drawString(
                     Minecraft.getInstance().font,
-                    Component.translatable("gui.trainees.config.save") + worldName,
+                    Component.translatable("gui.trainees.config.world", worldName),
                     10, height - 10,
                     0x888888,
                     false
@@ -443,23 +460,89 @@ public class ChemConfigScreen extends Screen implements IHoverText {
 
     // ==================== 内部类：滑动条 ====================
 
+    /** 滑块值展示模式 */
+    private static final int MODE_PLAIN = 0;
+    private static final int MODE_ON_OFF = 1;   // 布尔开关（开/关文字）
+    private static final int MODE_PRECISION = 2; // 气体网格 A/B/C 精度档位
+
+    private static final DecimalFormat DF_DYN = new DecimalFormat("0.########");
+    private static final DecimalFormat DF_SCI = new DecimalFormat("0.00E0");
+
     private static class SliderEntry {
-        final String displayName;
-        final String key;
-        final DoubleSupplier supplier;
-        final DoubleConsumer consumer;
+        final String displayName;      // 翻译键
+        final String key;              // 内部键（难度预设/匹配用）
+        final DoubleSupplier supplier; // 域值提供者（bool 为 0/1；log 为指数）
+        final DoubleConsumer consumer; // 域值消费者（内部负责类型转换）
         final double min;
         final double max;
+        final boolean integer;         // 整数吸附（IntValue）
+        final int mode;                // 展示模式
+        final boolean logScale;        // 对数刻度（min/max 为指数）
 
         SliderEntry(String displayName, String key,
                     ForgeConfigSpec.DoubleValue configValue,
                     double min, double max) {
+            this(displayName, key, configValue::get, configValue::set,
+                    min, max, false, MODE_PLAIN, false);
+        }
+
+        /** 对数刻度：min/max 为指数（如 -12 ~ 0），显示与设置按 10^x */
+        SliderEntry(String displayName, String key,
+                    ForgeConfigSpec.DoubleValue configValue,
+                    double minExp, double maxExp, boolean logScale) {
+            this(displayName, key,
+                    () -> Math.log10(configValue.get()),
+                    d -> configValue.set(Math.pow(10, d)),
+                    minExp, maxExp, false, MODE_PLAIN, true);
+        }
+
+        SliderEntry(String displayName, String key,
+                    ForgeConfigSpec.IntValue configValue,
+                    int min, int max) {
+            this(displayName, key,
+                    () -> (double) configValue.get(),
+                    d -> configValue.set((int) Math.round(d)),
+                    min, max, true, MODE_PLAIN, false);
+        }
+
+        /** 整数档位枚举（如精度 A/B/C） */
+        SliderEntry(String displayName, String key,
+                    ForgeConfigSpec.IntValue configValue,
+                    int min, int max, int mode) {
+            this(displayName, key,
+                    () -> (double) configValue.get(),
+                    d -> configValue.set((int) Math.round(d)),
+                    min, max, true, mode, false);
+        }
+
+        SliderEntry(String displayName, String key,
+                    ForgeConfigSpec.BooleanValue configValue) {
+            this(displayName, key,
+                    () -> configValue.get() ? 1.0 : 0.0,
+                    d -> configValue.set(d >= 0.5),
+                    0, 1, false, MODE_ON_OFF, false);
+        }
+
+        SliderEntry(String displayName, String key,
+                    DoubleSupplier supplier, DoubleConsumer consumer,
+                    double min, double max) {
+            this(displayName, key, supplier, consumer,
+                    min, max, false, MODE_PLAIN, false);
+        }
+
+        private SliderEntry(String displayName, String key,
+                            DoubleSupplier supplier, DoubleConsumer consumer,
+                            double min, double max,
+                            boolean integer, int mode, boolean logScale) {
             this.displayName = displayName;
             this.key = key;
-            this.supplier = configValue::get;
-            this.consumer = configValue::set;
+            this.supplier = supplier;
+            this.consumer = consumer;
             this.min = min;
             this.max = max;
+            this.integer = integer;
+            this.mode = mode;
+            this.logScale = logScale;
         }
     }
 
@@ -469,34 +552,81 @@ public class ChemConfigScreen extends Screen implements IHoverText {
         private final DoubleConsumer consumer;
         private final double min;
         private final double max;
+        private final boolean integer;
+        private final int mode;
+        private final boolean logScale;
         private double currentValue;
 
-        public ConfigSlider(String displayName, String key,
-                            int x, int y, int width, int height,
-                            double min, double max, double currentValue,
-                            DoubleConsumer consumer) {
-            super(x, y, width, height, Component.translatable(key), 0);
-            this.displayName = displayName;
-            this.key = key;
-            this.consumer = consumer;
-            this.min = min;
-            this.max = max;
-            this.currentValue = currentValue;
-            this.value = (currentValue - min) / (max - min);
+        public ConfigSlider(SliderEntry entry,
+                            int x, int y, int width, int height) {
+            super(x, y, width, height, Component.empty(), 0);
+            this.displayName = entry.displayName;
+            this.key = entry.key;
+            this.consumer = entry.consumer;
+            this.min = entry.min;
+            this.max = entry.max;
+            this.integer = entry.integer;
+            this.mode = entry.mode;
+            this.logScale = entry.logScale;
+
+            double raw = entry.supplier.getAsDouble();
+            this.currentValue = Math.max(min, Math.min(max, raw));
+            this.value = clamp01((currentValue - min) / (max - min));
             updateMessage();
         }
 
         @Override
         protected void updateMessage() {
             String display = Component.translatable(displayName).getString();
-            this.setMessage(Component.literal(
-                    display + ": §f" + DF.format(currentValue) + " §8[" + DF.format(min) + " - " + DF.format(max) + "]"
-            ));
+            String lo = formatBound(min);
+            String hi = formatBound(max);
+            String range = lo.isEmpty() && hi.isEmpty()
+                    ? ""
+                    : " §8[" + lo + " - " + hi + "]";
+            this.setMessage(Component.literal(display + ": " + formatValue(currentValue) + range));
+        }
+
+        private String formatValue(double v) {
+            switch (mode) {
+                case MODE_ON_OFF:
+                    return v >= 0.5
+                            ? "§a" + Component.translatable("gui.trainees.config.toggle.on").getString()
+                            : "§8" + Component.translatable("gui.trainees.config.toggle.off").getString();
+                case MODE_PRECISION:
+                    return precisionLabel((int) Math.round(v));
+                default:
+                    return logScale ? "§f" + DF_SCI.format(Math.pow(10, v)) : "§f" + fmt(v);
+            }
+        }
+
+        private String formatBound(double v) {
+            if (mode == MODE_ON_OFF || mode == MODE_PRECISION) return "";
+            if (logScale) return DF_SCI.format(Math.pow(10, v));
+            return fmt(v);
+        }
+
+        private String precisionLabel(int index) {
+            String letter = switch (index) {
+                case 0 -> "a";
+                case 1 -> "b";
+                default -> "c";
+            };
+            return "§f" + Component.translatable("gui.trainees.config.precision." + letter).getString();
+        }
+
+        private String fmt(double v) {
+            return integer ? String.valueOf((long) Math.round(v)) : DF_DYN.format(v);
         }
 
         @Override
         protected void applyValue() {
-            currentValue = min + (max - min) * value;
+            double v = min + (max - min) * value;
+            if (integer) {
+                v = Math.round(v);
+                // 重新校准滑条刻度，避免非整数刻度停留
+                this.value = clamp01((v - min) / (max - min));
+            }
+            currentValue = v;
             consumer.accept(currentValue);
 
             if (!isUpdatingFromPreset) {
@@ -511,12 +641,16 @@ public class ChemConfigScreen extends Screen implements IHoverText {
 
         public void setValue(double value) {
             this.currentValue = Math.max(min, Math.min(max, value));
-            this.value = (this.currentValue - min) / (max - min);
+            this.value = clamp01((this.currentValue - min) / (max - min));
             updateMessage();
         }
 
         public void commitValue() {
             consumer.accept(currentValue);
         }
+    }
+
+    private static double clamp01(double v) {
+        return Math.max(0.0, Math.min(1.0, v));
     }
 }

@@ -113,6 +113,17 @@ public class ChemConfig {
     public static final ForgeConfigSpec.IntValue ENGINE_MAX_CHAIN_REACTIONS_PER_TICK;
     public static final ForgeConfigSpec.DoubleValue ENGINE_EPSILON;
 
+    // ============================================================
+    // 十五、开放气体网格（Phase 9 / §19.13）
+    // ============================================================
+    public static final ForgeConfigSpec.IntValue GAS_DIFFUSION_INTERVAL;
+    public static final ForgeConfigSpec.DoubleValue GAS_DIFFUSION_BASE;
+    public static final ForgeConfigSpec.IntValue GAS_PRECISION_MODE;
+    public static final ForgeConfigSpec.IntValue GAS_ACTIVE_RADIUS;
+    public static final ForgeConfigSpec.BooleanValue GAS_CONTAINER_LEAK_ENABLED;
+    public static final ForgeConfigSpec.DoubleValue GAS_CONTAINER_LEAK_RATE;
+    public static final ForgeConfigSpec.DoubleValue GAS_DISSOLVE_THRESHOLD;
+
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
 
@@ -402,6 +413,45 @@ public class ChemConfig {
         ENGINE_EPSILON = builder
                 .comment("反应进度截断阈值（防 Zeno 悖论）")
                 .defineInRange("epsilon", 1e-6, 1e-12, 1.0);
+
+        builder.pop();
+
+        // ============================================================
+        // 十五、开放气体网格（Phase 9 / §19.13）
+        // ============================================================
+        builder.push("gas_grid");
+
+        GAS_DIFFUSION_INTERVAL = builder
+                .comment("气体扩散周期（每 N tick 执行一次全网格扩散）")
+                .defineInRange("diffusionInterval", 10, 1, 200);
+
+        GAS_DIFFUSION_BASE = builder
+                .comment("基础迁移系数（单周期最多迁移浓度差的比例，越小越慢越稳）")
+                .defineInRange("diffusionBase", 0.05, 0.001, 0.5);
+
+        GAS_PRECISION_MODE = builder
+                .comment("气体网格精度档位",
+                        "0 = A 全粗（默认）：卸载与退出全部坍缩为区块粗账（存储最小，重进按重心再水合）",
+                        "1 = B 半精：卸载坍缩，但退出时仍加载的区块按精数据保存（常驻区精复原）",
+                        "2 = C 全精：永不粗化（卸载保留精数据，适合高配/小活动范围）")
+                .defineInRange("precisionMode", 0, 0, 2);
+
+        GAS_ACTIVE_RADIUS = builder
+                .comment("气体活性半径（区块）：玩家此距离内高频演化，之外低频/只读缓存")
+                .defineInRange("activeRadiusChunks", 3, 1, 16);
+
+        GAS_CONTAINER_LEAK_ENABLED = builder
+                .comment("容器（烧杯/电解槽等）敞口时气相是否自动逸散到上方空气（Phase 9 §10.3 泄漏 API）",
+                        "密封/吹气等控制手段后续实现")
+                .define("containerLeakEnabled", true);
+
+        GAS_CONTAINER_LEAK_RATE = builder
+                .comment("容器泄漏速率（每 tick 逃逸浓度差的比例；轻气快、重气慢按 1/√M）")
+                .defineInRange("containerLeakRate", 0.005, 0.0001, 0.1);
+
+        GAS_DISSOLVE_THRESHOLD = builder
+                .comment("气体湮灭阈值（mol/格）：低于此量视为消散于大气（控制污染云的扩散范围与大小）")
+                .defineInRange("dissolveThreshold", 1e-3, 1e-6, 1.0);
 
         builder.pop();
 

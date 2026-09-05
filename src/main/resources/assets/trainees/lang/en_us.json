@@ -335,5 +335,61 @@
   "subtitles.trainees.heavy_hit": "Charging",
   "subtitles.trainees.heavy_hit_reset": "Charging",
   
-  "jei.trainees.trainer_altar": "Kun Altar"
+  "jei.trainees.trainer_altar": "Kun Altar",
+
+  "gui.trainees.config.title": "Chemistry Config - Current World",
+  "gui.trainees.config.error.not_loaded": "Error: config not loaded! Please load a world first.",
+  "gui.trainees.config.score": "Difficulty Score: %s / 100",
+
+  "gui.trainees.config.difficulty.easy": "Easy",
+  "gui.trainees.config.difficulty.normal": "Normal",
+  "gui.trainees.config.difficulty.hard": "Hard",
+  "gui.trainees.config.difficulty.custom": "Custom",
+
+  "gui.trainees.config.group.resource_getting": "▼ Resource Gain",
+  "gui.trainees.config.group.pollution": "▼ Pollution & Environment",
+  "gui.trainees.config.group.energy": "▼ Energy Efficiency",
+  "gui.trainees.config.group.strict_mapping": "▼ Fixed Mappings",
+  "gui.trainees.config.group.engine": "▼ Engine Scheduling",
+  "gui.trainees.config.group.gas_grid": "▼ Gas Grid",
+
+  "gui.trainees.config.slider.ore_valuable": "Ore valuable ratio",
+  "gui.trainees.config.slider.ore_gangue": "Ore gangue ratio",
+  "gui.trainees.config.slider.pollution_speed": "Pollution spread speed",
+  "gui.trainees.config.slider.pollution_toxicity": "Toxicity threshold",
+  "gui.trainees.config.slider.plant_penalty": "Plant growth penalty",
+  "gui.trainees.config.slider.energy_consumption": "Machine energy use",
+  "gui.trainees.config.slider.energy_generation": "Machine energy output",
+
+  "gui.trainees.config.slider.bucket_mapping": "Bucket capacity (mol/bucket)",
+  "gui.trainees.config.slider.ingot_mapping": "Ingot amount (mol/ingot)",
+  "gui.trainees.config.slider.nugget_mapping": "Nugget amount (mol/nugget)",
+  "gui.trainees.config.slider.max_per_component": "Max moles per component",
+  "gui.trainees.config.slider.max_total": "Max total moles",
+
+  "gui.trainees.config.slider.engine_polling_interval": "Engine poll interval (ticks)",
+  "gui.trainees.config.slider.engine_max_rules_per_poll": "Max rules per poll",
+  "gui.trainees.config.slider.engine_max_chain_per_tick": "Max chain reactions per tick",
+  "gui.trainees.config.slider.engine_epsilon": "Reaction cutoff threshold ε",
+
+  "gui.trainees.config.slider.gas_diffusion_interval": "Diffusion interval (ticks)",
+  "gui.trainees.config.slider.gas_diffusion_base": "Base transfer coefficient",
+  "gui.trainees.config.slider.gas_precision": "Precision mode",
+  "gui.trainees.config.slider.gas_active_radius": "Active radius (chunks)",
+  "gui.trainees.config.slider.gas_leak_enabled": "Container gas leak",
+  "gui.trainees.config.slider.gas_leak_rate": "Container leak rate",
+  "gui.trainees.config.slider.gas_dissolve_threshold": "Gas dissolve threshold (mol/cell)",
+
+  "gui.trainees.config.toggle.on": "ON",
+  "gui.trainees.config.toggle.off": "OFF",
+  "gui.trainees.config.precision.a": "A · Coarse",
+  "gui.trainees.config.precision.b": "B · Semi-fine",
+  "gui.trainees.config.precision.c": "C · Fine",
+
+  "gui.trainees.config.button.save": "Save",
+  "gui.trainees.config.button.reset": "Reset",
+  "gui.trainees.config.button.close": "Close",
+  "gui.trainees.config.save.success": "Chemistry config saved for this world!",
+  "gui.trainees.config.save.failed": "Failed to save! Check the log.",
+  "gui.trainees.config.world": "Current world: %s"
 }

@@ -13,6 +13,8 @@ import com.pha.trainees.chemistry.block.BeakerBlock;
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
 import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.engine.ReactionFailure;
+import com.pha.trainees.chemistry.gas.GasGridManager;
+import com.pha.trainees.chemistry.gas.GasMixture;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.reaction.ReactionEdge;
 import com.pha.trainees.chemistry.reaction.ReactionGraph;
@@ -24,6 +26,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -88,6 +91,27 @@ public class DebugCommand {
                                 .then(Commands.argument("mb", IntegerArgumentType.integer(1, 100000))
                                         .executes(ctx -> fluidTest(ctx, false))
                                 )
+                        )
+                )
+                .then(Commands.literal("gas")
+                        .then(Commands.literal("add")
+                                .then(Commands.argument("ionId", StringArgumentType.string())
+                                        .then(Commands.argument("moles", DoubleArgumentType.doubleArg(0.001, 99999))
+                                                .executes(DebugCommand::gasAdd)
+                                        )
+                                )
+                        )
+                        .then(Commands.literal("info")
+                                .executes(DebugCommand::gasInfo)
+                        )
+                        .then(Commands.literal("clear")
+                                .executes(DebugCommand::gasClear)
+                        )
+                        .then(Commands.literal("stats")
+                                .executes(DebugCommand::gasStats)
+                        )
+                        .then(Commands.literal("reset")
+                                .executes(DebugCommand::gasReset)
                         )
                 )
         );
@@ -270,6 +294,90 @@ public class DebugCommand {
                                 + "§7 | " + f.detail()), false);
             }
         }
+        return 1;
+    }
+
+    // ==================== 气体网格调试（Phase 9 / §19.13） ====================
+
+    /** 准星命中方块面向的相邻格（加气/查询目标；指向地板则气在板上方一格） */
+    private static BlockPos gasTargetPos(Player player) {
+        BlockHitResult hr = getTargetBlock(player);
+        if (hr != null) {
+            return hr.getBlockPos().relative(hr.getDirection());
+        }
+        return player.blockPosition().above();
+    }
+
+    private static int gasAdd(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        Player player = context.getSource().getPlayerOrException();
+        if (!(player.level() instanceof ServerLevel serverLevel)) return 0;
+        IonType ion = ModIons.getById(ResourceLocation.tryParse(StringArgumentType.getString(context, "ionId")));
+        if (ion == null) {
+            context.getSource().sendFailure(Component.literal("§c未找到离子，请使用 'trainees:h_plus' 格式"));
+            return 0;
+        }
+        double moles = DoubleArgumentType.getDouble(context, "moles");
+        BlockPos target = gasTargetPos(player);
+        GasGridManager manager = GasGridManager.get(serverLevel);
+        manager.addGas(serverLevel, target, ion, moles);
+        GasMixture g = manager.get(target);
+        double now = g != null ? g.getAmount(ion) : 0;
+        context.getSource().sendSuccess(() -> Component.literal(
+                "§a已向 " + target.toShortString() + " 加入 " + DF.format(moles) + " mol "
+                        + ion.getId().getPath() + "（该格现有 " + DF.format(now) + " mol）"), true);
+        return 1;
+    }
+
+    private static int gasInfo(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        Player player = context.getSource().getPlayerOrException();
+        if (!(player.level() instanceof ServerLevel serverLevel)) return 0;
+        BlockPos target = gasTargetPos(player);
+        GasGridManager manager = GasGridManager.get(serverLevel);
+        GasMixture g = manager.get(target);
+        context.getSource().sendSuccess(() -> Component.literal("§6=== 气体格 " + target.toShortString() + " ==="), false);
+        if (g == null || g.isEmpty()) {
+            context.getSource().sendSuccess(() -> Component.literal("  §7(空)"), false);
+        } else {
+            context.getSource().sendSuccess(() -> Component.literal(
+                    "  温度 " + String.format("%.0f", g.getTemperature()) + "K | 总 "
+                            + String.format("%.3f", g.totalMoles()) + " mol"), false);
+            for (var e : g.getContents().entrySet()) {
+                context.getSource().sendSuccess(() -> Component.literal(
+                        "  §f" + e.getKey().getId().getPath() + " §7= " + DF.format(e.getValue()) + " mol"), false);
+            }
+        }
+        return 1;
+    }
+
+    private static int gasClear(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        Player player = context.getSource().getPlayerOrException();
+        if (!(player.level() instanceof ServerLevel serverLevel)) return 0;
+        BlockPos target = gasTargetPos(player);
+        GasGridManager manager = GasGridManager.get(serverLevel);
+        GasMixture g = manager.get(target);
+        if (g == null || g.isEmpty()) {
+            context.getSource().sendSuccess(() -> Component.literal("§7该格无气体"), false);
+            return 1;
+        }
+        for (IonType ion : new java.util.ArrayList<>(g.getContents().keySet())) {
+            manager.removeGas(serverLevel, target, ion, Double.MAX_VALUE);
+        }
+        context.getSource().sendSuccess(() -> Component.literal("§a已清空 " + target.toShortString() + " 的气体"), true);
+        return 1;
+    }
+
+    private static int gasStats(CommandContext<CommandSourceStack> context) {
+        if (!(context.getSource().getEntity() instanceof ServerPlayer sp)) return 0;
+        GasGridManager manager = GasGridManager.get(sp.serverLevel());
+        context.getSource().sendSuccess(() -> Component.literal(
+                "§6气体网格：精格 " + manager.fineCellCount() + " | 粗账区块 " + manager.summaryCount()), false);
+        return 1;
+    }
+
+    private static int gasReset(CommandContext<CommandSourceStack> context) {
+        if (!(context.getSource().getEntity() instanceof ServerPlayer sp)) return 0;
+        GasGridManager.get(sp.serverLevel()).reset();
+        context.getSource().sendSuccess(() -> Component.literal("§a已清空气体网格（精格/粗账/快照）"), true);
         return 1;
     }
 
