@@ -415,7 +415,14 @@ public class ReactionEngine {
 
         // ====== 8. 计算本 Tick 的反应进度 Δξ ======
         double deltaTime = 0.05; // 1 Tick = 0.05 秒
-        double deltaXi = netRate * deltaTime;
+        double deltaXiBase = netRate * deltaTime;
+        double deltaXi = deltaXiBase;
+        // 电解规则：工作电压档位放大本 Tick 进度（§19.11，模拟高电流高产出）。
+        // 注意：到此已通过 NOT_POWERED 检查（电解规则必已通电），烧杯等 factor=1 不受影响。
+        double voltageFactor = container.getVoltageFactor();
+        if (rule.getElectricalWorkPerMol() > 0 && voltageFactor > 1.0) {
+            deltaXi = deltaXiBase * voltageFactor;
+        }
 
         // ====== 9. 进度截断（防 Zeno） ======
         // 注意：不在此标记 BALANCED——Δξ 过小可能只是低温等暂态，
@@ -500,9 +507,15 @@ public class ReactionEngine {
             }
         }
 
-        // ====== 12. 热力学反馈 ======
-        // 反应释放的热量 = -ΔH × Δξ（容器吸收热量，温度升高）
-        double reactionHeat = -rule.getDeltaH() * deltaXi; // kJ（正值为放热）
+        // ====== 12. 热力学反馈（净热账，§19.11） ======
+        // 净热 = 电解注入电功 − 产物化学能需求(ΔH)：
+        //   - 非电解规则（电功=0）→ −ΔH×Δξ（原行为：放热升温/吸热降温）
+        //   - 电解 factor=1（理论最低）→ (ΔG − ΔH)×Δξ = −TΔS < 0 → 温和吸热降温
+        //   - factor 超过热中性点(≈ΔH/ΔG) → 净发热（过电位/电阻热，档越高越烫）
+        double workInjectedKj = rule.getElectricalWorkPerMol() > 0
+                ? rule.getElectricalWorkPerMol() * deltaXi
+                : 0.0;
+        double reactionHeat = workInjectedKj - rule.getDeltaH() * deltaXi; // kJ（正值为净发热）
         container.addThermalEnergy(reactionHeat * 1000); // 转为 J
 
         // 记录最近反应（环形缓冲区）

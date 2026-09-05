@@ -47,6 +47,27 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
     /** 单侧积累上限（mol），防止槽满停产前无限囤积 */
     public static final double MAX_ACC_MOLES = 64.0;
 
+    // ===== 工作电压档位（§19.11）：1~5 档 → 电压倍率 = 理论分解电压 × factor =====
+    // 档位语义：1=低速(理论工作点,温和) 2=标准(近热中性) 3=快速 4=极速 5=过载(最快最烫最耗)
+    public static final double[] VOLTAGE_FACTORS = {1.0, 1.2, 1.5, 1.8, 2.2};
+    public static final String[] VOLTAGE_NAMES = {"低速", "标准", "快速", "极速", "过载"};
+    public static final int MAX_VOLTAGE_LEVEL = VOLTAGE_FACTORS.length;
+    private int voltageLevel = 2; // 默认标准档
+
+    public int getVoltageLevel() {
+        return voltageLevel;
+    }
+
+    public void cycleVoltageLevel() {
+        voltageLevel = voltageLevel % MAX_VOLTAGE_LEVEL + 1;
+        setChanged();
+    }
+
+    @Override
+    public double getVoltageFactor() {
+        return VOLTAGE_FACTORS[Math.max(0, Math.min(MAX_VOLTAGE_LEVEL - 1, voltageLevel - 1))];
+    }
+
     public static final int SLOT_MEMBRANE = 0;
     public static final int SLOT_OUT_A = 1;
     public static final int SLOT_OUT_B = 2;
@@ -286,12 +307,14 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
     private static final String KEY_OUT_B = "OutB";
     private static final String KEY_CATHODE_ACC = "CathodeAcc";
     private static final String KEY_ANODE_ACC = "AnodeAcc";
+    private static final String KEY_VOLTAGE_LEVEL = "VoltageLevel";
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.putInt(KEY_ANODE_ENERGY, anodeEnergy);
         tag.putInt(KEY_CATHODE_ENERGY, cathodeEnergy);
+        tag.putInt(KEY_VOLTAGE_LEVEL, voltageLevel);
         tag.put(KEY_MEMBRANE, inventory.getStackInSlot(SLOT_MEMBRANE).save(new CompoundTag()));
         tag.put(KEY_OUT_A, inventory.getStackInSlot(SLOT_OUT_A).save(new CompoundTag()));
         tag.put(KEY_OUT_B, inventory.getStackInSlot(SLOT_OUT_B).save(new CompoundTag()));
@@ -304,6 +327,9 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
         super.load(tag);
         this.anodeEnergy = tag.getInt(KEY_ANODE_ENERGY);
         this.cathodeEnergy = tag.getInt(KEY_CATHODE_ENERGY);
+        this.voltageLevel = tag.contains(KEY_VOLTAGE_LEVEL)
+                ? Math.max(1, Math.min(MAX_VOLTAGE_LEVEL, tag.getInt(KEY_VOLTAGE_LEVEL)))
+                : 2;
         inventory.setStackInSlot(SLOT_MEMBRANE, ItemStack.of(tag.getCompound(KEY_MEMBRANE)));
         inventory.setStackInSlot(SLOT_OUT_A, ItemStack.of(tag.getCompound(KEY_OUT_A)));
         inventory.setStackInSlot(SLOT_OUT_B, ItemStack.of(tag.getCompound(KEY_OUT_B)));

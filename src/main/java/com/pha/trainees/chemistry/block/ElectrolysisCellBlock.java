@@ -162,9 +162,30 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
             return InteractionResult.CONSUME;
         }
 
-        player.displayClientMessage(
-                Component.literal("§7右键：倒流体/放膜 | 空手：状态 | 潜行空手：取产物"), true);
-        return InteractionResult.PASS;
+        // 6. 其他手持：循环切换工作档位（1~5 档旋钮）
+        cycleVoltage(player, cell);
+        return InteractionResult.CONSUME;
+    }
+
+    /** 工作档循环（1~5）：档位数字 + 档名暗示，物理参数不进玩家主交互（§19.11） */
+    private static void cycleVoltage(Player player, ElectrolysisCellBlockEntity cell) {
+        cell.cycleVoltageLevel();
+        int level = cell.getVoltageLevel();
+        String name = ElectrolysisCellBlockEntity.VOLTAGE_NAMES[level - 1];
+        String hint;
+        if (level == 1) {
+            hint = "§7低速 · 省电 · 温和";
+        } else if (level == 2) {
+            hint = "§7标准";
+        } else if (level == 3) {
+            hint = "§e快速 · 略热 · 耗电↑";
+        } else if (level == 4) {
+            hint = "§6极速 · 发烫 · 耗电↑↑";
+        } else {
+            hint = "§c过载 · 高热 · 耗电↑↑↑（小心！）";
+        }
+        player.displayClientMessage(Component.literal(
+                "§e工作档：§f" + level + "/5 §7[" + name + "] §r" + hint), true);
     }
 
     private static void popOutputs(Player player, ElectrolysisCellBlockEntity cell) {
@@ -190,6 +211,9 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
         player.sendSystemMessage(Component.literal(
                 "  电极方向：阳极 " + facing.getName() + " / 阴极 " + facing.getOpposite().getName()));
         player.sendSystemMessage(Component.literal(
+                "  工作档：" + cell.getVoltageLevel() + "/5 §7[" + voltageName(cell) + "]"
+                        + "（手持任意物品右键可调档）"));
+        player.sendSystemMessage(Component.literal(
                 "  隔膜：" + (cell.hasMembrane() ? "§a已装入（产物分侧纯化）" : "§7无（产物混合输出）")));
         player.sendSystemMessage(Component.literal(
                 "  电极储能：阳极 " + cell.getAnodeEnergy() + " FE / 阴极 " + cell.getCathodeEnergy() + " FE"));
@@ -200,5 +224,11 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
                 "  温度 " + String.format("%.0f", cell.getTemperature()) + "K | 内容物 "
                         + cell.getContents().size() + " 种 | 总 "
                         + String.format("%.2f", cell.getTotalMoles()) + " mol"));
+    }
+
+    private static String voltageName(ElectrolysisCellBlockEntity cell) {
+        int l = cell.getVoltageLevel();
+        return ElectrolysisCellBlockEntity.VOLTAGE_NAMES[Math.max(0, Math.min(
+                ElectrolysisCellBlockEntity.VOLTAGE_NAMES.length - 1, l - 1))];
     }
 }

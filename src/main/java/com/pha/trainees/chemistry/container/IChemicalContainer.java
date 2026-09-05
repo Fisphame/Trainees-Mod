@@ -194,4 +194,16 @@ public interface IChemicalContainer {
     default boolean onProductGenerated(ReactionRule rule, IonType ion, double moles) {
         return false;
     }
+
+    // ==================== 电解工作电压档（§19.10 / §19.11） ====================
+
+    /**
+     * 电解工作电压倍率（相对理论分解电压；玩家侧表现为 1~5 档旋钮）。
+     * 影响：① 实际电功 W_实际 = 理论电功 × factor（每 mol 电耗上升、净热账 W_实际 − ΔH 转热）；
+     *      ② 电解进度倍率（档越高单位时间产物越多）。
+     * 非电解容器（烧杯等）默认 1.0（= 理论最低工作点，无额外发热）。
+     */
+    default double getVoltageFactor() {
+        return 1.0;
+    }
 }

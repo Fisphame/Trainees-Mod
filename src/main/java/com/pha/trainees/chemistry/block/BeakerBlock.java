@@ -191,6 +191,12 @@ public class BeakerBlock extends BaseEntityBlock {
                 return InteractionResult.FAIL;
             }
             double total = contents.values().stream().mapToDouble(Double::doubleValue).sum();
+            // 取样下限 0.1 mol（§19.11：实验室小量制备量级；不足则提示累积）
+            if (total < 0.1) {
+                player.displayClientMessage(Component.literal("§7内容物不足 0.1 mol，无法取样（当前 "
+                        + String.format("%.3f", total) + " mol）"), true);
+                return InteractionResult.FAIL;
+            }
             double sampleTotal = Math.min(total, 1.0);
             // 按比例抽取最多 1 mol 样本
             Map<IonType, Double> sample = new HashMap<>();
