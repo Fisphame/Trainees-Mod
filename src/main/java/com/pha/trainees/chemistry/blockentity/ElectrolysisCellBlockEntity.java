@@ -111,6 +111,17 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
         return !inventory.getStackInSlot(SLOT_MEMBRANE).isEmpty();
     }
 
+    /** 写入膜槽（交互用） */
+    public void setMembraneStack(ItemStack stack) {
+        inventory.setStackInSlot(SLOT_MEMBRANE, stack.copyWithCount(1));
+        setChanged();
+    }
+
+    /** 读取膜槽（交互用） */
+    public ItemStack getMembraneStack() {
+        return inventory.getStackInSlot(SLOT_MEMBRANE).copy();
+    }
+
     private enum Side { CATHODE, ANODE, UNKNOWN }
 
     /** 产物属于哪个电极（现实：阴极=还原产物 H₂/金属，阳极=氧化产物 O₂/Cl₂） */
