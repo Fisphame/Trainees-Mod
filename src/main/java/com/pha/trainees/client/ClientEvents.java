@@ -2,13 +2,18 @@ package com.pha.trainees.client;
 
 import com.pha.trainees.Main;
 
+import com.pha.trainees.chemistry.item.SubstanceItem;
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.registry.ModChemistry;
 import com.pha.trainees.registry.ModRecipes;
 import net.minecraft.client.RecipeBookCategories;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterRecipeBookCategoriesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,10 +36,26 @@ public class ClientEvents {
                     Renderer.KunAltarBlockEntityRenderer::new);
         });
 
+        // 物质基类：按形态选择模型（§19.15，模型 overrides 谓词 trainees:form）
+        event.enqueueWork(() -> ItemProperties.register(
+                ModChemistry.ModChemistryItems.SUBSTANCE.get(),
+                new ResourceLocation(Main.MODID, "form"),
+                (stack, level, entity, seed) -> SubstanceItem.getForm(stack).ordinal()));
+
         // 注意：Trainer Altar 多方块结构的注册已移至服务器端（Main.onServerStarted），
         // 因为结构匹配/激活逻辑全部在服务端运行，且结构 NBT 位于 data/ 命名空间，
         // 客户端的资源管理器（仅索引 assets/）无法读取。
 
+    }
+
+    /**
+     * 物质基类染色（§19.15）：形态底图是白/灰阶贴图，颜色由物质数据 tint 上来
+     * （与草/树叶同理，只是颜色源换成 IonType.displayColor；多组分按摩尔分数加权）。
+     */
+    @SubscribeEvent
+    public static void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
+        event.register((stack, tintIndex) -> tintIndex == 0 ? SubstanceItem.getDisplayColor(stack) : 0xFFFFFFFF,
+                ModChemistry.ModChemistryItems.SUBSTANCE.get());
     }
 
     // 土申祭坛配方在原版配方书中的分类（消除 "Unknown recipe category" 警告）
@@ -61,7 +82,7 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("beaker_info", new BeakerHudOverlay());
+        event.registerAboveAll("chemical_container_info", new ChemicalContainerHudOverlay());
         event.registerAboveAll("analyzer_info", new AnalyzerHudOverlay());
     }
 }

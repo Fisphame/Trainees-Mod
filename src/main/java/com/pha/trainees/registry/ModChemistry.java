@@ -541,6 +541,7 @@ public class ModChemistry {
                 .formationGibbs(-78.9)
                 .tag(IonTags.CATION)
                 .tag(IonTags.REDUCER)   // Fe²⁺可被氧化
+                .displayColor(0x8FBF8F)
                 .build()
         );
 
@@ -551,6 +552,7 @@ public class ModChemistry {
                 .formationGibbs(-4.7)
                 .tag(IonTags.CATION)
                 .tag(IonTags.OXIDIZER)  // Fe³⁺可被还原
+                .displayColor(0xC98A2B)
                 .build()
         );
 
@@ -560,6 +562,7 @@ public class ModChemistry {
                 .formationEnthalpy(71.7)
                 .formationGibbs(49.9)
                 .tag(IonTags.CATION)
+                .displayColor(0xE8F2FA)
                 .build()
         );
 
@@ -570,6 +573,7 @@ public class ModChemistry {
                 .formationGibbs(65.5)
                 .tag(IonTags.CATION)
                 .tag(IonTags.OXIDIZER)  // Cu²⁺可被还原
+                .displayColor(0x3E9BE0)
                 .build()
         );
 
@@ -637,6 +641,8 @@ public class ModChemistry {
                 .flameColor(0xCCFFCC)
                 .tag(IonTags.ACID)
                 .tag(IonTags.VOLATILE)
+                .displayColor(0xE9F0E9)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -649,6 +655,8 @@ public class ModChemistry {
                 .formationGibbs(-131.2)
                 .toxicityLevel(2)
                 .tag(IonTags.ACID)
+                .displayColor(0xE4EEF7)
+                .form(IonType.Form.SOLUTION)
                 .build()
         );
 
@@ -662,6 +670,8 @@ public class ModChemistry {
                 .flameColor(0xC8FF00)
                 .tag(IonTags.OXIDIZER)
                 .tag(IonTags.HALOGEN)
+                .displayColor(0xD9E84A)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -672,6 +682,8 @@ public class ModChemistry {
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .tag(IonTags.OXIDIZER)
+                .displayColor(0xCFE0FF)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -681,6 +693,8 @@ public class ModChemistry {
                 .specificHeat(29.1)
                 .formationEnthalpy(0)
                 .formationGibbs(0)
+                .displayColor(0xE0E0E0)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -692,6 +706,8 @@ public class ModChemistry {
                 .formationGibbs(-137.2)
                 .toxicityLevel(2)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xE0E0E0)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -702,6 +718,8 @@ public class ModChemistry {
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .tag(IonTags.REDUCER)
+                .displayColor(0x2B2B2B)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -712,6 +730,8 @@ public class ModChemistry {
                 .formationEnthalpy(0)
                 .formationGibbs(0)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xE6F2FF)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -721,6 +741,8 @@ public class ModChemistry {
                 .specificHeat(37.2)
                 .formationEnthalpy(-393.5)
                 .formationGibbs(-394.4)
+                .displayColor(0xE6E6E6)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -733,6 +755,8 @@ public class ModChemistry {
                 .toxicityLevel(2)
                 .tag(IonTags.ACID)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xE8E8E8)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -744,6 +768,8 @@ public class ModChemistry {
                 .formationGibbs(-371.1)
                 .toxicityLevel(2)
                 .tag(IonTags.ACID)
+                .displayColor(0xEDEDED)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -756,6 +782,8 @@ public class ModChemistry {
                 .toxicityLevel(2)
                 .tag(IonTags.BASE)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xE6EEF5)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -765,6 +793,8 @@ public class ModChemistry {
                 .specificHeat(33.6)
                 .formationEnthalpy(-241.8)
                 .formationGibbs(-228.6)
+                .displayColor(0xE8F4FF)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -775,6 +805,8 @@ public class ModChemistry {
                 .specificHeat(75.3)
                 .formationEnthalpy(-285.8)
                 .formationGibbs(-237.1)
+                .displayColor(0xBFE3FF)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -786,6 +818,8 @@ public class ModChemistry {
                 .formationGibbs(-120.4)
                 .tag(IonTags.OXIDIZER)
                 .tag(IonTags.REDUCER)  // 既可作氧化剂也可作还原剂
+                .displayColor(0xDCEEF8)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -796,6 +830,8 @@ public class ModChemistry {
                 .specificHeat(50.5)
                 .formationEnthalpy(-411.1)
                 .formationGibbs(-384.1)
+                .displayColor(0xF5F5F5)
+                .form(IonType.Form.CRYSTAL)
                 .build()
         );
 
@@ -806,6 +842,8 @@ public class ModChemistry {
                 .formationEnthalpy(-385.8)
                 .formationGibbs(-359.4)
                 .tag(IonTags.MOLTEN_SALT)
+                .displayColor(0xF5F5F5)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -817,6 +855,8 @@ public class ModChemistry {
                 .formationGibbs(-379.7)
                 .toxicityLevel(1)
                 .tag(IonTags.BASE)
+                .displayColor(0xFAFAFA)
+                .form(IonType.Form.GRANULE)
                 .build()
         );
 
@@ -827,6 +867,8 @@ public class ModChemistry {
                 .formationEnthalpy(-397.8)
                 .formationGibbs(-350.2)
                 .tag(IonTags.MOLTEN_SALT)
+                .displayColor(0xFAFAFA)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -837,6 +879,8 @@ public class ModChemistry {
                 .formationEnthalpy(-1130.7)
                 .formationGibbs(-1044.4)
                 .tag(IonTags.BASE)
+                .displayColor(0xF2F2F2)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -848,6 +892,8 @@ public class ModChemistry {
                 .formationGibbs(-465.0)
                 .tag(IonTags.CATALYST)
                 .tag(IonTags.OXIDE)
+                .displayColor(0x2A2A2A)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -858,6 +904,8 @@ public class ModChemistry {
                 .formationEnthalpy(-1207.6)
                 .formationGibbs(-1128.8)
                 .tag(IonTags.PRECIPITATE)
+                .displayColor(0xF7F7F7)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -868,6 +916,8 @@ public class ModChemistry {
                 .formationEnthalpy(-635.1)
                 .formationGibbs(-604.0)
                 .tag(IonTags.OXIDE)
+                .displayColor(0xF0F0F0)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -878,6 +928,8 @@ public class ModChemistry {
                 .formationEnthalpy(-986.1)
                 .formationGibbs(-898.5)
                 .tag(IonTags.BASE)
+                .displayColor(0xF5F5F5)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -888,6 +940,8 @@ public class ModChemistry {
                 .formationEnthalpy(-1125.5)
                 .formationGibbs(-992.8)
                 .tag(IonTags.ACID)
+                .displayColor(0xFAFAFA)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -900,6 +954,8 @@ public class ModChemistry {
                 .formationGibbs(0)
                 .tag(IonTags.METAL)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xD8D8D8)
+                .form(IonType.Form.BULK)
                 .build()
         );
 
@@ -911,6 +967,8 @@ public class ModChemistry {
                 .formationGibbs(0)
                 .tag(IonTags.METAL)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xC87137)
+                .form(IonType.Form.BULK)
                 .build()
         );
 
@@ -924,6 +982,8 @@ public class ModChemistry {
                 .tag(IonTags.ACID)
                 .tag(IonTags.OXIDIZER)   // 浓硫酸有强氧化性
                 .tag(IonTags.VOLATILE)
+                .displayColor(0xE8E4C0)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -936,6 +996,8 @@ public class ModChemistry {
                 .formationGibbs(-742.2)
                 .tag(IonTags.OXIDE)
                 .tag(IonTags.VALUABLE)       // 有效成分（矿石中有价值的部分）
+                .displayColor(0x9E3B24)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -947,6 +1009,8 @@ public class ModChemistry {
                 .formationGibbs(-856.3)
                 .tag(IonTags.OXIDE)
                 .tag(IonTags.GANGUE)         // 脉石（杂质）
+                .displayColor(0xEDEDED)
+                .form(IonType.Form.CRYSTAL)
                 .build()
         );
 
@@ -958,6 +1022,8 @@ public class ModChemistry {
                 .formationGibbs(-146.0)
                 .tag(IonTags.OXIDE)
                 .tag(IonTags.VALUABLE)
+                .displayColor(0xB03A2E)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -990,6 +1056,8 @@ public class ModChemistry {
                 .formationGibbs(6.4)
                 .tag(IonTags.HYDROCARBON)
                 .tag(IonTags.ALKANE)
+                .displayColor(0xE8DCA0)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -1001,6 +1069,8 @@ public class ModChemistry {
                 .formationGibbs(17.3)
                 .tag(IonTags.HYDROCARBON)
                 .tag(IonTags.ALKANE)
+                .displayColor(0xE6D79A)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -1012,6 +1082,8 @@ public class ModChemistry {
                 .formationGibbs(28.1)
                 .tag(IonTags.HYDROCARBON)
                 .tag(IonTags.ALKANE)
+                .displayColor(0xE4D494)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -1026,6 +1098,8 @@ public class ModChemistry {
                 .tag(IonTags.HYDROCARBON)
                 .tag(IonTags.AROMATIC)
                 .tag(IonTags.VOLATILE)
+                .displayColor(0xE6E6E0)
+                .form(IonType.Form.LIQUID)
                 .build()
         );
 
@@ -1038,6 +1112,8 @@ public class ModChemistry {
                 .formationGibbs(0)
                 .tag(IonTags.NONMETAL)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xE8D44D)
+                .form(IonType.Form.POWDER)
                 .build()
         );
 
@@ -1050,6 +1126,8 @@ public class ModChemistry {
                 .formationGibbs(97.8)
                 .toxicityLevel(2)
                 .flameColor(0xB4552A)
+                .displayColor(0xDCD7C0)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -1061,6 +1139,8 @@ public class ModChemistry {
                 .formationGibbs(51.3)
                 .toxicityLevel(2)
                 .flameColor(0xB4552A)
+                .displayColor(0xB5502A)
+                .form(IonType.Form.GAS)
                 .build()
         );
 
@@ -1082,6 +1162,8 @@ public class ModChemistry {
                 .formationGibbs(0)
                 .tag(IonTags.METAL)
                 .tag(IonTags.REDUCER)
+                .displayColor(0xE6E6E6)
+                .form(IonType.Form.BULK)
                 .build()
         );
 

@@ -46,8 +46,9 @@ public class SubstanceBlueprint {
      * @param units 份数
      */
     public Map<IonType, Double> createComposition(double units) {
-        double valuableMultiplier = ChemConfig.ORE_VALUABLE_RATIO_MULTIPLIER.get();
-        double gangueMultiplier = ChemConfig.ORE_GANGUE_RATIO_MULTIPLIER.get();
+        // 统一走档位解析入口（§7.5 方案 C：档位唯一权威）
+        double valuableMultiplier = ChemConfig.DifficultyPresets.valuableMultiplier();
+        double gangueMultiplier = ChemConfig.DifficultyPresets.gangueMultiplier();
         return createComposition(units, valuableMultiplier, gangueMultiplier);
     }
 

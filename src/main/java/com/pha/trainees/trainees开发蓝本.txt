@@ -275,6 +275,20 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 难度指标 = (资源得分 × 权重1 + 污染得分 × 权重2 + 能源得分 × 权重3) / 总权重 × 100
 ```
 
+### 7.5 ✅ 已定：档位唯一权威（方案 C）＋ 滑块拖即自定义（C-1，2026-08 拍板）
+
+**代码原状（两条读取路径并存）**：
+- `SubstanceItem`：非 `CUSTOM` 时走**档位 → 预设表**，只有 `CUSTOM` 才读配置乘数；`SubstanceBlueprint.createMaterial` 却**直接读**配置乘数、完全不看档位；
+- 污染/能源乘数当时没有任何游戏消费方；GUI 只写乘数、从不写档位 → `GAME_DIFFICULTY` 实际恒为 `NORMAL`；`DifficultyScorer` 还读了一次档位却没用（死读）。
+
+**定稿规则（方案 C）**：
+1. **档位（`GAME_DIFFICULTY`）是唯一权威**。所有难度消费方（矿石成分、污染压力、能源效率、难度指标、未来市场/成就）必须走统一入口 `ChemConfig.DifficultyPresets.valuableMultiplier() / gangueMultiplier() / pollutionDiffusionSpeed() / pollutionToxicityThreshold() / energyConsumptionMultiplier() / energyGenerationMultiplier()`；**禁止再直接读** `ORE_*` / `POLLUTION_*` / `ENERGY_*` 配置项。
+2. **解析语义**：非 `CUSTOM` → 预设表（§9.2）；`CUSTOM` → 读 6 个乘数配置（此时它们才是真源）。
+3. **GUI 双写（C-1）**：点难度按钮 = 写档位（并把该档乘数同步进配置，便于阅读/匹配）；**拖任意难度滑块 = 自动切 `CUSTOM`**（拖到恰好等于某预设组合时回归该档位）；打开界面时按存档档位刷新乘数配置再构建滑块（手改配置文件 `gameDifficulty=HARD` 仍然整套生效）。
+4. **"自定义"是状态不是预设**：点"自定义"按钮不改变数值，仅声明"接下来我手调"。
+5. **实现记录**：统一入口落在 `DifficultyPresets`（含 `tier()` / `isCustomTier()`）；`SubstanceBlueprint`、`SubstanceItem`、`DifficultyScorer` 均已改走入口；`ChemConfigScreen` 增加 `syncMultipliersFromTier()` 与档位回写。编译通过（2026-09-06）。
+6. **已知边界**：GUI 的档位/乘数写入发生在客户端屏幕；单人（集成服同 JVM）即时生效，专用服务器上客户端写入的是本地副本（若要服主级生效，后续需加网络包，与现有滑块同源问题）。
+
 
 ## 第八部分：物质基类与混合物系统
 
@@ -323,6 +337,8 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 | **烧杯交互** | 默认添加量 | `BEAKER_DEFAULT_FLUID_ADD_AMOUNT` |
 | **难度权重** | 难度指标计算权重 | `WEIGHT_RESOURCE_GETTING` |
 
+> **读取纪律（§7.5 方案 C）**：难度相关的 6 个乘数配置（资源×2、污染×2、能源×2）**不是独立真源**——非 `CUSTOM` 档时玩法一律按 `GAME_DIFFICULTY` → 预设表解析；它们只在 `CUSTOM` 档下作为手调真源。任何新系统都必须调用 `ChemConfig.DifficultyPresets` 的统一入口方法，不得直接读这些配置项。
+
 ### 9.2 难度预设值（`DifficultyPresets`）
 
 | 难度 | 资源乘数 | 污染参数 | 能源参数 |
@@ -331,32 +347,48 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 | **普通** | 有效 1.0 / 脉石 1.0 | 扩散 1.0 / 毒性 1.0 | 耗电 1.0 / 发电 1.0 |
 | **困难** | 有效 0.7 / 脉石 1.3 | 扩散 2.0 / 毒性 0.5 | 耗电 1.5 / 发电 0.7 |
 
-### 9.3 GUI 配置界面
+### 9.3 GUI 配置界面（`ChemConfigScreen`，现状）
 
 - **触发位置**：游戏内 ESC 菜单（`PauseScreen`）。
-- **设计**：
-  - 顶部三个难度按钮（简单/普通/困难），点按切换预设。
-  - 实时显示难度指标（0~100）。
-  - 下方按分类显示所有可配置字段的滑动条。
-  - 当任一字段与预设不符时，自动切换为“自定义”难度。
+- **顶部**：难度指标实时显示（0~100，由当前实际配置值算出）+ 四个难度按钮（简单/普通/困难/自定义；"自定义"是**由数值匹配自动进入的状态**，不是预设）。
+- **分组滑块**（自上而下）：
+  1. 资源获取（矿石有效成分/脉石比例）
+  2. 污染与环境（扩散速度/毒性阈值/植物惩罚）
+  3. 能源效率（耗电/发电倍数）
+  4. 严格映射（固定档：水桶容量、锭/粒当量、单组分上限、总量上限）
+  5. 引擎调度（轮询间隔、单轮最大规则数、每 tick 连锁上限、ε 截断阈值）
+  6. 气体网格（扩散周期、基础迁移系数、精度档位 A/B/C、活性半径、容器逸散开关、泄漏速率、湮灭阈值）
+- **滑块类型支持**：普通浮点；`IntValue` 整数吸附；布尔开关（开/关文案）；整数档位枚举（A·B·C）；对数刻度（ε、湮灭阈值，科学计数法显示）。数值显示按量级动态取小数位（小值不再被 "0.00" 掩盖）。
+- **保存**：底部「保存」按钮把内存值落盘到当前存档的 `SERVER_SPEC`（拖动滑块即时生效于内存，落盘由按钮触发）。
+- **实现记录**：见 §19.13 末尾「配置 GUI 补全」（翻译键修复、难度按钮索引匹配、预设键对齐等）。
+- **难度档位写入语义**：✅ 已定（§7.5 方案 C + C-1）——点难度按钮写档位并同步乘数；拖滑块自动切 CUSTOM；打开界面按存档档位刷新乘数；"自定义"按钮只声明手调状态、不改数值。
 
 
 ## 第十部分：开放世界气体网格
 
-### 10.1 架构选择
+### 10.1 架构选择（2026-08 实现现状）
 
-- **数据结构**：`Map<BlockPos, GasMixture>`（仅缓存已加载区块）。
+- **存储**：每维度一份 `SavedData`（`GasGridManager`）。**精场** `Map<ChunkPos, Map<BytePos, GasMixture>>`（逐格，仅加载区）＋**粗账** `Map<ChunkPos, GasChunkSummary>`（每区块一条：各气体总 mol、mol 加权重心、平均温度）。
 - **GasMixture**：`Map<IonType, Double> moles` + `double temperature`。
-- **扩散模拟**：菲克定律（Fick's Laws），每 Tick 向相邻 6 个方向迁移摩尔数。
+- **扩散模拟**：菲克定律，每 `diffusionInterval` tick 对精场 6 邻迁移；系数 `base × √(29/M) × √(T/293)`（格雷姆定律，以空气为基准），显式限幅。稳定性约束：每方向只处理一边、源端单格迁出 ≤50%、单次迁移下限 1e-9、低于湮灭阈值的格清扫。
+- **温度**：不逐格解导热 PDE，用**解析热源叠加场**（火/岩浆/营火等 → `环境 + max((T源−Tenv)·exp(−d/λ))`，3³ 扫描）；温度反向驱动扩散速率。
 
-### 10.2 存档策略（关键）
+### 10.2 存档策略（2026-08 定稿，取代原「不主动存档」案）
 
 - **烧杯容器**：使用 `ListTag` + `DoubleTag` 存储 `(ID, moles)` 对。
-- **开放网格**：**不主动存档**。区块卸载时，将气体数据向邻近网格加权扩散（抹平）后丢弃。区块重新加载时从零开始重新扩散。保证存档体积恒定。
+- **开放网格（两级 LOD + 三档精度）**：
+  - 区块**卸载**：精场坍缩为区块粗账后丢弃精数据（A/B 档），或按 C 档保留精数据；
+  - 区块**加载**：优先用精存快照复原，否则按粗账重心做 3³ 距离衰减水合撒布（成分与总质量守恒，仅分布形状近似）；
+  - **退出存档**：A 档全部坍缩粗账；B 档额外保存"当前仍加载区"的精数据快照；C 档全精存。
+- **精度档位**（`gas_grid.precisionMode`，服务端配置）：A 全粗（默认，存储最省）／B 半精（常驻区精复原）／C 全精（高配或小活动范围）。
+- **粗账的用途**：环境污染计算、露天气体渲染、离线时间近似（卸载区时间静止，重载后自组织扩散）。
+- **湮灭阈值**（`dissolveThreshold`，默认 1e-3 mol/格）：低于此量视为消散于大气，用于控制污染云规模与精格数量（1e-4 过细已弃，实测 1e-3 下约 3 万精格流畅）。
 
-### 10.3 烧杯-网格交互（Leakage API）
+### 10.3 容器-网格交互（双向开口面）
 
-烧杯检测顶部是否为空气，若内部气体分压 > 外部，每 Tick 调用 `GasGridManager.addGas(pos.above(), ion, Δn)` 释放气体。
+- 容器（烧杯/电解槽）顶部为空气时，顶格与上方网格格按**浓度差双向交换**：容器浓度高 → 逸散；外部浓度高 → 回吸（受成分/总量上限约束）。
+- 逸散侧先记入容器内**泄漏缓冲**，累积达到湮灭阈值才一次性抛入网格（防止制造大量微量格）。
+- 开关与速率由 `gas_grid.containerLeakEnabled / containerLeakRate` 控制；密封、吹气等控制手段留待后续（改开口状态即可）。
 
 
 ## 第十一部分：沉浸感与游戏性表现
@@ -424,15 +456,21 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 - 单容器（50 种离子）：< 0.1ms / Tick。
 - 开放网格（1000 个格子扩散）：< 1ms / Tick。
 
-### 14.2 调试工具
+### 14.2 调试工具（现状）
 
-- **调试命令**：`/chemtester add <ionId> <moles>`（向准星对准的烧杯添加离子）、`/chemtester info`（查看烧杯状态）、`/chemtester clear`（清空烧杯）。
+- **命令族**：`/chemtester`
+  - 容器：`add <ionId> <moles>`（向准星对准的容器加离子）、`info`（容器状态）、`clear`（清空）
+  - 引擎：`power`（电解电源开关）、`last`（最近反应记录）、`failures`（最近失败原因）、`graph`（反应图发到客户端可视化）
+  - 流体：`fluid fill|drain <mB>`（验证 `IFluidHandler` 桥接，1000mB↔64mol）
+  - 气体网格：`gas add <ionId> <moles>`、`gas info`、`gas clear`、`gas stats`（精格/粗账规模）、`gas reset`
 - **命令权限**：仅 OP/创造模式玩家可用（`requires(source -> source.hasPermission(2))`）。
-- **环形缓冲区**：引擎维护最近 20 条反应记录（执行规则 + 转化量）。
+- **环形缓冲区**：引擎保留最近 20 条反应记录与 20 条失败记录；容器各自保留最近 10 条失败记录（运行时，不存 NBT）。失败记录随 BE 更新包同步客户端，供分析仪 HUD 显示。
 
-### 14.3 可配置开关
+### 14.3 可配置开关（现状：`SERVER_SPEC` 分组）
 
-配置文件提供：`enableHeatShimmer`、`enableGasParticles`、`enableThermalRunaway`、`pollingInterval` 等选项。
+配置按组管理：`difficulty`（难度档位）、`resource_getting`、`pollution`、`energy`、严格映射、物理参数（安全温度/基础热容/换热系数）、热源温度、反应默认值、优先级、烧杯交互、难度权重、`engine`（轮询间隔/单轮规则上限/每 tick 连锁上限/ε）、`gas_grid`（扩散周期/迁移系数/精度档位/活性半径/逸散开关/泄漏速率/湮灭阈值）。
+
+> 原案中的 `enableHeatShimmer`、`enableGasParticles`、`enableThermalRunaway` 等表现层开关**尚未落地**（属 Phase 10 表现层），届时按组补入。
 
 
 ## 第十五部分：开发路线图
@@ -441,10 +479,10 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 | :--- | :--- | :--- | :--- |
 | **Phase 1** | 数据模型搭建 | `IonType` 注册表、`ReactionRule`、`ReactionGraph`、`Phase` 枚举 | ✅ 已完成 |
 | **Phase 2** | 容器与接口 | `IChemicalContainer` 接口、`BeakerBlockEntity`（烧杯基础功能） | ✅ 已完成 |
-| **Phase 3** | 引擎核心 | `ReactionEngine`（事件队列、Tick轮询、PendingRules、Epsilon截断） | ✅ 已完成 |
+| **Phase 3** | 引擎核心 | `ReactionEngine`（事件队列 + Tick 轮询 + ε 截断；原 PENDING_RULES 挂起机制已移除，见 §3.2.3） | ✅ 已完成 |
 | **Phase 4** | 热力学集成 | 温度/压强计算、物态区分浓度、阿伦尼乌斯/范特霍夫修正 | ✅ 已完成 |
 | **Phase 5** | 物质基类系统 | `IMaterial`、`SubstanceBlueprint`、`SubstanceItem` | ✅ 已完成 |
-| **Phase 6** | 配置系统 | `ChemConfig`、难度预设、GUI 配置界面 | ✅ 已完成 |
+| **Phase 6** | 配置系统 | `ChemConfig`、难度预设、GUI 配置界面（六组滑块，含引擎调度/气体网格，见 §9.3） | ✅ 已完成 |
 | **Phase 7** | 反应注册 | 中和、分解、沉淀、催化、可逆、多反应物、浓度依赖、电解（理论验证完成）+ 硫磺→硫酸链/水电解/盐酸合成 | ✅ 已完成 |
 
 > **开发工具**：`/chemtester graph` 将反应图发到客户端可视化（节点按物态着色、边按规则着色）；`/chemtester last` 看最近反应记录；`/chemtester power` 开关电解电源。反应图可视化是趣味调试功能，反应规模大了会重叠卡顿，届时可关。
@@ -552,7 +590,7 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 - [ ] **Patchouli 化学书**：依赖注释暂留（用户侧有问题），数据结构保留，后续解决。
 - [ ] **魔力（Mana）线**：祭坛已是第 0 代原型（免费合成/第二路径/产物路由齐全），落地需补 `IManaStorage` + 支付环节 + 养鸡来源。
 - [ ] **蒸馏/分馏（真·气液平衡）**：等 Phase 9 网格落地后直接实现（见 §19.2），不做简化版。
-- [ ] **反应预测器 + 预期产物失败反馈**：共享"引擎失败原因收集器"（见 §19.6/19.7），建议在 Phase 8 前后启动。
+- [ ] **反应预测器 + 预期产物失败反馈**：共享"引擎失败原因收集器"（见 §19.6/19.7），建议在 Phase 8 前后启动。→ ✅ 已实现（2026-09-06，见 §19.14）
 - [ ] **化工市场（贸易站）**：后期板块，货币独立设计（见 §19.4）。
 - [ ] **虚空采矿（矿浆产出 + 魔法配方）**：后期板块（见 §19.5）。
 - [ ] **Phase 8-12**：数据生成器 / 开放气体网格 / 游戏性表现 / 有机标签 / 优化，未开工。
@@ -575,7 +613,7 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 ## 第十九部分：能源、工业与引导层讨论纪要（2026-08 外部讨论）
 
 > 本节记录一次外部设计讨论（能量系统/蒸馏/流体网格/化工市场/虚空采矿/魔法合理化/玩家引导/失败反馈）的决策结论。
-> **工作准则（作者要求）**：① 凡是涉及蓝本尚未覆盖的开发理念，讨论确定后一律顺手写入蓝本；② 后续无论是写代码还是确认设计，若有不清楚的问题，**先询问直到彻底明白后再执行**，不得带疑执行。
+> **工作准则（作者要求）**：① 凡是涉及蓝本尚未覆盖的开发理念，讨论确定后一律顺手写入蓝本；② 后续无论是写代码还是确认设计，若有不清楚的问题，**先询问直到彻底明白后再执行**，不得带疑执行；③ 作者的表述可能不严谨、有误或使用非标准术语——AI 应按**意图**理解，不必逐字照办，但必须在回复中**纠正错误、澄清概念**（纠正内容经作者确认后写入蓝本）。
 
 ### 19.1 能源体系决策：电力 = FE，只看功率，不做电压/电流
 
@@ -796,3 +834,157 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 - 难度按钮激活态改为难度数组索引匹配（原按 message==displayName 中文硬比较，英文客户端失效）；预设匹配键由 camelCase 校正为与滑块 key 一致的 snake_case（难度预设此前从未真正生效）。
 - 新增「引擎调度」组：轮询间隔/单轮最大规则数/每tick连锁上限（整数吸附）+ ε 对数刻度滑块；新增「气体网格」组：扩散周期（整数）/基础迁移系数/精度档位 A·B·C（整数档位）/活性半径（整数）/容器逸散开关（开·关）/泄漏速率/湮灭阈值（对数刻度 1e-6~1）。
 - zh_cn/en_us 补全缺失键（含严格映射滑块、新组、开关与精度档位文案）。
+
+### 19.14 引导层落地：分析仪诊断 GUI + 反应预测器 + 原料去向（2026-09-06 实现）
+
+> 对应 §19.6「反应预测器与失败反馈合流」与 §19.7「失败反馈设计细节」的方案 a（GUI）与方案 b（聊天简报），
+> 以及 §19.7 补充决策 **2c**（保留"最近执行的规则与竞争信息"）。作者确认的交互与范围：**右键 → GUI；潜行右键 → 聊天简报；泛化到所有化学容器**。
+
+**2c：实际执行记录 + 原料去向**
+- 新增 `ExecutedRule(ruleId, deltaXi, gameTime, competition)`：与 `ReactionFailure` 配对——一个答"为什么没反应"，一个答"原料被谁消耗了"。
+- `IChemicalContainer` 增加 `recordExecutedRule` / `getRecentExecutedRules`（default 空实现）；`BeakerBlockEntity` 保留最近 **5** 条（仅运行时，不存 NBT）。
+- `ReactionEngine.executeRule` 由 `boolean` 改为**返回 Δξ**（失败返回 0），让调用方能拿到本次推进量用于记录。
+- `processPolling` 增加竞争追踪：维护 `反应物 → 实际消耗它的规则`，被挤掉的竞争规则挂到胜者名下，生成"`规则B` 因 `HCO₃⁻` 被本规则抢先消耗而未能执行"这类说明；执行循环结束后统一落盘本轮记录（竞争关系此时才完整）。事件路径（`processTrigger`）同样记录，但无共享反应物竞争。
+
+**6b：诊断 GUI（方案 a）+ 聊天简报（方案 b）**
+- 数据通道 `AnalyzerReportPacket`（服务端组装 → 客户端打开 `AnalyzerScreen`）：携带 6 组**已格式化**文本行（容器状态 / 内容物 / 最近失败 / 最近执行 / 可执行 / 未达条件），**客户端零化学计算**（沿用 `OpenGraphPacket` 的推送模式）。
+- 生成器 `chemistry/report/AnalyzerReport`：同一份数据供两个出口——`sendToClient`（GUI）与 `sendChatBrief`（聊天简报）；内容物按摩尔数降序并带相态标签；失败/执行各最多 5 行。
+- **可操作建议**（§19.7 要求"不只说缺什么，还说怎么补"）：温度不足 → "升温至 ≥ X K（当前 Y K）"；缺前置 → 列出缺失前置物显示名；缺反应物 → 列出缺失反应物；未通电 → "接入 FE（电解槽需两电极面都有电）"；已达平衡 → "升温/降温或移出产物可推动"。
+- GUI `AnalyzerScreen`：顶部两个标签页（诊断 / 预测）+ 底部关闭；内容区滚轮滚动、超长自动裁剪；标题显示容器名。
+- 交互统一入口 `chemistry/util/AnalyzerAccess.tryUse`：泛化到**所有 `IChemicalContainer`**（烧杯、电解槽、未来机器），容器方块只需在自己 `use` 里调一行；`BeakerBlock`/`ElectrolysisCellBlock` 已接入，`AnalyzerItem.useOn` 亦改走该入口。
+- HUD `AnalyzerHudOverlay` 泛化：由"方块是 `BeakerBlock`"改为"BE 是 `BeakerBlockEntity`（含电解槽）"，电解槽自动获得常驻 HUD。
+- 语言键：`gui.trainees.analyzer.screen_title / tab.* / section.* / button.close / hint.scroll`（zh + en）。
+- 旧的 `BeakerBlock.sendDiagnosticReport` 已删除，聊天简报由 `AnalyzerReport` 统一提供（内容更全，含执行记录）。
+
+**后续待办**：① 分析仪"锁定目标"（NBT 持久化 + 免对准）；② 预测页跳转反应图视图；③ 建议细化（催化剂用量/升温手段指引）；④ 专用服务器场景下 GUI 打开依赖网络包已具备，无需额外工作。
+
+**✅ 追加（2026-09-06 作者反馈，点 1-3 + 方程式渲染）**
+1. **电解槽静默**：删除 `ElectrolysisCellBlock.reportState` 与取产物后的附带报告——查询类信息不再挤聊天栏；空手右键只剩挥空动作（不影响潜行空手取产物）。调档/装膜/取产物/错误等 **action bar 短反馈保留**。
+   信息迁移：`IChemicalContainer.appendDiagnostics(List<String>)` 新钩子（default 空实现），电解槽实现它输出电极方向/工作档/隔膜/双面储能/回路/输出槽状态；分析仪诊断页在通用信息后统一追加该钩子内容——**分析仪不特判任何具体容器**，未来机器同样接入。
+2. **准星 HUD 泛化**：`BeakerHudOverlay` → `ChemicalContainerHudOverlay`（注册名 `chemical_container_info`），判定改为 `IChemicalContainer`，文本统一取**方块 id 的翻译键**（`Block#getDescriptionId()`）再翻译。顺带补上此前缺失的 `block.trainees.beaker`（zh 烧杯 / en Beaker）——原先 HUD 写死中文掩盖了缺键。
+3. **执行记录扩容**：`BeakerBlockEntity.MAX_RECENT_EXECUTED` 与 `AnalyzerReport.MAX_EXECUTED_LINES` 由 5 → **20**（保留与展示同档）。
+4. **方程式渲染器** `chemistry/util/ReactionFormula`：把 `ReactionRule` 渲染为 `2H₂ + O₂ → 2H₂O`（系数略 1；化学式走 `IonDisplay`，含价态上标/物态后缀），`bold()` 提供 §l 粗体包装。
+   **显示规范（作者定稿）**：只显示纯方程式 + 粗体，**ΔH / 最低温度等条件不进方程式**，避免干扰阅读；rule id 降为次要信息（仅失败行括注）。
+   已接入：分析仪诊断页（最近失败、最近执行/原料去向）+ 预测页（可执行、未达条件）+ 聊天简报。
+   配套：`ReactionGraph.getRuleById(String)` 懒建 id→规则索引（注册/清空图时失效），供诊断记录（只存 ruleId）还原方程式。
+5. **⏳ JEI 集成挂起**：作者有自设方案，留待下次讨论后再实现；`ReactionFormula` 已按"mod 内 UI 与 JEI 共用"设计（不依赖任何客户端类），可直接复用。
+6. **分析仪 HUD 精简（2026-09-06 作者确认）**：HUD 不再显示"最近失败"提示区块（失败/未进行信息统一由分析仪 GUI 诊断页提供，见 §19.14 后续实现）。**✅ 已清理（2026-09-06）**：移除 `lastFailure` 字段、`getLastFailure()`、`LastFailure` 的 BE 更新包同步与序列化辅助方法，以及 `recordFailure` 中为同步而做的 `setChanged()`（原先每次失败都会触发一次更新包）；失败记录环形缓冲保留，仍供 GUI 诊断读取。
+
+### 19.15 ⏳ 物质物品化与渲染方案（2026-09-06 讨论中，未定稿）
+
+> 作者提出：不想为每种纯物质注册一堆 item（NaCl、Na、Cl₂、无水硫酸）与其流体/桶变体，也不愿逐个写"加入容器"的映射；
+> 倾向**用数据生成把大量 NBT 变体的物质基类塞进创造栏**（同一 item，NBT 不同），这样映射只需写物质基类一处。
+> 本节记录该提案、AI 的概念纠正、可选路线与开放问题；**尚未拍板，暂不写代码**。
+
+**AI 的三处纠正（待作者确认）**
+1. "subitem" 不是 MC 概念：同一 item + 不同 NBT 的 ItemStack 是标准做法；创造栏条目通过 `CreativeModeTab.Builder#displayItems` 塞入任意 `ItemStack`（NBT 变体可行）。
+2. 避免注册多物品的**主要收益不是性能**（item 注册本身很轻），而是：不需要 per-物质 的 model/json/lang、不膨胀物品标签与配方、映射集中一处、便于数据包/数据生成。
+3. 代码现状：`IonType` **已有** `flameColor`（ARGB，用于焰色/气体颜色），新颜色字段需与它划清职责或合并；`SubstanceItem` 动态成分模式（`composition` ListTag）的 `getName`/tooltip 尚未完整（当前只有蓝图模式有名字）。
+
+**难点 1：离子不能是物品（概念分层）**
+- 化学约束：离子不会单独以"可称量样品"存在，宏观物质**必为电中性**（离子必带反离子）。所以物品/流体层只能承载**电中性物种或混合物**。
+- 因此 `IonType` = 反应图节点（可为离子/分子/原子/官能团），物品层 = 物质（`SubstanceBlueprint`/`composition` 已支持"多离子组成一个物质"）。
+- 离子参与的反应在容器内部发生，**产物按电中性物种表达**（Cl₂ 分子、Na 原子等）；只以离子形式存在的物种（H⁺/OH⁻/SO₄²⁻）不需要物品，但 JEI 需要一个"可点击条目"——这正是 §19.15 与"JEI 设想"的交汇点（候选：自定义 JEI ingredient 类型承载"裸离子条目"）。
+
+**难点 2：NBT 变体的贴图/渲染（1.20.1 可用机制）**
+- 正交两轴：**形态**（决定 sprite/model，离散：粉末/晶体/颗粒/块/液体/溶液/气体…）＋ **颜色**（tint 值，来自物质数据）。
+- 颜色：`RegisterColorHandlersEvent.Item` + `IItemColor`（物品）／`RegisterColorHandlersEvent.Block` + `BlockColor`（方块）——与草/树叶同机制，只是颜色源换成物质数据；贴图需做成**白/灰阶**以最大化 tint 范围，tintindex 分层可做"主色 + 高光/玻璃感"。
+- 模型选择（形态）：① `minecraft:custom_model_data`（NBT int）+ 模型 `overrides`——最省事，零代码；② `ItemProperties.register` 自定义谓词——语义更清晰；③ `IClientItemExtensions#getCustomRenderer` + `BlockEntityWithoutLevelRenderer`（BEWLR）——代码渲染，适合**连续参数**（液面高度、混合物渐变、颗粒随机形状）。
+- 混合物/溶液：颜色可按摩尔分数加权（建议线性空间加权后做 gamma 校正）；浓度可用透明度或液面高度表达。不同形态不需要不同逻辑，只是模型/贴图不同。
+
+**候选路线**
+- **A 全物品化**（每物质一个 item，数据生成 model/lang）：最直观、JEI/配方/外部互操作零摩擦；代价是注册与资源体积、创造栏膨胀。
+- **B 全 NBT 化**（作者提案）：注册与贴图极省；代价是 JEI/搜索/配方需要自定义 ingredient 与动态名称，外部 mod 互操作需约定。
+- **C 混合（AI 倾向）**：少量"一级物质"（硫酸/氨/氯气/铝/硅等参与机器、管道、市场、主流搜索的）做真物品/真流体；其余大量中间体/离子只存在于容器与网格，用品类 NBT 物质表达。按玩法需要逐步"提升"某物质到一级。
+
+**开放问题（状态）**
+1. ~~路线选 A / B / C？~~ → ✅ **C（混合式）**，见下"已定"
+2. ~~形态枚举集合怎么定？~~ → ✅ 见下"已定"
+3. ~~颜色数据放哪里？~~ → ✅ 见下"已定"
+4. 流体是否仍按 §17.2 注册 Forge 流体（管道/世界交互）？若只做"内部网格 + 物质物品"，需明确放弃哪些互操作。
+5. 溶液/混合物的颜色与堆叠一致性（NBT 键规范、浮点精度、排序）由谁保证。
+
+**✅ 已定（2026-09-06 作者确认）**
+- **路线 C（混合式）**：少量"一级物质"做真物品/真流体，其余物质走 NBT 物质基类；一级/二级之间保留**升格与降格通道**（升格 = 加注册 + 映射条目 + 模型/语言），不需要重构。
+- **形态（form）**：固定枚举起步 **粉末 / 晶体 / 颗粒 / 块 / 液体 / 溶液 / 气体**；`Phase` 派生默认形态、`IonType` 可覆盖。**形态仅作渲染属性，不参与反应判定**（避免同一物质因形态分裂成多个图节点、导致反应图翻倍）。
+- **颜色**：`IonType` 新增 `displayColor`（物质外观色），与既有 `flameColor`（焰色/气体颜色）**分工**；蓝图/物质层可覆盖。混合物/溶液颜色按摩尔分数加权（线性空间加权 + gamma 校正，避免偏暗）。
+- **渲染机制（技术选型）**：形态 → 模型选择（优先 `ItemProperties` 自定义谓词 / `custom_model_data` + `overrides`；连续参数如液面高度用 BEWLR）；颜色 → `RegisterColorHandlersEvent.Item` + `IItemColor` × 白/灰阶贴图（与草/树叶同机制，颜色源换成物质数据）。
+
+**✅ 一级物质准入判据（2026-09-06 作者确认）**
+- **总原则**：一级物质 = **必须离开容器、以独立 token 被其他系统引用的电中性物质**；二级 = 只在容器/网格内部存在、或只能以物质基类整体取样的中间体。
+- **判据（满足其一即一级）**
+  1. **元素单质**：进入玩法的元素态物质（金属/非金属/气体单质）——元素守恒主线、电解与冶金产物、经济与任务的自然标的（作者明确要求"至少有单质"）。
+  2. **跨系统接口**：① 参与配方（工作台/祭坛/机器）② 需要桶/管道/世界流体 ③ 需要经济与任务计价 ④ 玩家长期携带流通（催化剂、试剂、电极/膜等材料）。
+  3. **教材级基础物**：化学工业通用词汇（水、三酸两碱、常见溶剂/燃料/氧化还原剂），约 30~60 种量级。
+- **默认排除**：反应图中间体（SO₃/H₂SO₃/NO/NO₂/N₂O₄/络离子…）、只以离子形式存在的物种、任意配比混合物（永远走 NBT 物质）。
+- **预算**：首批一级物品 ≤ ~40、一级流体 ≤ ~10；其余按玩法需要升格。
+- **首批范围（作者确认）**：判据 1 中"已注册且进入玩法的元素单质" ＋ 判据 2 中"现有配方/机器**已经**引用的物质"；其余暂缓升格。
+- **风险提示**：同一物质可能同时是一级物品与容器内离子（如硫酸）——必须规定**规范表示**（物品 ↔ 离子集合的换算统一走同一 mapper），否则出现"两种硫酸"的语义分裂。
+
+**⚠ AI 补充的未考虑项（详见讨论回复，待逐条确认）**：电中性/反离子表达、NBT 堆叠一致性、动态名称与搜索、配方 Ingredient 的 NBT 匹配安全、颜色碰撞的可辨识性、颜色来源优先级、渲染缓存性能、创造栏构建开销、未来 1.20.5+ data component 迁移、形态与化学解耦。
+
+### 19.16 JEI 集成方案（2026-09-06 定稿方向，待实现）
+
+> 作者提问："离子反应中 IonType 不需要对应 item，但 JEI 中需要，怎么解决？JEI 有没有不依赖 ItemStack 的方式？"
+> **AI 核实结论：有，且是 JEI 官方支持的正道**——JEI 的条目体系不止 ItemStack；其原版插件本身就用这套机制注册 `FluidStack`。
+
+**JEI 的非物品条目机制（已验证）**
+- `IModPlugin#registerIngredients(IModIngredientRegistration)` 中调用 `IModIngredientRegistration.register(IIngredientType<V>, Collection<V> allIngredients, IIngredientHelper<V>, IIngredientRenderer<V>)` 即可注册任意类型条目（官方文档明言"JEI supports anything as an ingredient"）。
+- 配方槽位使用通用入口：`IRecipeLayoutBuilder.addSlot(role, x, y).addIngredient(IIngredientType<V>, V)`（`IIngredientAcceptor` 自 JEI 9.3 起提供，物品/流体只是它的便捷重载）。
+- `IIngredientHelper<V>` 负责：`getUniqueId` / `getWildcardId` / `getDisplayName`（搜索用）/ `getModId` / `getResourceId` / `getColors`（颜色搜索）/ `copyIngredient` / `getErrorInfo`（+ `getCheatItemStack` 可选）等；`IIngredientRenderer<V>` 负责 16×16 绘制与 tooltip。
+- 分类图标也可用自定义条目绘制（`IGuiHelper#createDrawableIngredient(type, value)`），背景可用代码绘制的 `IDrawable`——**无需新增贴图**。
+- 规则注册：`registration.addRecipes(RecipeType<ReactionRule>, 全部规则)`，数据源直接用 `ReactionGraph`（客户端同样已注册）。
+
+**呈报模型（AI 建议，待作者确认细节）**
+- **裸离子/无物品物种 → 自定义条目**（如 `IonStack`/`ChemicalEntry`）：渲染为"粗体公式 + 电荷上标 + `displayColor` 色块"，tooltip 给公式/摩尔质量/物态等；R/U 由 JEI 焦点系统自动支持（R = 出现在产物槽的规则，U = 出现在反应物槽的规则）。
+- **物质（一级真物品 与 二级 NBT 物质）→ 继续用 ItemStack 槽位**：这样 R/U 能同时命中"物品配方（工作台/祭坛/其他 mod）"与"我们的化学方程式"——**统一的关键是化学配方里对有物品的物质就放该 ItemStack**。NBT 变体需通过 `IModPlugin#registerItemSubtypes` + `IIngredientSubtypeInterpreter` 让 JEI 把不同成分识别为不同条目。
+- 布局建议：**上排 = 反应物槽位 → 产物槽位**（可点击、tooltip 带计量数），**下方 = 粗体方程式文本**（`ReactionFormula`，人眼可读）；条件（ΔH/温度/前置）按 §19.14 定稿不进方程式，V1 不在 JEI 展示。
+
+**✅ 已定（2026-09-06 作者确认）**
+1. **呈报模型 = 混用**：裸离子/无物品物种 → 自定义 JEI 条目；物质（一级真物品与二级 NBT 物质）→ ItemStack 槽位（化学配方里对有物品的物质直接放该 ItemStack，从而 R/U 同时命中物品配方与化学方程式）。
+2. **可见性 = 百科式**：JEI 注册**全部**反应规则（含科技树后端内容），不做进度过滤。
+
+**✅ 条件区（作者 2026-09-06 追加定稿）**
+- 原"条件不进方程式"仅指**方程式字符串**本身；JEI 中应在**独立位置**附上**"使反应最低能进行的一系列条件"**。
+- 目的（作者表述）：给出**最低门槛**，把"多少温度/是否强力冷却"这类**优化与副作用权衡**留给玩家——这正是 JEI 给不了的部分（如加热加速到速率过高可能卡管道、放热反应想快就需要强冷却）。
+- 候选条目（数据源均已存在）：最低触发温度 `getMinTemperature()`、前置/催化剂 `getPreconditions()`（检测存在但不消耗）、通电要求 `getElectricalWorkPerMol() > 0`、热效应 `getDeltaH()`（放热/吸热，供玩家判断是否需要冷却）、活化能 `getActivationEnergy()`、平衡常数 `calculateEquilibriumConstant()` / 可逆性。
+- AI 建议分层：**必显** = 最低温度 + 前置/催化剂 + 通电要求；**建议显** = ΔH（放热/吸热，直接支撑作者的例子）；**可选进阶** = Ea、K*（可先留空位）。
+- **作者定稿（2026-09-06）**：**全部一起给**（最低温度 / 前置·催化剂 / 通电要求 / ΔH / Ea / K），玩家自行选择性地看；**前置条件显示所需摩尔数**（如 `需 MnO₂ ≥ 1 mol`）；条件区放在方程之外的独立位置，并明确标注哪些是"门槛"、哪些是"规划参考"。
+- 职责边界（规范）：JEI 是静态百科，只回答"最低需要什么"，**不显示玩家当前是否满足**（那是分析仪职责）。
+- 实现要点：JEI 为客户端界面，条件文本必须走**语言键**（`jei.trainees.reaction.cond.*`，%s 占位）；背景用代码绘制的 `IDrawable`（无需新贴图）；hover 明细可用 `getTooltipStrings`；每物种一个槽（计量数放方程式与 tooltip，不按系数摆多个槽）。
+
+**⚠ 顺带发现的待办**：分析仪报告（§19.14）是**服务端拼中文串**下发，英文客户端/多人场景仍显示中文。后续建议改为"服务端发结构化数据 + 客户端本地化"（与本节 JEI 的语言键方案统一）。
+→ **作者决定（2026-09-06）：与 JEI 语言键一并处理**（列入本轮实现范围：分析仪报告改结构化 + 客户端本地化）。
+
+**其他注意**：可逆反应是两条独立规则 → JEI 会出现两条相反方程式（V1 接受，后续可合并为 ⇌）；带 NBT 的物质条目若注册过多会拖慢 JEI 列表，建议只注册常用/一级物质或按搜索命中隐藏。
+
+**✅ 已实现（2026-09-06，步骤 ①②③④）**
+- **① `SubstanceItem` 动态命名/tooltip**：动态成分模式命名（单组分 = 化学式；多组分 = "最大组分 等 n 种"，走语言键）；tooltip 全本地化（总量/形态/成分/蓝图模式，成分名走 `IonDisplay`）；新增 `getForm(ItemStack)` 与 `getDisplayColor(ItemStack)`（多组分按摩尔分数在**线性空间**加权后 gamma 校正）。
+- **② `IonType` 形态与颜色**：新增 `Form` 枚举（粉末/晶体/颗粒/块/液体/溶液/气体；`Phase` 派生默认、Builder 可覆盖、`getTranslationKey()`）与 `displayColor`（Builder `displayColor(rgb)`）；明确"形态仅渲染属性，不参与反应判定"。
+- **③ JEI 裸离子条目**：`ChemicalIngredientTypes.ION`（`IIngredientType<IonType>`，uid = `trainees:ion`）＋ `IonIngredientHelper`（唯一 id/显示名=化学式/颜色搜索/错误信息）＋ `IonIngredientRenderer`（16×16 色块 + 公式缩写，tooltip 本地化：形态/摩尔质量/ΔHf°/ΔGf°/毒性/标签）；插件 `registerIngredients` 注册全部离子。
+- **④ JEI 化学反应分类** `ReactionRecipeCategory`：`RecipeType<ReactionRule>`；布局 = 上排槽位（每物种一槽、计量数进 tooltip）→ 箭头 → 粗体方程式（`ReactionFormula`）→ 条件区（新增 `ReactionInfo.conditionLines`：门槛三项 + ΔH/Ea/K，K 用纯数学层按 298 K 计算，**不依赖容器**）；背景与图标**代码绘制**（无新贴图）；`registerRecipes` 从 `ReactionGraph` 按 id 去重注册**全部规则**（百科式）；催化剂 = 烧杯 + 电解槽；`ReactionRule` 补 `isEquilibriumOverridden()`。
+- 语言键：zh/en 同步（离子 tooltip、反应分类、条件区、形态名、混合物命名）。
+- **注**：化学分类槽位当前统一使用裸离子条目（任意物种均可 R/U）；**混用模型的 ItemStack 分支**待物质/物品映射就绪后接入（步骤 ⑤⑥）。
+
+**⏳ 剩余步骤**：⑤ 物质条目渲染（形态模型 + `IItemColor` tint，需形态底图/占位登记 `RESOURCES_MISSING.md`）；⑥ 一级物质注册脚手架（先不填内容）；⑦ 分析仪报告改结构化 + 客户端本地化（与 JEI 语言键一并处理）。
+
+**✅ 已实现（2026-09-06，步骤⑦ 分析仪报告结构化 + 客户端本地化；步骤⑥ 一级物质脚手架）**
+- **结构化文本载体** `chemistry/report/ReportLine`：翻译键 + 参数；参数可为**字面量**或**嵌套翻译键**（形态名、失败类型名等二级翻译由客户端解析）。格式（颜色码/缩进/加粗）写在语言文件的值里。
+- **引擎侧去句子化**：`PredictedRule.detail` → `args`（结构化参数：温度、Q、K、缺失物种…）；`ReactionFailure` 增加 `args`（保留 `detail` 供日志与 `/chemtester failures`）；`ExecutedRule.competition` → `CompetitionNote(blockedRuleId, reactantId)`；`missingReactants` 改输出**化学式**而非内部 id。
+- **容器诊断钩子**：`IChemicalContainer.appendDiagnostics(List<ReportLine>)`；电解槽诊断行全部改为键 + 参数（新增 `trainees.voltage.1..5` 档名键）。
+- **传输与渲染**：`AnalyzerReportPacket` 传结构化行（嵌套参数一并编解码）；`AnalyzerScreen` 负责本地化渲染；容器名改为传**方块 descriptionId**（服务端不再解析语言，与 §19.14 点 2 的 HUD 规则一致）。
+- **聊天简报**：全部改用 `Component.translatable`，客户端自动本地化（不再下发中文串）。
+- **语言键**：新增 zh/en 各约 70 条（摘要/内容物/失败/预测/建议/电解槽诊断/档名/聊天）；顺带补齐旧分析仪 HUD 键（`AnalyzerItemNormal/Creative` 用）的 en 缺失。
+- **步骤⑥ 一级物质脚手架** `chemistry/material/FirstClassSubstances`：`register(IonType, Supplier<ItemStack>)` / `isFirstClass` / `itemFor` / `all`；JEI 化学反应分类已接入混用模型——**有真物品用 ItemStack 槽位**（R/U 同时命中物品配方与化学方程式），否则退回裸离子条目。内容层按批次登记即可，无需改代码。
+- **✅ 本地化收尾（2026-09-06 作者要求）**：烧杯（12 条）与电解槽（7 条）全部交互反馈改为语言键；分析仪 HUD（普通/创造）文本与反应图界面标题本地化；`VOLTAGE_NAMES` 代码常量移除（档名改用 `trainees.voltage.1..5`）；补齐 zh/en 双向缺失键（祭坛成就、化学物品 tooltip 第二行、两件物品英文名）——**两语言键集现已完全一致（各 515 条）**。
+- **仍为中文硬编码（有意保留，另批处理）**：`/chemtester` 调试命令输出（OP 工具，约 33 条）；以及本模组其他子系统——发送方块 `SenderBlockEntity`、传送石棍 `StoneStickTItem`、DeepSeek 聊天命令 `ModCommand`——它们不属于化学引导层，建议随各自功能批次一起本地化。
+
+**✅ 已实现（2026-09-06，步骤⑤ 物质形态渲染；作者要求"由 AI 生成占位底图"）**
+- **形态底图（程序化占位）**：新增生成脚本 `scripts/gen_form_textures.js`（零依赖 Node，自写 PNG 编码），输出 7 张 16×16 RGBA 灰阶底图到 `assets/trainees/textures/item/substance/`：`powder`（颗粒噪点丘）/`crystal`（宝石棱面 + 暗描边）/`granule`（颗粒点阵）/`bulk`（锭块）/`liquid`（液滴高光）/`solution`（液滴 + 溶质颗粒）/`gas`（雾团）。**灰阶 + alpha 形状**是硬约定：颜色由 tint 乘上去，底图越白 tint 越准。美术替换时保持同尺寸/同灰阶约定即可，代码与模型 JSON 不动；脚本另有 7 合 1 对照图输出到 `scripts/.out/`（已 gitignore）。
+- **模型**：7 个形态模型 `models/item/substance_<form>.json`（`item/generated` + layer0 = 对应底图）＋ 基模型 `models/item/substance.json` 用 `overrides` 谓词 `trainees:form`（0~6）在 7 个形态模型间切换（物质物品此前**没有模型**，等于隐形）。
+- **形态选择与染色**：`ClientEvents` 注册 `ItemProperties`（谓词 `trainees:form` ← `SubstanceItem.getForm(stack).ordinal()`）＋ `RegisterColorHandlersEvent.Item`（tintIndex 0 ← `SubstanceItem.getDisplayColor(stack)`；多组分按摩尔分数线性空间加权 + gamma 校正）。`item/generated` 的 layer0 天然 tintindex 0（与皮革甲/刷怪蛋/药水同理），故无需自定义 loader。
+- 说明：`displayColor` 目前多为默认白（= 不上色）；**逐个物质填色属于内容层工作**，可随后续内容批次补。
+- **✅ 首批外观数据（2026-09-06，作者同意先填一批便于实机验证）**：为 **43 个**常见物质在 `ModChemistry` 注册处补了 `displayColor`，其中 **39 个**同时覆盖了 `form`：水/双氧水/硫酸/盐酸/熔融盐/烃类（LIQUID、SOLUTION）、Cl₂/O₂/H₂/N₂/CO/CO₂/SO₂/SO₃/NO₂/N₂O₄/NH₃（GAS）、Cu²⁺（蓝）/Fe²⁺（浅绿）/Fe³⁺（黄棕）/Cu⁺（近无色）（AQUEOUS）、硫/碳/MnO₂/Fe₂O₃/Cu₂O/纯碱/石灰石/生石灰/熟石灰/硫酸氢钠（POWDER）、NaOH（GRANULE）、NaCl/SiO₂（CRYSTAL）、Fe/Cu/Na（BULK）。其余物质保持默认（白 = 贴图原色），随内容批次补。
+
+
+

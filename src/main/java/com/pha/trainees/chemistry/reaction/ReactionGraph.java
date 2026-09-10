@@ -16,6 +16,9 @@ public class ReactionGraph {
 
     private final Map<IonType, List<ReactionEdge>> adjacencyMap = new ConcurrentHashMap<>();
 
+    /** 规则 id → 规则 的懒建索引（诊断显示用；图变化时置空失效） */
+    private volatile Map<String, ReactionRule> ruleIndex;
+
     private ReactionGraph() {}
 
     public static ReactionGraph getInstance() {
@@ -33,6 +36,7 @@ public class ReactionGraph {
         if (source == null || target == null || rule == null) {
             throw new IllegalArgumentException("Source, target and rule cannot be null");
         }
+        ruleIndex = null; // 图变化 → 索引失效
 
         // 自环去重
         if (source.equals(target)) {
@@ -118,9 +122,42 @@ public class ReactionGraph {
     }
 
     /**
+     * 按规则 id 查找规则（§19.14：诊断记录只保存 ruleId，显示时需要还原方程式）。
+     * 支持 `path` 或 `namespace:path` 两种写法；找不到返回 null。
+     * 索引懒构建，注册/清空图时失效。
+     */
+    public ReactionRule getRuleById(String ruleId) {
+        if (ruleId == null) return null;
+        Map<String, ReactionRule> index = ruleIndex;
+        if (index == null) {
+            index = buildRuleIndex();
+            ruleIndex = index;
+        }
+        ReactionRule rule = index.get(ruleId);
+        if (rule != null) return rule;
+        // 允许用 "trainees:xxx" 形式查询
+        int sep = ruleId.indexOf(':');
+        return sep >= 0 ? index.get(ruleId.substring(sep + 1)) : null;
+    }
+
+    private Map<String, ReactionRule> buildRuleIndex() {
+        Map<String, ReactionRule> index = new HashMap<>();
+        for (List<ReactionEdge> edges : adjacencyMap.values()) {
+            for (ReactionEdge edge : edges) {
+                ReactionRule rule = edge.getRule();
+                if (rule == null || rule.getId() == null) continue;
+                index.putIfAbsent(rule.getId().getPath(), rule);
+                index.putIfAbsent(rule.getId().toString(), rule);
+            }
+        }
+        return index;
+    }
+
+    /**
      * 清空图（用于热加载或调试）
      */
     public void clear() {
         adjacencyMap.clear();
+        ruleIndex = null;
     }
 }

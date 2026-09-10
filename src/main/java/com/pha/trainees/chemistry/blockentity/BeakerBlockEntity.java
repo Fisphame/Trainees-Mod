@@ -2,6 +2,7 @@ package com.pha.trainees.chemistry.blockentity;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.chemistry.container.IChemicalContainer;
+import com.pha.trainees.chemistry.engine.ExecutedRule;
 import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.engine.ReactionFailure;
 import com.pha.trainees.chemistry.gas.GasGridManager;
@@ -287,11 +288,9 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
     @Override
     public CompoundTag getUpdateTag() {
-        // 客户端在加载时调用的更新标签
+        // 客户端在加载时调用的更新标签（容器内容物/温度等仍需同步给客户端 HUD）
         CompoundTag tag = super.getUpdateTag();
         saveAdditional(tag);
-        // 附送最近一条失败诊断（仅同步，不写存档）
-        writeFailureToTag(tag, "LastFailure", lastFailure);
         return tag;
     }
 
@@ -299,7 +298,6 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
     public void handleUpdateTag(CompoundTag tag) {
         // 客户端接收更新标签时调用，直接加载数据
         load(tag);
-        this.lastFailure = readFailureFromTag(tag, "LastFailure");
     }
 
     @Nullable
@@ -622,20 +620,16 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
     private final ArrayDeque<ReactionFailure> recentFailures = new ArrayDeque<>();
 
-    /** 最近一条失败（客户端同步用，仅运行时；供分析仪 HUD 常驻显示） */
-    private ReactionFailure lastFailure;
-
     @Override
     public void recordFailure(ReactionFailure failure) {
         if (failure == null) return;
-        this.lastFailure = failure;
+        // 仅保留运行时记录供分析仪诊断读取；不同步客户端、不触发更新包（§19.14：HUD 失败提示已移除）
         synchronized (recentFailures) {
             if (recentFailures.size() >= MAX_RECENT_FAILURES) {
                 recentFailures.removeFirst();
             }
             recentFailures.addLast(failure);
         }
-        setChanged(); // 标记脏，促使下一次更新包把 lastFailure 同步给客户端
     }
 
     @Override
@@ -645,36 +639,28 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         }
     }
 
-    /** 客户端读取最近一条失败（HUD 用） */
-    @Nullable
-    public ReactionFailure getLastFailure() {
-        return lastFailure;
+    // ==================== 实际执行记录（§19.7 决策 2c） ====================
+
+    /** 容器侧保留的最近执行记录条数（仅运行时，不存 NBT）；§19.14 点 3：扩到 20 条 */
+    private static final int MAX_RECENT_EXECUTED = 20;
+
+    private final ArrayDeque<ExecutedRule> recentExecuted = new ArrayDeque<>();
+
+    @Override
+    public void recordExecutedRule(ExecutedRule record) {
+        if (record == null) return;
+        synchronized (recentExecuted) {
+            if (recentExecuted.size() >= MAX_RECENT_EXECUTED) {
+                recentExecuted.removeFirst();
+            }
+            recentExecuted.addLast(record);
+        }
     }
 
-    // ---- 失败记录序列化（仅走 BE 更新包同步，不写入存档） ----
-
-    private static void writeFailureToTag(CompoundTag tag, String key, ReactionFailure f) {
-        if (f == null) return;
-        CompoundTag sub = new CompoundTag();
-        sub.putString("type", f.type().name());
-        sub.putString("rule", f.ruleId());
-        sub.putString("detail", f.detail());
-        sub.putLong("time", f.gameTime());
-        tag.put(key, sub);
-    }
-
-    @Nullable
-    private static ReactionFailure readFailureFromTag(CompoundTag tag, String key) {
-        if (!tag.contains(key)) return null;
-        CompoundTag sub = tag.getCompound(key);
-        try {
-            return new ReactionFailure(
-                    ReactionFailure.Type.valueOf(sub.getString("type")),
-                    sub.getString("rule"),
-                    sub.getString("detail"),
-                    sub.getLong("time"));
-        } catch (Exception e) {
-            return null;
+    @Override
+    public List<ExecutedRule> getRecentExecutedRules() {
+        synchronized (recentExecuted) {
+            return new ArrayList<>(recentExecuted);
         }
     }
 }

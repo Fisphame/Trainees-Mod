@@ -26,3 +26,9 @@ forge*changelog.txt
 
 # claude
 .claude
+
+# 临时素材/外部语料（不入库）
+/src/main/java/com/pha/trainees/tmp*.txt
+
+# 生成器输出（贴图对照图等开发产物）
+/scripts/.out/

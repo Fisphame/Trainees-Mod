@@ -5,6 +5,7 @@ import com.pha.trainees.chemistry.material.SimpleMaterial;
 import com.pha.trainees.chemistry.material.SubstanceBlueprint;
 import com.pha.trainees.chemistry.material.SubstanceBlueprintRegistry;
 import com.pha.trainees.chemistry.particle.IonType;
+import com.pha.trainees.chemistry.util.IonDisplay;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.registry.ModChemistry;
 import net.minecraft.nbt.CompoundTag;
@@ -156,25 +157,17 @@ public class SubstanceItem extends Item {
 
     /**
      * 根据当前难度档位获取有效成分乘数。
-     * CUSTOM 档直接读配置字段；预设档读取预设表。
+     * 统一走档位解析入口（§7.5 方案 C）：非 CUSTOM 读预设表，CUSTOM 读配置乘数。
      */
     private static double getValuableMultiplier() {
-        ChemConfig.DifficultyLevel difficulty = ChemConfig.GAME_DIFFICULTY.get();
-        if (difficulty == ChemConfig.DifficultyLevel.CUSTOM) {
-            return ChemConfig.ORE_VALUABLE_RATIO_MULTIPLIER.get();
-        }
-        return ChemConfig.DifficultyPresets.get(difficulty).oreValuableMultiplier;
+        return ChemConfig.DifficultyPresets.valuableMultiplier();
     }
 
     /**
      * 根据当前难度档位获取脉石乘数。
      */
     private static double getGangueMultiplier() {
-        ChemConfig.DifficultyLevel difficulty = ChemConfig.GAME_DIFFICULTY.get();
-        if (difficulty == ChemConfig.DifficultyLevel.CUSTOM) {
-            return ChemConfig.ORE_GANGUE_RATIO_MULTIPLIER.get();
-        }
-        return ChemConfig.DifficultyPresets.get(difficulty).oreGangueMultiplier;
+        return ChemConfig.DifficultyPresets.gangueMultiplier();
     }
     // ==================== 显示相关 ====================
 
@@ -190,7 +183,71 @@ public class SubstanceItem extends Item {
                 }
             }
         }
-        return super.getName(stack);
+        // 动态成分模式：单组分显示化学式；多组分显示"最大组分 等 n 种"（§19.15 物质条目命名）
+        Map<IonType, Double> comp = getComposition(stack);
+        if (comp.isEmpty()) {
+            return super.getName(stack);
+        }
+        if (comp.size() == 1) {
+            IonType ion = comp.keySet().iterator().next();
+            return Component.literal(IonDisplay.format(ion.getId().getPath()));
+        }
+        Map.Entry<IonType, Double> dominant = comp.entrySet().stream()
+                .max(Map.Entry.comparingByValue()).orElse(null);
+        String main = dominant == null ? "?" : IonDisplay.format(dominant.getKey().getId().getPath());
+        return Component.translatable("item.trainees.substance.mixture", main, comp.size());
+    }
+
+    /**
+     * 物品堆的表现形态（§19.15 渲染属性）：单组分取该物质形态；多组分取最大组分；空堆兜底粉末。
+     */
+    public static IonType.Form getForm(ItemStack stack) {
+        Map<IonType, Double> comp = getComposition(stack);
+        if (comp.isEmpty()) return IonType.Form.POWDER;
+        return comp.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(e -> e.getKey().getForm())
+                .orElse(IonType.Form.POWDER);
+    }
+
+    /**
+     * 物品堆的显示颜色（ARGB）：单组分取该物质 {@code displayColor}；
+     * 多组分按摩尔分数加权——在**线性空间**加权后再做 gamma 校正（避免直接平均导致偏暗）。
+     * 白色（0xFFFFFFFF，未指定颜色）视作"贴图原色"，混色时按白色参与。
+     */
+    public static int getDisplayColor(ItemStack stack) {
+        Map<IonType, Double> comp = getComposition(stack);
+        if (comp.isEmpty()) return 0xFFFFFFFF;
+        if (comp.size() == 1) {
+            return comp.keySet().iterator().next().getDisplayColor();
+        }
+        double total = comp.values().stream().mapToDouble(Double::doubleValue).sum();
+        if (total <= 0) return 0xFFFFFFFF;
+        double r = 0, g = 0, b = 0;
+        for (Map.Entry<IonType, Double> e : comp.entrySet()) {
+            double w = e.getValue() / total;
+            int argb = e.getKey().getDisplayColor();
+            r += toLinear((argb >> 16) & 0xFF) * w;
+            g += toLinear((argb >> 8) & 0xFF) * w;
+            b += toLinear(argb & 0xFF) * w;
+        }
+        return 0xFF000000 | (toSrgb(r) << 16) | (toSrgb(g) << 8) | toSrgb(b);
+    }
+
+    /** sRGB 通道 → 线性（粗略 gamma 2.2） */
+    private static double toLinear(int channel) {
+        return Math.pow(channel / 255.0, 2.2);
+    }
+
+    /** 线性 → sRGB 通道（0~255） */
+    private static int toSrgb(double linear) {
+        int v = (int) Math.round(Math.pow(Math.max(0, Math.min(1, linear)), 1 / 2.2) * 255);
+        return Math.max(0, Math.min(255, v));
+    }
+
+    /** 形态的语言键（供 tooltip / JEI 条目复用） */
+    public static String formKey(IonType.Form form) {
+        return form.getTranslationKey();
     }
 
     @Override
@@ -199,28 +256,30 @@ public class SubstanceItem extends Item {
 
         Map<IonType, Double> comp = getComposition(stack);
         if (comp.isEmpty()) {
-            tooltip.add(Component.literal("§7空物质"));
+            tooltip.add(Component.translatable("tooltip.trainees.substance.empty"));
             return;
         }
 
         double total = comp.values().stream().mapToDouble(Double::doubleValue).sum();
-        tooltip.add(Component.literal("§7总摩尔数: §f" + DF.format(total) + " mol"));
+        tooltip.add(Component.translatable("tooltip.trainees.substance.total", DF.format(total)));
+        tooltip.add(Component.translatable("tooltip.trainees.substance.form",
+                Component.translatable(formKey(getForm(stack))).getString()));
 
-        // 显示成分（按摩尔数从大到小排序）
-        tooltip.add(Component.literal("§7成分:"));
+        // 显示成分（按摩尔数从大到小排序；化学式走 IonDisplay）
+        tooltip.add(Component.translatable("tooltip.trainees.substance.components"));
         comp.entrySet().stream()
                 .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
                 .forEach(entry -> {
-                    String ionName = entry.getKey().getId().getPath();
+                    String ionName = IonDisplay.format(entry.getKey().getId().getPath());
                     double moles = entry.getValue();
                     double percentage = total > 0 ? moles / total * 100 : 0;
-                    tooltip.add(Component.literal("  §8- §f" + ionName + " §7" + DF.format(moles) +
-                            " mol (§8" + DF.format(percentage) + "%§7)"));
+                    tooltip.add(Component.literal("  §8- §f" + ionName + " §7" + DF.format(moles)
+                            + " mol §8(" + DF.format(percentage) + "%)"));
                 });
 
         // 显示模式标识
         if (isBlueprint(stack)) {
-            tooltip.add(Component.literal("§8[蓝图模式]"));
+            tooltip.add(Component.translatable("tooltip.trainees.substance.blueprint_mode"));
         }
     }
 

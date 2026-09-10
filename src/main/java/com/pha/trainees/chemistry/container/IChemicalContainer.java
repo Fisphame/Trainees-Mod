@@ -183,6 +183,39 @@ public interface IChemicalContainer {
         return java.util.List.of();
     }
 
+    // ==================== 实际执行记录与竞争信息（§19.7 决策 2c） ====================
+
+    /**
+     * 记录一次实际执行成功的反应（含被它挤掉的竞争规则说明）。
+     * 默认实现不记录；烧杯等容器可覆写为保留最近 N 条（仅运行时，不存 NBT）。
+     */
+    default void recordExecutedRule(com.pha.trainees.chemistry.engine.ExecutedRule record) {
+    }
+
+    /**
+     * 获取本容器最近实际执行成功的反应记录（最旧在前）。
+     * 与 {@link #getRecentFailures()} 配对：一个答"为什么没反应"，一个答"原料被谁消耗了"。
+     */
+    default java.util.List<com.pha.trainees.chemistry.engine.ExecutedRule> getRecentExecutedRules() {
+        return java.util.List.of();
+    }
+
+    // ==================== 诊断补充信息（§19.14） ====================
+
+    /**
+     * 容器专属诊断补充行（分析仪诊断页显示）。
+     *
+     * <p>通用信息（温度/体积/总量/供电/内容物）由分析仪统一生成；机器类容器在这里补充
+     * 自己的状态（如电解槽的电极方向、隔膜、双面储能），这样分析仪无需特判任何具体容器类型，
+     * 也不会把机器信息刷进聊天栏（§19.14 点 1：信息查询统一走分析仪）。</p>
+     *
+     * <p>追加的是**结构化行**（翻译键 + 参数），由客户端本地化渲染（§19.16 语言键一并处理）。</p>
+     *
+     * @param lines 追加 {@link com.pha.trainees.chemistry.report.ReportLine}
+     */
+    default void appendDiagnostics(java.util.List<com.pha.trainees.chemistry.report.ReportLine> lines) {
+    }
+
     // ==================== 产物处理钩子（§19.10 电解槽） ====================
 
     /**

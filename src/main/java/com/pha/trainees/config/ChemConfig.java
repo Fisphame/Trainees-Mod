@@ -516,6 +516,63 @@ public class ChemConfig {
             return PRESETS.getOrDefault(difficulty, PRESETS.get(DifficultyLevel.NORMAL));
         }
 
+        // ============================================================
+        // 统一难度读取入口（§7.5 方案 C：档位唯一权威）
+        //   非 CUSTOM → 预设表；CUSTOM → 配置乘数（手调真源）
+        //   所有难度消费方（矿石成分/污染/能源/难度指标…）必须走这里，
+        //   禁止再直接读 ORE_*/POLLUTION_*/ENERGY_* 配置项。
+        // ============================================================
+
+        public static DifficultyLevel tier() {
+            return GAME_DIFFICULTY.get();
+        }
+
+        public static boolean isCustomTier() {
+            return tier() == DifficultyLevel.CUSTOM;
+        }
+
+        public static double valuableMultiplier() {
+            DifficultyLevel d = tier();
+            return d == DifficultyLevel.CUSTOM
+                    ? ORE_VALUABLE_RATIO_MULTIPLIER.get()
+                    : get(d).oreValuableMultiplier;
+        }
+
+        public static double gangueMultiplier() {
+            DifficultyLevel d = tier();
+            return d == DifficultyLevel.CUSTOM
+                    ? ORE_GANGUE_RATIO_MULTIPLIER.get()
+                    : get(d).oreGangueMultiplier;
+        }
+
+        public static double pollutionDiffusionSpeed() {
+            DifficultyLevel d = tier();
+            return d == DifficultyLevel.CUSTOM
+                    ? POLLUTION_DIFFUSION_SPEED.get()
+                    : get(d).pollutionDiffusionSpeed;
+        }
+
+        public static double pollutionToxicityThreshold() {
+            DifficultyLevel d = tier();
+            return d == DifficultyLevel.CUSTOM
+                    ? POLLUTION_TOXICITY_THRESHOLD.get()
+                    : get(d).pollutionToxicityThreshold;
+        }
+
+        public static double energyConsumptionMultiplier() {
+            DifficultyLevel d = tier();
+            return d == DifficultyLevel.CUSTOM
+                    ? ENERGY_CONSUMPTION_MULTIPLIER.get()
+                    : get(d).energyConsumptionMultiplier;
+        }
+
+        public static double energyGenerationMultiplier() {
+            DifficultyLevel d = tier();
+            return d == DifficultyLevel.CUSTOM
+                    ? ENERGY_GENERATION_MULTIPLIER.get()
+                    : get(d).energyGenerationMultiplier;
+        }
+
         public static class ConfigValues {
             public final double bucketToMolWater;
             public final double solidIngotToMol;
@@ -559,15 +616,13 @@ public class ChemConfig {
          * 数值越高代表游戏越困难
          */
         public static double calculateScore() {
-            DifficultyLevel current = GAME_DIFFICULTY.get();
-
-            // 获取当前有效的难度参数
-            double valuableMultiplier = ORE_VALUABLE_RATIO_MULTIPLIER.get();
-            double gangueMultiplier = ORE_GANGUE_RATIO_MULTIPLIER.get();
-            double pollutionSpeed = POLLUTION_DIFFUSION_SPEED.get();
-            double toxicityThreshold = POLLUTION_TOXICITY_THRESHOLD.get();
-            double energyConsumption = ENERGY_CONSUMPTION_MULTIPLIER.get();
-            double energyGeneration = ENERGY_GENERATION_MULTIPLIER.get();
+            // 统一走档位解析入口（§7.5 方案 C）：分数反映玩家实际承受的难度
+            double valuableMultiplier = DifficultyPresets.valuableMultiplier();
+            double gangueMultiplier = DifficultyPresets.gangueMultiplier();
+            double pollutionSpeed = DifficultyPresets.pollutionDiffusionSpeed();
+            double toxicityThreshold = DifficultyPresets.pollutionToxicityThreshold();
+            double energyConsumption = DifficultyPresets.energyConsumptionMultiplier();
+            double energyGeneration = DifficultyPresets.energyGenerationMultiplier();
 
             // 计算各维度得分 (0~1)
             // 1. 资源获取难度：有效成分越低/脉石越高 → 越困难

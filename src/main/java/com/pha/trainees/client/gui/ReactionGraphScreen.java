@@ -35,7 +35,8 @@ public class ReactionGraphScreen extends Screen {
     private final Map<String, Integer> edgeColors = new HashMap<>();
 
     public ReactionGraphScreen(List<String> nodeStrs, List<String> edgeStrs) {
-        super(Component.literal("§l反应图"));
+        super(Component.translatable("gui.trainees.reaction_graph.title")
+                .withStyle(net.minecraft.ChatFormatting.BOLD));
         for (String n : nodeStrs) {
             String[] p = n.split(">");
             if (p.length == 2) nodes.add(new NodeInfo(p[0], phaseColor(p[1])));

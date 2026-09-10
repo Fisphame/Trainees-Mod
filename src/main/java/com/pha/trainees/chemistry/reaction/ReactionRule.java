@@ -73,6 +73,9 @@ public class ReactionRule {
     public double getMinTemperature() { return minTemperature.get(); }
     public boolean isSelfLoop() { return isSelfLoop; }
 
+    /** 是否显式覆盖了平衡常数（可逆玩法；JEI 等只读展示需要区分算法，§19.16） */
+    public boolean isEquilibriumOverridden() { return equilibriumOverridden; }
+
     /**
      * 检查容器是否满足前置条件（催化剂等）
      */

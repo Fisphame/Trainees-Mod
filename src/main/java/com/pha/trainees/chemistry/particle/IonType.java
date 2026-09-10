@@ -19,6 +19,8 @@ public class IonType {
     private final double formationGibbs;     // ΔGf° kJ/mol
     private final int toxicityLevel;         // 0-3
     private final int flameColor;            // ARGB 用于焰色/气体颜色
+    private final int displayColor;          // ARGB 物质外观色（渲染 tint 用；§19.15）
+    private final Form form;                 // 物质形态（渲染属性，不参与反应判定；§19.15）
     private final Set<ResourceLocation> tags;
 
     // 可选：用于经验的温度范围或浓度阈值（后续可接入配置）
@@ -34,6 +36,9 @@ public class IonType {
         this.formationGibbs = builder.formationGibbs;
         this.toxicityLevel = builder.toxicityLevel;
         this.flameColor = builder.flameColor;
+        this.displayColor = builder.displayColor;
+        // 形态可由 Builder 覆盖；未指定时按物态派生默认形态（§19.15：形态仅渲染属性）
+        this.form = builder.form != null ? builder.form : Form.defaultFor(builder.phase);
         this.tags = Set.copyOf(builder.tags);
         this.minStableTemp = builder.minStableTemp;
         this.maxStableTemp = builder.maxStableTemp;
@@ -48,6 +53,10 @@ public class IonType {
     public double getFormationGibbs() { return formationGibbs; }
     public int getToxicityLevel() { return toxicityLevel; }
     public int getFlameColor() { return flameColor; }
+    /** 物质外观色（ARGB），供物品 tint / JEI 条目渲染（§19.15） */
+    public int getDisplayColor() { return displayColor; }
+    /** 物质形态（渲染属性；默认由物态派生，可被 Builder 覆盖） */
+    public Form getForm() { return form; }
     public Set<ResourceLocation> getTags() { return tags; }
 
     public boolean isStableAt(double temperatureKelvin) {
@@ -72,6 +81,44 @@ public class IonType {
         return id.toString();
     }
 
+    // ---------- 物质形态（渲染属性，§19.15） ----------
+
+    /**
+     * 物质形态：决定物品/JEI 条目用哪张底图（白/灰阶贴图 + tint 上色）。
+     * <b>仅渲染语义，不参与任何反应判定</b>——同一物质的形态差异不应分裂成多个 {@link IonType}。
+     */
+    public enum Form {
+        /** 粉末 */
+        POWDER,
+        /** 晶体 */
+        CRYSTAL,
+        /** 颗粒 */
+        GRANULE,
+        /** 块状/锭状 */
+        BULK,
+        /** 纯液体 */
+        LIQUID,
+        /** 溶液 */
+        SOLUTION,
+        /** 气体 */
+        GAS;
+
+        /** 按物态派生默认形态（SOLID 默认粉末，可按物质覆盖为晶体/颗粒/块） */
+        public static Form defaultFor(Phase phase) {
+            return switch (phase) {
+                case GAS -> GAS;
+                case LIQUID -> LIQUID;
+                case AQUEOUS -> SOLUTION;
+                case SOLID -> POWDER;
+            };
+        }
+
+        /** 语言键（tooltip / JEI 条目 / 物品提示共用） */
+        public String getTranslationKey() {
+            return "trainees.form." + name().toLowerCase();
+        }
+    }
+
     // ---------- Builder ----------
     public static class Builder {
         private final ResourceLocation id;
@@ -82,6 +129,8 @@ public class IonType {
         private double formationGibbs = 0;
         private int toxicityLevel = 0;
         private int flameColor = 0xFFFFFF; // 白色默认
+        private int displayColor = 0xFFFFFF; // 白 = 不上色（渲染为贴图原色）
+        private Form form = null;          // null = 按物态派生
         private final Set<ResourceLocation> tags = new HashSet<>();
         private double minStableTemp = 0;
         private double maxStableTemp = 9999;
@@ -97,6 +146,10 @@ public class IonType {
         public Builder formationGibbs(double val) { this.formationGibbs = val; return this; }
         public Builder toxicityLevel(int val) { this.toxicityLevel = val; return this; }
         public Builder flameColor(int val) { this.flameColor = val; return this; }
+        /** 物质外观色（RGB，0xRRGGBB；用于物品 tint 与 JEI 条目；与 flameColor 分工） */
+        public Builder displayColor(int rgb) { this.displayColor = 0xFF000000 | (rgb & 0xFFFFFF); return this; }
+        /** 物质形态（渲染属性；不指定则按物态派生） */
+        public Builder form(Form val) { this.form = val; return this; }
         public Builder tag(ResourceLocation tag) { this.tags.add(tag); return this; }
         public Builder stableRange(double minK, double maxK) { this.minStableTemp = minK; this.maxStableTemp = maxK; return this; }
 

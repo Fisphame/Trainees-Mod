@@ -2,6 +2,8 @@ package com.pha.trainees.chemistry.item;
 
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
 import com.pha.trainees.chemistry.particle.IonType;
+import com.pha.trainees.chemistry.util.IonDisplay;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 
@@ -27,22 +29,29 @@ public class AnalyzerItemNormal extends AnalyzerItem {
         List<Component> lines = new ArrayList<>();
 
         // 标题行
-        lines.add(Component.literal("§6§l=== 烧杯分析报告 ==="));
+        lines.add(Component.translatable("gui.trainees.analyzer.title")
+                .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
 
         // 温度
         double tempK = beaker.getTemperature();
         double tempC = tempK - 273.15;
-        lines.add(Component.literal("§e温度: §f" + DF.format(tempK) + " K (§7" + DF.format(tempC) + "°C§f)"));
+        lines.add(Component.translatable("gui.trainees.analyzer.temperature",
+                DF.format(tempK), DF.format(tempC)).withStyle(ChatFormatting.YELLOW));
 
         // 体积
-        lines.add(Component.literal("§e体积: §f" + DF.format(beaker.getVolume()) + " L"));
+        lines.add(Component.translatable("gui.trainees.analyzer.volume",
+                DF.format(beaker.getVolume())).withStyle(ChatFormatting.YELLOW));
 
         // 内容物（主要成分，取前3种）
         Map<IonType, Double> contents = beaker.getContents();
         if (contents.isEmpty()) {
-            lines.add(Component.literal("§7内容物: 空"));
+            lines.add(Component.translatable("gui.trainees.analyzer.contents")
+                    .append(" ")
+                    .append(Component.translatable("gui.trainees.analyzer.contents_empty"))
+                    .withStyle(ChatFormatting.GRAY));
         } else {
-            lines.add(Component.literal("§e内容物:"));
+            lines.add(Component.translatable("gui.trainees.analyzer.contents")
+                    .withStyle(ChatFormatting.YELLOW));
             // 按物质的量从大到小排序，取前3
             List<Map.Entry<IonType, Double>> sorted = contents.entrySet().stream()
                     .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
@@ -51,21 +60,24 @@ public class AnalyzerItemNormal extends AnalyzerItem {
             for (Map.Entry<IonType, Double> entry : sorted) {
                 IonType ion = entry.getKey();
                 double moles = entry.getValue();
-                String ionName = ion.getId().getPath();
+                String ionName = IonDisplay.format(ion.getId().getPath());
                 lines.add(Component.literal("  §7" + ionName + ": §f" + DF.format(moles) + " mol"));
             }
             if (contents.size() > 3) {
-                lines.add(Component.literal("  §7... 还有 " + (contents.size() - 3) + " 种成分"));
+                lines.add(Component.translatable("gui.trainees.analyzer.contents_more",
+                        contents.size() - 3).withStyle(ChatFormatting.GRAY));
             }
         }
 
         // 压力（如果有气体）
         double pressure = beaker.getPressure();
         if (pressure > 0.01) {
-            lines.add(Component.literal("§e压力: §f" + DF.format(pressure) + " atm"));
+            lines.add(Component.translatable("gui.trainees.analyzer.pressure",
+                    DF.format(pressure)).withStyle(ChatFormatting.YELLOW));
         }
 
-        lines.add(Component.literal("§8[右键烧杯可锁定目标]"));
+        lines.add(Component.translatable("gui.trainees.analyzer.normal_footer")
+                .withStyle(ChatFormatting.DARK_GRAY));
 
         return lines;
     }

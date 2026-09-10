@@ -20,6 +20,8 @@ public class ModNetwork {
         int id = 0;
         CHANNEL.registerMessage(id++, OpenGraphPacket.class,
                 OpenGraphPacket::encode, OpenGraphPacket::decode, OpenGraphPacket::handle);
+        CHANNEL.registerMessage(id++, AnalyzerReportPacket.class,
+                AnalyzerReportPacket::encode, AnalyzerReportPacket::decode, AnalyzerReportPacket::handle);
     }
 
     public static SimpleChannel get() {

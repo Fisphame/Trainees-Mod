@@ -5,6 +5,7 @@ import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.item.SubstanceItem;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
+import com.pha.trainees.chemistry.report.ReportLine;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.registry.ModChemistry;
 import net.minecraft.core.BlockPos;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,8 +51,8 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
 
     // ===== 工作电压档位（§19.11）：1~5 档 → 电压倍率 = 理论分解电压 × factor =====
     // 档位语义：1=低速(理论工作点,温和) 2=标准(近热中性) 3=快速 4=极速 5=过载(最快最烫最耗)
+    // 档名文案已迁至语言键 trainees.voltage.1..5（§19.16 本地化），不再用代码常量
     public static final double[] VOLTAGE_FACTORS = {1.0, 1.2, 1.5, 1.8, 2.2};
-    public static final String[] VOLTAGE_NAMES = {"低速", "标准", "快速", "极速", "过载"};
     public static final int MAX_VOLTAGE_LEVEL = VOLTAGE_FACTORS.length;
     private int voltageLevel = 2; // 默认标准档
 
@@ -277,6 +279,36 @@ public class ElectrolysisCellBlockEntity extends BeakerBlockEntity {
 
     public int getCathodeEnergy() {
         return cathodeEnergy;
+    }
+
+    /**
+     * 电解槽专属诊断行（§19.14 点 1）：原先空手右键刷聊天栏的状态报告迁移到这里，
+     * 统一由分析仪诊断页显示；电解槽自身不再输出查询类信息。
+     * 采用结构化行（翻译键 + 参数），客户端本地化（§19.16）。
+     */
+    @Override
+    public void appendDiagnostics(List<ReportLine> lines) {
+        Direction facing = getBlockState().hasProperty(ElectrolysisCellBlock.FACING)
+                ? getBlockState().getValue(ElectrolysisCellBlock.FACING)
+                : Direction.NORTH;
+        int level = getVoltageLevel();
+        lines.add(ReportLine.of("gui.trainees.analyzer.diag.electrodes",
+                facing.getName(), facing.getOpposite().getName()));
+        lines.add(ReportLine.raw("gui.trainees.analyzer.diag.voltage", List.of(
+                ReportLine.ReportArg.of(String.valueOf(level)),
+                ReportLine.ReportArg.key("trainees.voltage." + level))));
+        lines.add(ReportLine.of(hasMembrane()
+                ? "gui.trainees.analyzer.diag.membrane.yes"
+                : "gui.trainees.analyzer.diag.membrane.no"));
+        lines.add(ReportLine.of("gui.trainees.analyzer.diag.energy",
+                String.valueOf(anodeEnergy), String.valueOf(cathodeEnergy)));
+        lines.add(ReportLine.of(isElectricallyPowered()
+                        ? "gui.trainees.analyzer.diag.circuit.on"
+                        : "gui.trainees.analyzer.diag.circuit.off",
+                String.valueOf(ChemConfig.ELECTROLYZER_FREE_POWER.get())));
+        lines.add(ReportLine.of(isOutputBlocked()
+                ? "gui.trainees.analyzer.diag.output.blocked"
+                : "gui.trainees.analyzer.diag.output.ok"));
     }
 
     public ItemStackHandler getInventory() {

@@ -3,7 +3,9 @@ package com.pha.trainees.chemistry.block;
 import com.pha.trainees.chemistry.blockentity.ElectrolysisCellBlockEntity;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
+import com.pha.trainees.chemistry.util.AnalyzerAccess;
 import com.pha.trainees.chemistry.util.FluidIonMapper;
+import com.pha.trainees.chemistry.util.IonDisplay;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.registry.ModChemistry;
 import net.minecraft.core.BlockPos;
@@ -91,6 +93,12 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
         }
         ItemStack held = player.getItemInHand(hand);
 
+        // 分析仪（§19.6/19.7）：右键 → 诊断 GUI；潜行右键 → 聊天简报
+        InteractionResult analyzerResult = AnalyzerAccess.tryUse(level, pos, player, held);
+        if (analyzerResult != InteractionResult.PASS) {
+            return analyzerResult;
+        }
+
         // 1. 流体桶倒入（映射离子入 contents，按严格映射 64mol/桶）
         if (held.getItem() instanceof BucketItem) {
             FluidStack fs = FluidUtil.getFluidContained(held).orElse(null);
@@ -101,12 +109,15 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
                     if (!player.isCreative()) {
                         player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                     }
-                    player.displayClientMessage(Component.literal(
-                            "§a已倒入 " + ion.getId().getPath() + "（" + ChemConfig.BUCKET_TO_MOL_WATER.get() + " mol）"), true);
+                    player.displayClientMessage(Component.translatable(
+                            "message.trainees.electrolysis.poured",
+                            IonDisplay.format(ion.getId().getPath()),
+                            String.valueOf(ChemConfig.BUCKET_TO_MOL_WATER.get())), true);
                     return InteractionResult.CONSUME;
                 }
             }
-            player.displayClientMessage(Component.literal("§c该流体无法被识别为离子"), true);
+            player.displayClientMessage(Component.translatable(
+                    "message.trainees.electrolysis.fluid_unknown"), true);
             return InteractionResult.FAIL;
         }
 
@@ -131,7 +142,8 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
                     }
                 }
             }
-            player.displayClientMessage(Component.literal("§7电解槽中没有可盛装的液态物质"), true);
+            player.displayClientMessage(Component.translatable(
+                    "message.trainees.electrolysis.no_liquid"), true);
             return InteractionResult.FAIL;
         }
 
@@ -141,12 +153,14 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
             if (!cell.hasMembrane()) {
                 cell.setMembraneStack(held.copyWithCount(1));
                 held.shrink(1);
-                player.displayClientMessage(Component.literal("§a已装入离子交换膜：产物将分侧纯化"), true);
+                player.displayClientMessage(Component.translatable(
+                        "message.trainees.electrolysis.membrane_installed"), true);
             } else {
                 player.getInventory().add(cell.getMembraneStack());
                 cell.setMembraneStack(held.copyWithCount(1));
                 held.shrink(1);
-                player.displayClientMessage(Component.literal("§a已更换离子交换膜"), true);
+                player.displayClientMessage(Component.translatable(
+                        "message.trainees.electrolysis.membrane_replaced"), true);
             }
             return InteractionResult.CONSUME;
         }
@@ -156,9 +170,8 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
             popOutputs(player, cell);
             return InteractionResult.CONSUME;
         }
-        // 5. 空手：状态报告
+        // 5. 空手：不再输出查询类信息（§19.14 点 1）——查看状态请用分析仪右键
         if (held.isEmpty()) {
-            reportState(player, cell);
             return InteractionResult.CONSUME;
         }
 
@@ -167,25 +180,15 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
         return InteractionResult.CONSUME;
     }
 
-    /** 工作档循环（1~5）：档位数字 + 档名暗示，物理参数不进玩家主交互（§19.11） */
+    /** 工作档循环（1~5）：只露档位数字 + 档名 + 力道暗示，物理参数不进玩家主交互（§19.11）；文案走语言键（§19.16） */
     private static void cycleVoltage(Player player, ElectrolysisCellBlockEntity cell) {
         cell.cycleVoltageLevel();
         int level = cell.getVoltageLevel();
-        String name = ElectrolysisCellBlockEntity.VOLTAGE_NAMES[level - 1];
-        String hint;
-        if (level == 1) {
-            hint = "§7低速 · 省电 · 温和";
-        } else if (level == 2) {
-            hint = "§7标准";
-        } else if (level == 3) {
-            hint = "§e快速 · 略热 · 耗电↑";
-        } else if (level == 4) {
-            hint = "§6极速 · 发烫 · 耗电↑↑";
-        } else {
-            hint = "§c过载 · 高热 · 耗电↑↑↑（小心！）";
-        }
-        player.displayClientMessage(Component.literal(
-                "§e工作档：§f" + level + "/5 §7[" + name + "] §r" + hint), true);
+        player.displayClientMessage(Component.translatable(
+                "message.trainees.electrolysis.voltage_set",
+                String.valueOf(level),
+                Component.translatable("trainees.voltage." + level),
+                Component.translatable("message.trainees.electrolysis.hint." + level)), true);
     }
 
     private static void popOutputs(Player player, ElectrolysisCellBlockEntity cell) {
@@ -201,34 +204,9 @@ public class ElectrolysisCellBlock extends BaseEntityBlock {
                 any = true;
             }
         }
-        player.displayClientMessage(Component.literal(any ? "§a已取出输出槽产物" : "§7输出槽为空"), true);
-        reportState(player, cell);
+        player.displayClientMessage(Component.translatable(any
+                ? "message.trainees.electrolysis.output_taken"
+                : "message.trainees.electrolysis.output_empty"), true);
     }
 
-    private static void reportState(Player player, ElectrolysisCellBlockEntity cell) {
-        Direction facing = cell.getBlockState().getValue(FACING);
-        player.sendSystemMessage(Component.literal("§6=== 电解槽状态 ==="));
-        player.sendSystemMessage(Component.literal(
-                "  电极方向：阳极 " + facing.getName() + " / 阴极 " + facing.getOpposite().getName()));
-        player.sendSystemMessage(Component.literal(
-                "  工作档：" + cell.getVoltageLevel() + "/5 §7[" + voltageName(cell) + "]"
-                        + "（手持任意物品右键可调档）"));
-        player.sendSystemMessage(Component.literal(
-                "  隔膜：" + (cell.hasMembrane() ? "§a已装入（产物分侧纯化）" : "§7无（产物混合输出）")));
-        player.sendSystemMessage(Component.literal(
-                "  电极储能：阳极 " + cell.getAnodeEnergy() + " FE / 阴极 " + cell.getCathodeEnergy() + " FE"));
-        player.sendSystemMessage(Component.literal(
-                "  供电：" + (cell.isElectricallyPowered() ? "§aOK（回路接通/无限电）" : "§c未构成回路（需双面供电）")
-                        + " | 无限电配置 = " + ChemConfig.ELECTROLYZER_FREE_POWER.get()));
-        player.sendSystemMessage(Component.literal(
-                "  温度 " + String.format("%.0f", cell.getTemperature()) + "K | 内容物 "
-                        + cell.getContents().size() + " 种 | 总 "
-                        + String.format("%.2f", cell.getTotalMoles()) + " mol"));
-    }
-
-    private static String voltageName(ElectrolysisCellBlockEntity cell) {
-        int l = cell.getVoltageLevel();
-        return ElectrolysisCellBlockEntity.VOLTAGE_NAMES[Math.max(0, Math.min(
-                ElectrolysisCellBlockEntity.VOLTAGE_NAMES.length - 1, l - 1))];
-    }
 }

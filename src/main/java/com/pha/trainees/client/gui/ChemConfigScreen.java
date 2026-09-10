@@ -90,6 +90,10 @@ public class ChemConfigScreen extends Screen implements IHoverText {
         // ============================================================
         // 正常初始化（配置已加载）
         // ============================================================
+        // 档位唯一权威（§7.5 方案 C）：存档里的档位（含手改配置文件）优先，
+        // 打开界面时先按档位刷新 6 个乘数配置，再据此构建滑块 → 界面与玩法一致。
+        syncMultipliersFromTier();
+
         int y = 20;
 
         // 1. 难度指标
@@ -275,27 +279,49 @@ public class ChemConfigScreen extends Screen implements IHoverText {
 
     private void onDifficultySelected(DifficultyLevel level) {
         this.selectedDifficulty = level;
-        this.isUpdatingFromPreset = true;
+        // 档位唯一权威（§7.5 方案 C）：点击档位按钮即写档位
+        ChemConfig.GAME_DIFFICULTY.set(level);
 
-        ChemConfig.DifficultyPresets.ConfigValues preset = ChemConfig.DifficultyPresets.get(level);
+        // CUSTOM = 「我要手调」状态：保留当前数值，不套预设
+        if (level != DifficultyLevel.CUSTOM) {
+            this.isUpdatingFromPreset = true;
 
-        for (Map.Entry<String, ConfigSlider> entry : sliders.entrySet()) {
-            String key = entry.getKey();
-            ConfigSlider slider = entry.getValue();
-            double value = getPresetValue(preset, key);
-            if (!Double.isNaN(value)) {
-                slider.setValue(value);
-                // 立即把预设值写入配置（内存），使分数显示实时更新；
-                // 落盘仍由「保存」按钮触发（与拖动滑块行为一致）
-                slider.commitValue();
+            ChemConfig.DifficultyPresets.ConfigValues preset = ChemConfig.DifficultyPresets.get(level);
+
+            for (Map.Entry<String, ConfigSlider> entry : sliders.entrySet()) {
+                String key = entry.getKey();
+                ConfigSlider slider = entry.getValue();
+                double value = getPresetValue(preset, key);
+                if (!Double.isNaN(value)) {
+                    slider.setValue(value);
+                    // 立即把预设值写入配置（内存），使分数显示实时更新；
+                    // 落盘仍由「保存」按钮触发（与拖动滑块行为一致）
+                    slider.commitValue();
+                }
             }
-        }
 
-        this.isUpdatingFromPreset = false;
+            this.isUpdatingFromPreset = false;
+        }
 
         refreshButtons();
         refreshScoreDisplay();
         updateDifficultyMatching();
+    }
+
+    /**
+     * 档位唯一权威（§7.5 方案 C）：打开界面时按存档档位刷新 6 个乘数配置。
+     * CUSTOM 档不刷新——此时乘数配置本身就是手调真源。
+     */
+    private void syncMultipliersFromTier() {
+        DifficultyLevel tier = ChemConfig.GAME_DIFFICULTY.get();
+        if (tier == DifficultyLevel.CUSTOM) return;
+        ChemConfig.DifficultyPresets.ConfigValues preset = ChemConfig.DifficultyPresets.get(tier);
+        ChemConfig.ORE_VALUABLE_RATIO_MULTIPLIER.set(preset.oreValuableMultiplier);
+        ChemConfig.ORE_GANGUE_RATIO_MULTIPLIER.set(preset.oreGangueMultiplier);
+        ChemConfig.POLLUTION_DIFFUSION_SPEED.set(preset.pollutionDiffusionSpeed);
+        ChemConfig.POLLUTION_TOXICITY_THRESHOLD.set(preset.pollutionToxicityThreshold);
+        ChemConfig.ENERGY_CONSUMPTION_MULTIPLIER.set(preset.energyConsumptionMultiplier);
+        ChemConfig.ENERGY_GENERATION_MULTIPLIER.set(preset.energyGenerationMultiplier);
     }
 
     private double getPresetValue(ChemConfig.DifficultyPresets.ConfigValues preset, String key) {
@@ -346,6 +372,10 @@ public class ChemConfigScreen extends Screen implements IHoverText {
         if (!matched) {
             this.selectedDifficulty = DifficultyLevel.CUSTOM;
         }
+
+        // C-1：滑块拖到非预设组合 → 档位自动转 CUSTOM；恰好等于某预设 → 回归该档位。
+        // 写档位后分数与玩法（矿石/污染/能源）都按同一权威口径解析。
+        ChemConfig.GAME_DIFFICULTY.set(this.selectedDifficulty);
 
         refreshButtons();
         refreshScoreDisplay();

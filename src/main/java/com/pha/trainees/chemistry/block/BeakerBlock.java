@@ -2,20 +2,17 @@ package com.pha.trainees.chemistry.block;
 
 import com.pha.trainees.Main;
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
-import com.pha.trainees.chemistry.engine.PredictedRule;
-import com.pha.trainees.chemistry.engine.ReactionEngine;
-import com.pha.trainees.chemistry.engine.ReactionFailure;
-import com.pha.trainees.chemistry.item.AnalyzerItem;
 import com.pha.trainees.chemistry.item.SubstanceItem;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
+import com.pha.trainees.chemistry.util.AnalyzerAccess;
 import com.pha.trainees.chemistry.util.FluidIonMapper;
+import com.pha.trainees.chemistry.util.IonDisplay;
 import com.pha.trainees.chemistry.util.SolidIonMapper;
 import com.pha.trainees.config.ChemConfig;
 import com.pha.trainees.registry.ModChemistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -43,7 +40,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class BeakerBlock extends BaseEntityBlock {
@@ -95,12 +91,10 @@ public class BeakerBlock extends BaseEntityBlock {
             return InteractionResult.CONSUME;
         }
 
-        // ====== 分析仪：HUD 常驻显示（最近失败）；服务端右键发送完整诊断报告（§19.7 方案 b） ======
-        if (heldItem.getItem() instanceof AnalyzerItem) {
-            if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-                sendDiagnosticReport(serverPlayer, beaker);
-            }
-            return InteractionResult.SUCCESS;
+        // ====== 分析仪（§19.6/19.7）：右键 → 诊断 GUI；潜行右键 → 聊天简报 ======
+        InteractionResult analyzerResult = AnalyzerAccess.tryUse(level, pos, player, heldItem);
+        if (analyzerResult != InteractionResult.PASS) {
+            return analyzerResult;
         }
 
         // ====== 流体桶/瓶（倒入） ======
@@ -126,7 +120,8 @@ public class BeakerBlock extends BaseEntityBlock {
                         }
                     } else {
                         player.displayClientMessage(
-                                Component.literal("§c无法识别该流体: " + fluid.getFluidType().getDescription().getString()),
+                                Component.translatable("message.trainees.beaker.fluid_unknown",
+                                        fluid.getFluidType().getDescription()),
                                 true
                         );
                         return InteractionResult.FAIL;
@@ -165,7 +160,8 @@ public class BeakerBlock extends BaseEntityBlock {
                             return InteractionResult.CONSUME;
                         } else {
                             Main.LOGGER.warn("[Beaker] Fluid {} has no bucket item!", fluid.getFluidType().getDescription().getString());
-                            player.displayClientMessage(Component.literal("§c该流体无法用桶盛装！"), true);
+                            player.displayClientMessage(Component.translatable(
+                                    "message.trainees.beaker.no_bucket_for_fluid"), true);
                             // 重要：虽然取不出，但我们已经移除了离子，需要回滚！
                             // 由于移除失败，需要把离子加回去
                             beaker.addIon(targetIon, removed);
@@ -173,13 +169,15 @@ public class BeakerBlock extends BaseEntityBlock {
                         }
                     }
                 } else {
-                    player.displayClientMessage(Component.literal("§c烧杯中的液态物质无法被桶盛装（未映射）"), true);
+                    player.displayClientMessage(Component.translatable(
+                            "message.trainees.beaker.liquid_unmapped"), true);
                     Main.LOGGER.warn("[Beaker] No fluid mapping for ion: {}", targetIon.getId().getPath());
                     return InteractionResult.FAIL;
                 }
             }
 
-            player.displayClientMessage(Component.literal("§7烧杯中没有可取的液态物质"), true);
+            player.displayClientMessage(Component.translatable(
+                    "message.trainees.beaker.no_liquid"), true);
             return InteractionResult.FAIL;
         }
 
@@ -187,14 +185,16 @@ public class BeakerBlock extends BaseEntityBlock {
         if (heldItem.getItem() == Items.GLASS_BOTTLE) {
             Map<IonType, Double> contents = beaker.getContents();
             if (contents.isEmpty()) {
-                player.displayClientMessage(Component.literal("§7烧杯是空的"), true);
+                player.displayClientMessage(Component.translatable(
+                        "message.trainees.beaker.empty"), true);
                 return InteractionResult.FAIL;
             }
             double total = contents.values().stream().mapToDouble(Double::doubleValue).sum();
             // 取样下限 0.1 mol（§19.11：实验室小量制备量级；不足则提示累积）
             if (total < 0.1) {
-                player.displayClientMessage(Component.literal("§7内容物不足 0.1 mol，无法取样（当前 "
-                        + String.format("%.3f", total) + " mol）"), true);
+                player.displayClientMessage(Component.translatable(
+                        "message.trainees.beaker.too_little_to_sample",
+                        String.format("%.3f", total)), true);
                 return InteractionResult.FAIL;
             }
             double sampleTotal = Math.min(total, 1.0);
@@ -212,7 +212,8 @@ public class BeakerBlock extends BaseEntityBlock {
             if (!player.getInventory().add(sampleItem)) {
                 player.drop(sampleItem, false);
             }
-            player.displayClientMessage(Component.literal("§a取出一份样本（" + String.format("%.3f", sampleTotal) + " mol）"), true);
+            player.displayClientMessage(Component.translatable(
+                    "message.trainees.beaker.sampled", String.format("%.3f", sampleTotal)), true);
             return InteractionResult.CONSUME;
         }
 
@@ -221,7 +222,8 @@ public class BeakerBlock extends BaseEntityBlock {
             // 获取成分
             Map<IonType, Double> composition = SubstanceItem.getComposition(heldItem);
             if (composition.isEmpty()) {
-                player.displayClientMessage(Component.literal("§c这个物质是空的！"), true);
+                player.displayClientMessage(Component.translatable(
+                        "message.trainees.beaker.substance_empty"), true);
                 return InteractionResult.FAIL;
             }
 
@@ -231,8 +233,9 @@ public class BeakerBlock extends BaseEntityBlock {
             double maxCapacity = ChemConfig.MAX_TOTAL_MOLES.get();
 
             if (currentTotal + totalMoles > maxCapacity) {
-                player.displayClientMessage(Component.literal("§c烧杯容量不足！当前 " +
-                        String.format("%.3f", currentTotal) + " / " + String.format("%.3f", maxCapacity) + " mol"), true);
+                player.displayClientMessage(Component.translatable(
+                        "message.trainees.beaker.capacity_full",
+                        String.format("%.3f", currentTotal), String.format("%.3f", maxCapacity)), true);
                 return InteractionResult.FAIL;
             }
 
@@ -245,8 +248,10 @@ public class BeakerBlock extends BaseEntityBlock {
                 double currentIon = beaker.getAmount(ion);
                 double maxPerComponent = ChemConfig.MAX_MOLES_PER_COMPONENT.get();
                 if (currentIon + moles > maxPerComponent) {
-                    player.displayClientMessage(Component.literal("§c" + ion.getId().getPath() +
-                            " 超过单成分上限 " + String.format("%.3f", maxPerComponent) + " mol"), true);
+                    player.displayClientMessage(Component.translatable(
+                            "message.trainees.beaker.component_limit",
+                            IonDisplay.format(ion.getId().getPath()),
+                            String.format("%.3f", maxPerComponent)), true);
                     return InteractionResult.FAIL;
                 }
                 beaker.addIon(ion, moles);
@@ -277,7 +282,8 @@ public class BeakerBlock extends BaseEntityBlock {
             }
         }
 
-        player.displayClientMessage(Component.literal("§7这个物品无法放入烧杯"), true);
+        player.displayClientMessage(Component.translatable(
+                "message.trainees.beaker.cannot_insert"), true);
         return InteractionResult.FAIL;
     }
 
@@ -300,68 +306,6 @@ public class BeakerBlock extends BaseEntityBlock {
         }
         // 使用 createTickerHelper 将 BeakerBlockEntity 的静态 tick 方法绑定到正确的 BlockEntityType
         return createTickerHelper(type, ModChemistry.ModChemistryBlockEntities.BEAKER.get(), BeakerBlockEntity::tick);
-    }
-
-    /**
-     * 服务端诊断报告（§19.7 方案 b：分析仪右键 → 聊天框完整报告）。
-     * 内容：可执行反应（预测）+ 未达条件（预测）+ 最近失败记录。
-     */
-    private static void sendDiagnosticReport(ServerPlayer player, BeakerBlockEntity beaker) {
-        player.sendSystemMessage(Component.literal("§6§l=== 化学诊断报告 ==="));
-
-        List<PredictedRule> predicted = ReactionEngine.predictReactions(beaker);
-
-        player.sendSystemMessage(Component.literal("§e--- 可执行反应 ---"));
-        boolean anyExec = false;
-        for (PredictedRule p : predicted) {
-            if (p.status() == PredictedRule.Status.EXECUTABLE) {
-                player.sendSystemMessage(Component.literal(
-                        "  §a✓ " + p.rule().getId().getPath() + " §7(" + p.detail() + ")"));
-                anyExec = true;
-            }
-        }
-        if (!anyExec) {
-            player.sendSystemMessage(Component.literal("  §7(无，见下方缺失项)"));
-        }
-
-        player.sendSystemMessage(Component.literal("§c--- 未达条件 ---"));
-        for (PredictedRule p : predicted) {
-            if (p.status() == PredictedRule.Status.EXECUTABLE) continue;
-            String color = switch (p.status()) {
-                case MISSING_REACTANT, MISSING_PRECONDITION -> "§e";
-                case TEMPERATURE_TOO_LOW -> "§b";
-                case NOT_POWERED -> "§d";
-                case ALREADY_BALANCED -> "§7";
-                default -> "§f";
-            };
-            player.sendSystemMessage(Component.literal(
-                    "  " + color + "§l" + statusName(p.status()) + "§r§7 " + p.rule().getId().getPath()
-                            + " — " + p.detail()));
-        }
-
-        List<ReactionFailure> failures = beaker.getRecentFailures();
-        player.sendSystemMessage(Component.literal("§6--- 最近失败（" + failures.size() + " 条） ---"));
-        if (failures.isEmpty()) {
-            player.sendSystemMessage(Component.literal("  §7(无)"));
-        } else {
-            int shown = 0;
-            for (int i = failures.size() - 1; i >= 0 && shown < 3; i--, shown++) {
-                ReactionFailure f = failures.get(i);
-                player.sendSystemMessage(Component.literal(
-                        "  §c" + f.type().name() + " §7" + f.ruleId() + " — " + f.detail()));
-            }
-        }
-    }
-
-    private static String statusName(PredictedRule.Status status) {
-        return switch (status) {
-            case EXECUTABLE -> "可执行";
-            case MISSING_PRECONDITION -> "缺前置";
-            case MISSING_REACTANT -> "缺反应物";
-            case TEMPERATURE_TOO_LOW -> "温度不足";
-            case NOT_POWERED -> "未通电";
-            case ALREADY_BALANCED -> "已达平衡";
-        };
     }
 
 }
