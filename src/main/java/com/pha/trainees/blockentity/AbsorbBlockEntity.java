@@ -8,10 +8,10 @@ import appeng.api.stacks.AEItemKey;
 import appeng.api.storage.IStorageMounts;
 import appeng.api.storage.IStorageProvider;
 import appeng.api.storage.MEStorage;
-import appeng.api.storage.StorageHelper;
 import appeng.api.util.AECableType;
 import com.pha.trainees.Main;
 import com.pha.trainees.registry.ModBlocks;
+import com.pha.trainees.registry.ModConfig;
 import com.pha.trainees.registry.ModItems;
 import com.pha.trainees.util.game.enums.AbsorbWorkModel;
 import com.pha.trainees.util.game.ParticleHelper;
@@ -75,6 +75,8 @@ public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements ITraver
 
     private final Map<BlockPos, ItemHandlerBlockEntity> map = new HashMap<>();
     private int timer = 0;
+    /** 推送周期计数（§19.21 主动推送，与吸取周期独立） */
+    private int pushTimer = 0;
     private static final int COOLDOWN_TICK = 8;
     private AbsorbWorkModel model = AbsorbWorkModel.HINDERING;
 
@@ -160,20 +162,123 @@ public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements ITraver
         if (!(t instanceof AbsorbBlockEntity absorb)) return;
         if (level.isClientSide) return;
 
-        if (++absorb.timer <= COOLDOWN_TICK) return;
-        absorb.timer = 0;
+        // 红石信号 = 停机（吸取与推送同时停）
+        boolean powered = level.getBestNeighborSignal(blockPos) > 0;
 
-        if (level.getBestNeighborSignal(blockPos) > 0) return;
-
-        absorb.find(level, blockPos);
-
-        // 获取当前 Absorb 自身存储的物品
-        ItemStack currentStored = absorb.itemHandler.getStackInSlot(0);
-
-        // 遍历所有邻居，并让每个邻居的处理返回更新后的 currentStored
-        for (Map.Entry<BlockPos, ItemHandlerBlockEntity> entry : absorb.map.entrySet()) {
-            currentStored = processNeighbor(entry.getValue(), currentStored, absorb);
+        // ===== 1. 吸取周期（原行为）：从邻接机器抽入本方块 =====
+        if (!powered && ++absorb.timer > COOLDOWN_TICK) {
+            absorb.timer = 0;
+            absorb.find(level, blockPos);
+            ItemStack currentStored = absorb.itemHandler.getStackInSlot(0);
+            for (Map.Entry<BlockPos, ItemHandlerBlockEntity> entry : absorb.map.entrySet()) {
+                currentStored = processNeighbor(entry.getValue(), currentStored, absorb);
+            }
         }
+
+        // ===== 2. 推送周期（§19.21 新增）：主动弹出一批到 ME 网络/邻接容器 =====
+        if (!powered && ModConfig.COMMON.absorbPushEnabled.get()
+                && ++absorb.pushTimer >= ModConfig.COMMON.absorbPushInterval.get()) {
+            absorb.pushTimer = 0;
+            absorb.pushStored(blockPos);
+        }
+    }
+
+    /**
+     * 主动推送一批内容物（§19.21）：
+     * <ol>
+     *   <li>优先**直连 ME 网络**（不再依赖输出总线轮询）；</li>
+     *   <li>网络离线/无电时，回退推送到**邻接容器**（排除本模组机器与其他汲取方块，避免回环）。</li>
+     * </ol>
+     * 每轮只推一批（批量可配置），剩余的下轮继续，避免单 tick 卡顿。
+     */
+    private void pushStored(BlockPos pos) {
+        ItemStack stored = itemHandler.getStackInSlot(0);
+        if (stored.isEmpty()) return;
+
+        int batch = Math.max(1, ModConfig.COMMON.absorbPushBatchSize.get());
+        int amount = Math.min(stored.getCount(), batch);
+
+        // 1) 直连 ME 网络
+        long inserted = insertIntoNetwork(stored, amount);
+        if (inserted > 0) {
+            shrinkStored(inserted);
+            return;
+        }
+
+        // 2) 邻接容器回退
+        if (ModConfig.COMMON.absorbNeighborPush.get()) {
+            int moved = pushToNeighbors(pos, stored, amount);
+            if (moved > 0) {
+                shrinkStored(moved);
+            }
+        }
+    }
+
+    /**
+     * 直接把物品塞进 AE2 网格存储。
+     *
+     * <p>注意：网格存储里**也挂着我们自己**（`IStorageProvider` 挂载的适配器），
+     * 所以必须保证自适应器对网络**只可抽、不可插**（见 {@link AbsorbInventoryAdapter#insert} 返回 0），
+     * 否则会出现"把东西推进自己"的死循环。</p>
+     *
+     * @return 实际插入数量；网络离线/无电/不支持时返回 0
+     */
+    private long insertIntoNetwork(ItemStack stack, int amount) {
+        if (!mainNode.isOnline()) return 0;
+        IGridNode node = mainNode.getNode();
+        if (node == null) return 0;
+        MEStorage storage = node.getGrid().getStorageService().getInventory();
+        if (storage == null) return 0;
+        AEItemKey key = AEItemKey.of(stack);
+        if (key == null) return 0;
+
+        long inserted = storage.insert(key, amount, Actionable.MODULATE, IActionSource.ofMachine(this));
+        if (inserted > 0) {
+            Main.LOGGER.debug("[Absorb] pushed {} x{} into ME network", key, inserted);
+        }
+        return inserted;
+    }
+
+    /**
+     * 回退路径：把物品推给邻接的 {@code IItemHandler}。
+     * **排除本模组机器与其他汲取方块**——它们是吸取来源，推送回去会形成回环。
+     */
+    private int pushToNeighbors(BlockPos pos, ItemStack stack, int amount) {
+        if (level == null) return 0;
+        int moved = 0;
+        for (Direction dir : Direction.values()) {
+            if (moved >= amount) break;
+            BlockPos target = pos.relative(dir);
+            BlockEntity be = level.getBlockEntity(target);
+            if (be == null || be instanceof IMachine) continue; // 排除回环来源
+
+            LazyOptional<IItemHandler> cap = be.getCapability(ForgeCapabilities.ITEM_HANDLER, dir.getOpposite());
+            if (!cap.isPresent()) continue;
+            IItemHandler handler = cap.orElse(null);
+            if (handler == null) continue;
+
+            int remaining = amount - moved;
+            ItemStack toPush = stack.copy();
+            toPush.setCount(remaining);
+            for (int slot = 0; slot < handler.getSlots() && !toPush.isEmpty(); slot++) {
+                toPush = handler.insertItem(slot, toPush, false);
+            }
+            moved += remaining - toPush.getCount();
+        }
+        if (moved > 0) {
+            Main.LOGGER.debug("[Absorb] pushed {} x{} to adjacent container(s)", stack.getItem(), moved);
+        }
+        return moved;
+    }
+
+    /** 从本方块槽位扣除已推送的数量 */
+    private void shrinkStored(long amount) {
+        ItemStack stored = itemHandler.getStackInSlot(0);
+        if (stored.isEmpty() || amount <= 0) return;
+        ItemStack remaining = stored.copy();
+        remaining.shrink((int) Math.min(amount, remaining.getCount()));
+        itemHandler.setStackInSlot(0, remaining.isEmpty() ? ItemStack.EMPTY : remaining);
+        setChanged();
     }
 
     /**
@@ -317,54 +422,10 @@ public class AbsorbBlockEntity extends ItemHandlerBlockEntity implements ITraver
 
     @Override
     public void mountInventories(IStorageMounts mounts) {
+        // 对网络**只暴露抽取**：适配器的 insert 恒返回 0（见 AbsorbInventoryAdapter），
+        // 这样主动推送 insertIntoNetwork() 永远不会把物品插回自己（§19.21 防回环）。
         mounts.mount(new AbsorbInventoryAdapter(this), 0);
     }
-    // ========== 主动推送方法 ==========
-
-//    public void pushStoredItemToNetwork() {
-//        Main.LOGGER.info("[Absorb] pushStoredItemToNetwork called, current stored: {}", getStoredItem());
-//        if (level == null || level.isClientSide()) {return;}
-//        // 关键：仅当节点已连接到物理网络时才进行推送
-//        if (!mainNode.isOnline()) {
-//            Main.LOGGER.debug("[Absorb] Not online, skipping push");
-//            return;
-//        }
-//        ItemStack stored = itemHandler.getStackInSlot(0);
-//        if (stored.isEmpty()) {
-//            Main.LOGGER.info("[Absorb] pushStoredItemToNetwork: stored is empty, returning");
-//            return;
-//        }
-//        IGridNode node = mainNode.getNode();
-//        if (node == null) {
-//            Main.LOGGER.info("[Absorb] pushStoredItemToNetwork: node is null, returning");
-//            return;
-//        }
-//        MEStorage storage = node.getGrid().getStorageService().getInventory();
-//        if (storage == null) {
-//            Main.LOGGER.info("[Absorb] pushStoredItemToNetwork: storage is null, returning");
-//            return;
-//        }
-//        AEItemKey what = AEItemKey.of(stored);
-//        if (what == null) {
-//            Main.LOGGER.info("[Absorb] pushStoredItemToNetwork: what is null, returning");
-//            return;
-//        }
-//        IActionSource source = IActionSource.ofMachine(this);
-//        long inserted = storage.insert(what, stored.getCount(), Actionable.MODULATE, source);
-//        Main.LOGGER.info("[Absorb] pushStoredItemToNetwork: inserted = {}", inserted);
-//        if (inserted > 0) {
-//            int remaining = stored.getCount() - (int) inserted;
-//            Main.LOGGER.info("[Absorb] pushStoredItemToNetwork: remaining = {}", remaining);
-//            if (remaining <= 0) {
-//                itemHandler.setStackInSlot(0, ItemStack.EMPTY);
-//            } else {
-//                ItemStack newStack = stored.copy();
-//                newStack.setCount(remaining);
-//                itemHandler.setStackInSlot(0, newStack);
-//            }
-//            setChanged();
-//        }
-//    }
 
     @Override
     public void setStoredItem(ItemStack itemStack) {

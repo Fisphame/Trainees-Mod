@@ -20,6 +20,7 @@ build
 # other
 eclipse
 run
+run-data
 
 # Files from Forge MDK
 forge*changelog.txt
@@ -32,3 +33,6 @@ forge*changelog.txt
 
 # 生成器输出（贴图对照图等开发产物）
 /scripts/.out/
+
+# 数据生成器缓存（生成物入库，缓存不入库）
+/src/generated/resources/.cache/

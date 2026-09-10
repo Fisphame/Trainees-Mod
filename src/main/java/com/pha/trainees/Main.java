@@ -74,6 +74,7 @@ public class Main {
 
         bus.register(new Register());
         bus.addListener(this::commonSetup);
+        // 数据生成器入口通过 @Mod.EventBusSubscriber 自动注册（见 datagen/ModDataGenerators）
         ebus.register(AbilityHandler.class);
         ebus.register(FoodHandler.class);
         ebus.register(this);

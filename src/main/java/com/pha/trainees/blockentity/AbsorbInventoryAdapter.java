@@ -27,37 +27,17 @@ public class AbsorbInventoryAdapter implements MEStorage {
     }
 
     // ===== 重写 insert/extract（基类默认返回 0） =====
+
+    /**
+     * **对网络只可抽、不可插**（§19.21）。
+     *
+     * <p>原因：汲取方块自己也在网格存储里挂了这个适配器；若它接受插入，
+     * 我们的主动推送（往网格 storage.insert）就会被路由回自己，形成死循环。
+     * 方块内容物只能来自"从邻接机器吸取"与玩家交互。</p>
+     */
     @Override
     public long insert(@Nonnull AEKey what, long amount, @Nonnull Actionable mode, @Nonnull IActionSource source) {
-        // 只处理物品类型
-        if (!(what instanceof AEItemKey itemKey)) return 0;
-
-        ItemStack stored = absorb.getStoredItem();
-        ItemStack toInsert = itemKey.toStack((int) amount);
-
-        // 如果已有物品且不匹配，拒绝插入
-        if (!stored.isEmpty() && !ItemStack.isSameItemSameTags(stored, toInsert)) {
-            return 0;
-        }
-
-        // 模拟模式：直接返回可插入数量
-        if (mode == Actionable.SIMULATE) {
-            return amount;
-        }
-
-        // 实际插入
-        if (stored.isEmpty()) {
-            absorb.setStoredItem(toInsert);
-        } else {
-            int newCount = stored.getCount() + (int) amount;
-            // 防止溢出（Integer.MAX_VALUE 是上限）
-            if (newCount < 0) newCount = Integer.MAX_VALUE;
-            ItemStack newStack = stored.copy();
-            newStack.setCount(Math.min(newCount, Integer.MAX_VALUE));
-            absorb.setStoredItem(newStack);
-        }
-
-        return amount;
+        return 0;
     }
 
     @Override
