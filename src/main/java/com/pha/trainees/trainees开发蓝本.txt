@@ -836,6 +836,17 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 - 蒸馏塔（§19.2）挂起为独立小节（9-9 不建塔，等其启动时定义气液交换接口）。
 - **已知 V1 简化**：温度非逐格热传导而是热源解析叠加；密度分层（Y 向沉浮）未做（留后续）；粗账仅按重心水合、无污染扩散演化；扩散在加载区全量遍历（活性半径节流未按 §19.13 完全落实，后续优化）。
 
+**⚠ 严重事故与修复：区块加载自死锁（2026-09-11，表现为旧存档无法打开）**
+- **现象**：进入某存档时世界加载进度卡在 39%~57% 不再前进；窗口**不显示"未响应"**（渲染线程正常），实为**服务端线程永久阻塞**。
+- **定位手段（可复用）**：无头 `runServer` 加载存档副本**没有复现**（它只准备出生点区域，没碰到出问题的区块）→ 改用 `gradlew runClient --args="--quickPlaySingleplayer <副本存档>"` 自动进档复现，再 `jstack` 抓线程栈。关键栈：
+  `Server thread: ServerChunkCache.getChunk ← Level.getBlockState ← GasGridManager.heatOffset ← getOrCreate ← addGas ← redistribute ← onChunkLoad ← ChunkEvent.Load ← ChunkMap.protoChunkToFullChunk`
+- **根因**：**在区块加载事件内部做世界访问**。`heatOffset` 用 `level.getBlockState(...)` 扫描 5³ 邻域热源，偏移一旦跨入**尚未加载**的邻区块就会**强制同步加载区块**；而当前线程正是负责完成该区块加载的线程 → **自死锁**。
+- **修复（两层）**：
+  1. **热源扫描绝不强制加载**：新增 `stateNoLoad()`——服务端走非阻塞 `ServerChunkCache.getChunkNow()`（未加载返回 null，视为无热源），客户端退回 `isLoaded` 判断；`heatOffset` 全量改用它。
+  2. **粗账水合移出加载事件**：`onChunkLoad` 只做**纯内存**的精存快照恢复；粗账水合（会读世界）改为**入队**，由 `ServerTickEvent` 里的 `processPendingHydration(level, HYDRATE_BUDGET_PER_TICK=4)` 限额消费（若期间已卸载则丢弃本次；粗账仍在 `summaries`，下次加载会重新排队）。
+- **工程纪律（新增）**：**任何 `ChunkEvent.Load/Unload` 回调里都不得访问世界**——`getBlockState`/`getBlockEntity`/`getBiome` 等可能触发加载的调用一律禁止；需要世界数据的后续工作**排队到服务端 tick**。同类风险点已复查：`environmentTemperature` 纯计算（安全）、`tickDiffusion` 只在 tick 内跑（安全）、`redistribute` 的 `isLoaded` 非强制（安全）。
+- **验证**：修复后同一存档（副本）客户端正常进入世界；`jstack` 显示 Server thread 处于 `MinecraftServer.tickServer` 正常循环（不再 parked 在 `getChunk`）。
+
 **✅ 配置 GUI 补全（2026-08，`ChemConfigScreen`）**：
 - 修复翻译键显示：分组标题改用 `Component.translatable(...).getString()`（原 `String.valueOf(Component)` 输出对象字串）；标题、底部存档名同修；难度指标改用 `scoreWidget` 字段引用刷新（不再按「难度指标」字串匹配，兼容英文客户端）。
 - 难度按钮激活态改为难度数组索引匹配（原按 message==displayName 中文硬比较，英文客户端失效）；预设匹配键由 camelCase 校正为与滑块 key 一致的 snake_case（难度预设此前从未真正生效）。
@@ -1417,6 +1428,10 @@ double scoreBias_NO2 = concentration / (concentration + 1.0);
 7. **配置界面**：你记的那个 mod 是 **Configured**（MrCrayfish，配 Catalogue）；它读任意 `ForgeConfigSpec` **自动生成界面**，客户端侧、零工作量 → **不再手写更多 Screen**；保留 `ChemConfigScreen` 仅因"难度预设按钮 + 难度指标分数"是自定义逻辑。注意我们的配置是 SERVER_SPEC（分存档），多人需两端安装。
 8. **FTB Quests**：待科技树落地；将来可用数据生成器**直接产出任务 SNBT**（§19.19 工具链复用），我们的 advancements 也可直接当任务目标。
 9. **NEI 纠正**：NEI 是 1.7 时代产物；1.20.1 看掉落用 **JER**。我们的实体掉落**已是标准 loot table**（`data/trainees/loot_tables/entities/*.json`）→ **装 JER 即自动可见，零改动**；若发现某些掉落是代码直给，应迁到 loot table（顺带可被整合包改）。
+10. **✅ 专用服务器兼容修复（2026-09-11，本地诊断顺带挖出）**：数据包类**不得在字节码里引用客户端类**——`OpenGraphPacket`/`AnalyzerReportPacket` 原本在 `handle` 的 lambda 里直接 `new Screen(...)`，导致**专用服务器在注册数据包时崩溃**（`Attempted to load class net/minecraft/client/gui/screens/Screen for invalid dist DEDICATED_SERVER`，模组直接加载失败）。
+    - 修复：新增 `client/ClientPacketHandlers`（客户端专用），数据包只通过 `DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandlers.xxx(...))` 调用；同时清掉 `ModChemistry` 里未使用的客户端 `Material` 导入。
+    - **纪律**：客户端类（`Screen`/`Minecraft`/`GuiGraphics`…）只能出现在 `client` 包与 `compat` 客户端插件内；`network`/`registry`/`chemistry` 等双端类**只允许字符串/ID 形式**跨端传递。
+    - 意义：AE2 子网自动化、多人服务器玩法与专用服务器部署都依赖这条（此前模组根本装不上服务器）。
 
 
 

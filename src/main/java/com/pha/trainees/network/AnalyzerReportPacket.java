@@ -1,8 +1,7 @@
 package com.pha.trainees.network;
 
 import com.pha.trainees.chemistry.report.ReportLine;
-import com.pha.trainees.client.gui.AnalyzerScreen;
-import net.minecraft.client.Minecraft;
+import com.pha.trainees.client.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -88,8 +87,9 @@ public class AnalyzerReportPacket {
     }
 
     public static void handle(AnalyzerReportPacket msg, Supplier<NetworkEvent.Context> ctx) {
+        // 客户端代码集中在 client-only 处理器里：服务器端永不加载本 lambda 的目标类（§19.21）
         ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> Minecraft.getInstance().setScreen(new AnalyzerScreen(msg))));
+                () -> () -> ClientPacketHandlers.openAnalyzer(msg)));
         ctx.get().setPacketHandled(true);
     }
 

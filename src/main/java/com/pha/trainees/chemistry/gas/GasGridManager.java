@@ -47,6 +47,10 @@ public class GasGridManager extends SavedData {
     private final Map<ChunkPos, Long> dirtyChunks = new ConcurrentHashMap<>();
     /** 精存快照（档 B：退出时仍加载的区块；档 C：全部）——存档层，加载时优先于此恢复 */
     private final Map<ChunkPos, Map<Long, GasMixture>> fineSnapshot = new ConcurrentHashMap<>();
+    /** 待水合区块队列（粗账 → 精场）：只在服务端 tick 消费，绝不在区块加载事件里处理（防自死锁） */
+    private final java.util.Queue<ChunkPos> pendingHydrate = new java.util.concurrent.ConcurrentLinkedQueue<>();
+    /** 每 tick 水合预算（区块数） */
+    public static final int HYDRATE_BUDGET_PER_TICK = 4;
 
     // 运行时持有维度（SavedData 反序列化后需重绑）
     private transient ResourceKey<Level> dimensionKey;
@@ -263,9 +267,9 @@ public class GasGridManager extends SavedData {
         }
     }
 
-    /** 区块加载：优先精存快照（B/C 的复原路径）→ 否则粗账再水合 */
+    /** 区块加载：优先精存快照（B/C 的复原路径）→ 否则**排队**粗账水合（不在加载事件里访问世界） */
     public void onChunkLoad(ServerLevel level, ChunkPos chunkPos) {
-        // 1) 精存快照（档 B 退出时保存的加载区 / 档 C 全量）
+        // 1) 精存快照（档 B 退出时保存的加载区 / 档 C 全量）：纯内存操作，可安全内联
         Map<Long, GasMixture> snapshot = fineSnapshot.remove(chunkPos);
         if (snapshot != null && !snapshot.isEmpty()) {
             for (Map.Entry<Long, GasMixture> e : snapshot.entrySet()) {
@@ -274,15 +278,33 @@ public class GasGridManager extends SavedData {
             setDirty();
             return;
         }
-        // 2) 粗账再水合（档 A，或 B 中已卸载过的区块）
-        GasChunkSummary summary = summaries.remove(chunkPos);
-        if (summary == null || summary.isEmpty()) return;
-        int ox = chunkPos.getMinBlockX();
-        int oz = chunkPos.getMinBlockZ();
-        for (GasChunkSummary.Entry e : summary.getEntries().values()) {
-            redistribute(level, ox, oz, e);
+        // 2) 粗账水合：会读方块状态（热源扫描）→ 必须挪出区块加载事件，否则强制加载区块 → 自死锁
+        if (summaries.containsKey(chunkPos)) {
+            pendingHydrate.offer(chunkPos);
         }
-        setDirty();
+    }
+
+    /**
+     * 在**服务端 tick** 中处理排队的水合（每 tick 有限预算，避免卡顿）。
+     *
+     * <p>为什么不在 `ChunkEvent.Load` 里直接水合：水合会调用 {@code redistribute → addGas → heatOffset}，
+     * 其中热源扫描属于世界访问；在区块加载回调内触发同步区块加载会形成自死锁（历史事故）。</p>
+     */
+    public void processPendingHydration(ServerLevel level, int budget) {
+        for (int i = 0; i < budget; i++) {
+            ChunkPos cp = pendingHydrate.poll();
+            if (cp == null) return;
+            // 期间可能又被卸载：丢弃本次（粗账仍在 summaries 里，下次加载会重新排队）
+            if (!level.isLoaded(cp.getWorldPosition())) continue;
+            GasChunkSummary summary = summaries.remove(cp);
+            if (summary == null || summary.isEmpty()) continue;
+            int ox = cp.getMinBlockX();
+            int oz = cp.getMinBlockZ();
+            for (GasChunkSummary.Entry e : summary.getEntries().values()) {
+                redistribute(level, ox, oz, e);
+            }
+            setDirty();
+        }
     }
 
     /** 把单气体粗账按重心散布回 3³ 邻域（距离线性衰减），余量落重心格 */
@@ -347,6 +369,10 @@ public class GasGridManager extends SavedData {
     /**
      * 计算某格由周围热源叠加的温度抬升 δT = max( (T_源−T_环境) × exp(−d/λ) )。
      * 解析近似：只取最近/最强热源贡献（不逐格迭代导热，稳态场一次成型）。
+     *
+     * <p><b>绝对禁止</b>在这里用 {@code level.getBlockState()}：扫描会跨到相邻（可能未加载）区块，
+     * 而本方法可能在 `ChunkEvent.Load` 内部被调用——强制同步加载区块会与"当前正在完成该区块加载的线程"
+     * 形成**自死锁**（历史事故：旧存档加载卡死）。故一律走 {@link #stateNoLoad}。</p>
      */
     private static double heatOffset(Level level, BlockPos pos, double envTemp) {
         double best = 0;
@@ -355,7 +381,10 @@ public class GasGridManager extends SavedData {
             for (int dy = -r; dy <= r; dy++) {
                 for (int dz = -r; dz <= r; dz++) {
                     if (dx == 0 && dy == 0 && dz == 0) continue;
-                    Double src = HEAT_SOURCE_TEMPS.get(level.getBlockState(pos.offset(dx, dy, dz)).getBlock());
+                    net.minecraft.world.level.block.state.BlockState state =
+                            stateNoLoad(level, pos.offset(dx, dy, dz));
+                    if (state == null) continue;
+                    Double src = HEAT_SOURCE_TEMPS.get(state.getBlock());
                     if (src == null) continue;
                     double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                     double contrib = (src - envTemp) * Math.exp(-dist / HEAT_LAMBDA);
@@ -366,6 +395,20 @@ public class GasGridManager extends SavedData {
             }
         }
         return best;
+    }
+
+    /**
+     * 读取方块状态但**绝不强制加载区块**：未加载 → null（视为无热源）。
+     * 服务端用非阻塞的 {@code getChunkNow}；客户端退回 isLoaded 判断。
+     */
+    @Nullable
+    private static net.minecraft.world.level.block.state.BlockState stateNoLoad(Level level, BlockPos pos) {
+        if (level instanceof ServerLevel serverLevel) {
+            net.minecraft.world.level.chunk.LevelChunk chunk =
+                    serverLevel.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4);
+            return chunk == null ? null : chunk.getBlockState(pos);
+        }
+        return level.isLoaded(pos) ? level.getBlockState(pos) : null;
     }
 
     /**

@@ -18,7 +18,6 @@ import com.pha.trainees.chemistry.reaction.ReactionGraph;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
 import com.pha.trainees.util.game.chemistry.ChemicalEquation;
 import com.pha.trainees.util.game.chemistry.ReactionConditions;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;

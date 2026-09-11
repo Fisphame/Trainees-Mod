@@ -1,7 +1,6 @@
 package com.pha.trainees.network;
 
-import com.pha.trainees.client.gui.ReactionGraphScreen;
-import net.minecraft.client.Minecraft;
+import com.pha.trainees.client.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -42,8 +41,9 @@ public class OpenGraphPacket {
     }
 
     public static void handle(OpenGraphPacket msg, Supplier<NetworkEvent.Context> ctx) {
+        // 客户端代码集中在 client-only 处理器里：服务器端永不加载本 lambda 的目标类（§19.21）
         ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> Minecraft.getInstance().setScreen(new ReactionGraphScreen(msg.nodes, msg.edges))));
+                () -> () -> ClientPacketHandlers.openReactionGraph(msg.nodes, msg.edges)));
         ctx.get().setPacketHandled(true);
     }
 }
