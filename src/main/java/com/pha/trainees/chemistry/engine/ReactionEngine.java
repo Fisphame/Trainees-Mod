@@ -93,6 +93,9 @@ public class ReactionEngine {
      */
     private static void recordFailure(IChemicalContainer container, ReactionFailure.Type type,
                                       ReactionRule rule, String detail, String... args) {
+        // 相变等"安静规则"（§19.17.1）：门槛之外驱动力极小，会走 ε 截断 / Q≥K 分支，
+        // 照常记录会刷满分析仪诊断页与失败环形缓冲，因此直接跳过。
+        if (rule.isQuiet()) return;
         long gameTime = gameTimeOf(container);
         ReactionFailure failure = new ReactionFailure(type, rule.getId().toString(), detail, gameTime, List.of(args));
         container.recordFailure(failure);
@@ -392,6 +395,13 @@ public class ReactionEngine {
             recordFailure(container, ReactionFailure.Type.TEMPERATURE_TOO_LOW, rule,
                     String.format("温度 %.1fK < 最低 %.1fK", container.getTemperature(), rule.getMinTemperature()),
                     fmt1(container.getTemperature()), fmt1(rule.getMinTemperature()));
+            return 0.0;
+        }
+        // 温度窗口上界（§19.17.1）：相变的"凝固/冷凝"侧门槛，也适用于热分解类规则
+        if (container.getTemperature() > rule.getMaxTemperature()) {
+            recordFailure(container, ReactionFailure.Type.TEMPERATURE_TOO_HIGH, rule,
+                    String.format("温度 %.1fK > 上限 %.1fK", container.getTemperature(), rule.getMaxTemperature()),
+                    fmt1(container.getTemperature()), fmt1(rule.getMaxTemperature()));
             return 0.0;
         }
         if (!container.containsAll(rule.getReactants())) {

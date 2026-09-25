@@ -14,7 +14,7 @@
         "announce_to_chat": true,
         "hidden": true
     },
-    "parent": "trainees:kun_anti",
+    "parent": "trainees:entity/kun_anti",
     "criteria": {
         "killed_kun_anti_boss": {
             "trigger": "minecraft:player_killed_entity",

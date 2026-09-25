@@ -15,6 +15,7 @@ import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.engine.ReactionFailure;
 import com.pha.trainees.chemistry.gas.GasGridManager;
 import com.pha.trainees.chemistry.gas.GasMixture;
+import com.pha.trainees.chemistry.heat.IHeatSource;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.reaction.ReactionEdge;
 import com.pha.trainees.chemistry.reaction.ReactionGraph;
@@ -70,6 +71,11 @@ public class DebugCommand {
                 .then(Commands.literal("power")
                         .then(Commands.argument("onoff", BoolArgumentType.bool())
                                 .executes(DebugCommand::setPower)
+                        )
+                )
+                .then(Commands.literal("heat")
+                        .then(Commands.argument("kelvin", DoubleArgumentType.doubleArg(1.0, 3000.0))
+                                .executes(DebugCommand::setHeatSource)
                         )
                 )
                 .then(Commands.literal("last")
@@ -169,6 +175,35 @@ public class DebugCommand {
             context.getSource().sendFailure(Component.literal("§c添加失败，请检查烧杯状态"));
             return 0;
         }
+    }
+
+    /**
+     * /chemtester heat &lt;K&gt;：把准星对准的**可设定热源**（如创造热源，§19.24）设为目标温度。
+     * 用它可以精确复现任意温度区间（含 0 ℃ 以下的负摄氏度），验证温度依赖的反应。
+     */
+    private static int setHeatSource(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        Player player = context.getSource().getPlayerOrException();
+        double kelvin = DoubleArgumentType.getDouble(context, "kelvin");
+
+        BlockHitResult hitResult = getTargetBlock(player);
+        if (hitResult == null) {
+            context.getSource().sendFailure(Component.literal("§c请将准星对准一个热源方块"));
+            return 0;
+        }
+        BlockEntity entity = player.level().getBlockEntity(hitResult.getBlockPos());
+        if (!(entity instanceof IHeatSource source)) {
+            context.getSource().sendFailure(Component.literal("§c目标方块不是热源方块"));
+            return 0;
+        }
+        if (!source.isSettable() || !source.setSourceTemperature(kelvin)) {
+            context.getSource().sendFailure(Component.literal("§c该热源不支持设定温度（燃料型热源的温度由燃料决定）"));
+            return 0;
+        }
+
+        double actual = source.getSourceTemperature();
+        context.getSource().sendSuccess(() -> Component.literal(
+                "§a热源目标温度：§f" + DF.format(actual) + " K §7(" + DF.format(actual - 273.15) + " ℃)"), true);
+        return 1;
     }
 
     private static int clearBeaker(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

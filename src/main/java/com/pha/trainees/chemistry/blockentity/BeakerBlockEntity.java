@@ -1,11 +1,13 @@
 package com.pha.trainees.chemistry.blockentity;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.chemistry.block.BeakerBlock;
 import com.pha.trainees.chemistry.container.IChemicalContainer;
 import com.pha.trainees.chemistry.engine.ExecutedRule;
 import com.pha.trainees.chemistry.engine.ReactionEngine;
 import com.pha.trainees.chemistry.engine.ReactionFailure;
 import com.pha.trainees.chemistry.gas.GasGridManager;
+import com.pha.trainees.chemistry.heat.IHeatSource;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
@@ -49,7 +51,6 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
 
     private static final double DEFAULT_TEMPERATURE = ChemConfig.DEFAULT_TEMPERATURE.get();
     private static final double DEFAULT_VOLUME = ChemConfig.DEFAULT_VOLUME.get();
-    private static final double MAX_SAFE_TEMPERATURE = ChemConfig.MAX_SAFE_TEMPERATURE.get();
 
     private static final Map<Block, Double> HEAT_SOURCE_TEMPS = new HashMap<>();
     static {
@@ -205,7 +206,7 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         double deltaT = joules / totalHeatCapacity;
         double newTemp = temperature + deltaT;
         double oldTemp = temperature;
-        this.temperature = Math.min(Math.max(0, newTemp), MAX_SAFE_TEMPERATURE);
+        this.temperature = Math.min(Math.max(0, newTemp), getMaxSafeTemperature());
         // 温度变化时重置平衡标记：K 随温度按范特霍夫变化，需重新评估平衡状态，
         // 否则加热/冷却后已达平衡的反应会被永久跳过
         if (Math.abs(this.temperature - oldTemp) > 1e-9) {
@@ -239,7 +240,8 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
             double moles = entry.getValue();
             sum += moles * ion.getSpecificHeat();
         }
-        this.totalHeatCapacity = sum + ChemConfig.BEAKER_BASE_HEAT_CAPACITY.get();
+        this.totalHeatCapacity = sum
+                + ChemConfig.BEAKER_BASE_HEAT_CAPACITY.get() * getContainerMaterial().capacityScale();
         if (this.totalHeatCapacity < ChemConfig.MIN_HEAT_CAPACITY.get()) {
             this.totalHeatCapacity = ChemConfig.MIN_HEAT_CAPACITY.get();
         }
@@ -344,7 +346,7 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         }
 
         // 临界温度警告节流：每 100 tick（5秒）最多输出一次，避免持续刷屏
-        if (beaker.temperature >= ChemConfig.MAX_SAFE_TEMPERATURE.get() * ChemConfig.CRITICAL_TEMPERATURE_RATIO.get()
+        if (beaker.temperature >= beaker.getMaxSafeTemperature() * ChemConfig.CRITICAL_TEMPERATURE_RATIO.get()
                 && level.getGameTime() % 100 == 0) {
             Main.LOGGER.warn("[Beaker] Beaker at {} is reaching critical temperature! {}K",
                     pos, String.format("%.1f", beaker.temperature));
@@ -356,12 +358,44 @@ public class BeakerBlockEntity extends BlockEntity implements IChemicalContainer
         BlockState belowState = level.getBlockState(below);
         Block belowBlock = belowState.getBlock();
 
-        Double heatSourceTemp = HEAT_SOURCE_TEMPS.get(belowBlock);
-        if (heatSourceTemp == null || heatSourceTemp <= temperature) return;
+        Double heatSourceTemp;
+        boolean setpointSource = false;
 
-        double deltaT = ChemConfig.BEAKER_HEAT_TRANSFER_COEFFICIENT.get() * (heatSourceTemp - temperature) * 0.05;
+        // ① 设定点型热源（恒温浴/创造热源等，§19.24）：语义是"目标温度"而非"上限"，
+        //    因此**双向**生效——热源比容器冷时会从容器吸热（冰浴/干冰/液氮同样可复现）
+        BlockEntity belowEntity = level.getBlockEntity(below);
+        if (belowEntity instanceof IHeatSource source && source.isHeatSourceActive()) {
+            heatSourceTemp = source.getSourceTemperature();
+            setpointSource = true;
+        } else {
+            // ② 燃料型热源（火/岩浆/营火等）：只能单向烤热，温度由燃料天然决定
+            heatSourceTemp = HEAT_SOURCE_TEMPS.get(belowBlock);
+        }
+        if (heatSourceTemp == null) return;
+
+        double gap = heatSourceTemp - temperature;
+        if (setpointSource ? Math.abs(gap) < 1e-3 : gap <= 0) return;
+
+        double deltaT = ChemConfig.BEAKER_HEAT_TRANSFER_COEFFICIENT.get()
+                * getContainerMaterial().transferScale() * gap * 0.05;
         double heatEnergy = deltaT * totalHeatCapacity;
         addThermalEnergy(heatEnergy);
+    }
+
+    /**
+     * 本容器的材料档位（§6.3 / ③-3）：坩埚与烧杯共用 {@link BeakerBlockEntity}，
+     * 材料由方块类型决定（{@code BeakerBlock.getContainerMaterial()}），非化学容器方块回落到玻璃档。
+     */
+    public com.pha.trainees.chemistry.container.ContainerMaterial getContainerMaterial() {
+        Block block = getBlockState().getBlock();
+        return block instanceof BeakerBlock beakerBlock
+                ? beakerBlock.getContainerMaterial()
+                : com.pha.trainees.chemistry.container.ContainerMaterial.GLASS;
+    }
+
+    /** 本容器的安全温度上限：由材料决定（玻璃 773 K → 陶瓷 2273 K），而非全局配置。 */
+    public double getMaxSafeTemperature() {
+        return getContainerMaterial().maxSafeTemperatureK();
     }
 
     /**

@@ -32,6 +32,7 @@ public class ReactionRule {
     private final Supplier<Double> preExponentialFactor;// 指前因子 A
     private final Supplier<Double> gamePriorityBias;    // 游戏性优先级偏置（默认1.0）
     private final Supplier<Double> minTemperature;      // 最低触发温度 (K)
+    private final Supplier<Double> maxTemperature;      // 最高可运行温度 (K，默认 +∞)
     // 电解所需电功（kJ/mol，蓝本 §17）：>0 表示该反应为电解反应，通电时 ΔG_eff = ΔG - W
     private final Supplier<Double> electricalWorkPerMol;
     // 动态优先级函数（蓝本 §5.2）：以容器状态为自变量的优先级偏置，为空则用 gamePriorityBias
@@ -39,6 +40,8 @@ public class ReactionRule {
     private final boolean isSelfLoop;                   // 是否为自环（分解反应）
     // 是否显式覆盖平衡常数（手设 K° × 范特霍夫）。默认 false → 物理公式 K = exp(-ΔG(T)/(R·T))。
     private final boolean equilibriumOverridden;
+    // 相变等"安静规则"（§19.17.1）：不写失败诊断，避免门槛附近刷满分析仪与失败缓冲。
+    private final boolean quiet;
 
     private ReactionRule(Builder builder) {
         this.id = builder.id;
@@ -53,10 +56,12 @@ public class ReactionRule {
         this.preExponentialFactor = builder.preExponentialFactor;
         this.gamePriorityBias = builder.gamePriorityBias;
         this.minTemperature = builder.minTemperature;
+        this.maxTemperature = builder.maxTemperature;
         this.electricalWorkPerMol = builder.electricalWorkPerMol;
         this.dynamicPriorityBias = builder.dynamicPriorityBias;
         this.isSelfLoop = builder.isSelfLoop;
         this.equilibriumOverridden = builder.equilibriumOverridden;
+        this.quiet = builder.quiet;
     }
 
     // ==================== Getters ====================
@@ -71,7 +76,11 @@ public class ReactionRule {
     public double getPreExponentialFactor() { return preExponentialFactor.get(); }
     public double getGamePriorityBias() { return gamePriorityBias.get(); }
     public double getMinTemperature() { return minTemperature.get(); }
+    public double getMaxTemperature() { return maxTemperature.get(); }
     public boolean isSelfLoop() { return isSelfLoop; }
+
+    /** 相变等"安静规则"：不写失败诊断（§19.17.1）。 */
+    public boolean isQuiet() { return quiet; }
 
     /** 是否显式覆盖了平衡常数（可逆玩法；JEI 等只读展示需要区分算法，§19.16） */
     public boolean isEquilibriumOverridden() { return equilibriumOverridden; }
@@ -146,7 +155,7 @@ public class ReactionRule {
      */
     public double calculatePriority(IChemicalContainer container) {
         double temp = container.getTemperature();
-        if (temp < minTemperature.get()) return 0;
+        if (temp < minTemperature.get() || temp > maxTemperature.get()) return 0;
         // 电解反应未通电时不可运行
         if (electricalWorkPerMol.get() > 0 && !container.isElectricallyPowered()) return 0;
         // 基础评分：热力学驱动力（有效自由能）/ 动力学壁垒
@@ -176,6 +185,8 @@ public class ReactionRule {
         private Supplier<Double> preExponentialFactor = ChemConfig.DEFAULT_PRE_EXPONENTIAL_FACTOR;
         private Supplier<Double> gamePriorityBias = () -> 1.0;
         private Supplier<Double> minTemperature = ChemConfig.DEFAULT_MIN_TEMPERATURE;
+        private Supplier<Double> maxTemperature = () -> Double.POSITIVE_INFINITY;
+        private boolean quiet = false;
         private Supplier<Double> electricalWorkPerMol = () -> 0.0;
         private Function<IChemicalContainer, Double> dynamicPriorityBias = null;
         private boolean isSelfLoop = false;
@@ -217,6 +228,15 @@ public class ReactionRule {
         public Builder preExponentialFactor(double val) { this.preExponentialFactor = () -> val; return this; }
         public Builder gamePriorityBias(double val) { this.gamePriorityBias = () -> val; return this; }
         public Builder minTemperature(double val) { this.minTemperature = () -> val; return this; }
+
+        /**
+         * 设置可运行温度上限（§19.17.1 温度窗口）：高于该值时优先级为 0 且执行被拦截。
+         * 相变用它做对偶门槛——熔化要求 T ≥ T_m，凝固要求 T ≤ T_m − 迟滞，死区杜绝熔点附近抖动。
+         */
+        public Builder maxTemperature(double val) { this.maxTemperature = () -> val; return this; }
+
+        /** 相变等"安静规则"：不写失败诊断（§19.17.1）。 */
+        public Builder quiet() { this.quiet = true; return this; }
 
         /**
          * 设置动态优先级函数（蓝本 §5.2 浓度依赖反应）。

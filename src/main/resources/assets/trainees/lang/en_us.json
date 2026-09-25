@@ -457,6 +457,7 @@
   "trainees.voltage.5": "Overload",
 
   "gui.trainees.analyzer.failure.temperature_too_low": "Temperature too low",
+  "gui.trainees.analyzer.failure.temperature_too_high": "Temperature too high",
   "gui.trainees.analyzer.failure.precondition_missing": "Missing precondition",
   "gui.trainees.analyzer.failure.reactant_missing": "Missing reactant",
   "gui.trainees.analyzer.failure.not_powered": "Not powered",
@@ -468,6 +469,7 @@
   "gui.trainees.analyzer.failure.insufficient_energy": "Insufficient energy",
 
   "gui.trainees.analyzer.failure_detail.temperature_too_low": "§8    %s K < minimum %s K",
+  "gui.trainees.analyzer.failure_detail.temperature_too_high": "§8    %s K > limit %s K",
   "gui.trainees.analyzer.failure_detail.precondition_missing": "§8    Preconditions unmet (catalyst/medium)",
   "gui.trainees.analyzer.failure_detail.reactant_missing": "§8    Missing reactants (%s)",
   "gui.trainees.analyzer.failure_detail.not_powered": "§8    Electrolysis reaction has no power",
@@ -480,6 +482,7 @@
 
   "gui.trainees.analyzer.predicted.not_powered": "§dNo power",
   "gui.trainees.analyzer.predicted.temperature_too_low": "§bToo cold",
+  "gui.trainees.analyzer.predicted.temperature_too_high": "§6Too hot",
   "gui.trainees.analyzer.predicted.missing_precondition": "§ePrecondition",
   "gui.trainees.analyzer.predicted.missing_reactant": "§eReactant",
   "gui.trainees.analyzer.predicted.already_balanced": "§7Balanced",
@@ -487,6 +490,7 @@
 
   "gui.trainees.analyzer.predicted_detail.not_powered": "§8    Electrolysis reaction has no power",
   "gui.trainees.analyzer.predicted_detail.temperature_too_low": "§8    %s K < minimum %s K",
+  "gui.trainees.analyzer.predicted_detail.temperature_too_high": "§8    %s K > limit %s K",
   "gui.trainees.analyzer.predicted_detail.missing_precondition": "§8    Missing preconditions (catalyst/medium)",
   "gui.trainees.analyzer.predicted_detail.missing_reactant": "§8    Missing reactant: %s",
   "gui.trainees.analyzer.predicted_detail.already_balanced.marked": "§8    Marked as balanced by the engine",
@@ -566,5 +570,50 @@
   "jei.trainees.reaction.cond.exothermic": "exothermic, self-heating",
   "jei.trainees.reaction.cond.endothermic": "endothermic, needs sustained heating",
   "jei.trainees.reaction.cond.ea": "§7Ea = §f%s kJ/mol",
-  "jei.trainees.reaction.cond.k": "§7K(298 K) ≈ §f%s"
+  "jei.trainees.reaction.cond.k": "§7K(298 K) ≈ §f%s",
+
+  "block.trainees.creative_heat_source": "Creative Heat Source",
+  "block.trainees.metal_crucible": "Metal Crucible",
+  "block.trainees.quartz_crucible": "Quartz Crucible",
+  "block.trainees.ceramic_crucible": "Ceramic Crucible",
+  "block.trainees.thermostatic_bath": "Thermostatic Bath",
+  "message.trainees.bath.set": "Setpoint: %s K (%s °C)",
+  "message.trainees.bath.medium": "Medium: %s · setpoint %s K",
+  "message.trainees.bath.medium.ice_salt": "Ice-salt bath",
+  "message.trainees.bath.medium.water": "Water bath",
+  "message.trainees.bath.medium.oil": "Oil bath",
+  "message.trainees.bath.medium.sand": "Sand bath",
+  "message.trainees.heat_source.set": "Heat source: %s K (%s °C) §7· right-click up · sneak-right-click down",
+
+  "block.trainees.packer": "Packer",
+  "item.trainees.bleach_good": "Chlorine Bleach",
+  "item.trainees.bleach_premium": "Premium Chlorine Bleach",
+  "item.trainees.defective_chlorine": "Chlorine Bleach (free chlorine over limit)",
+  "item.trainees.defective_alkali": "Chlorine Bleach (excess alkali)",
+  "item.trainees.defective_acid": "Chlorine Bleach (excess acid)",
+  "item.trainees.defective_chlorate": "Chlorine Bleach (chlorate over limit)",
+  "message.trainees.packer.no_container": "§cPacker needs a container above it (beaker/crucible/cell)",
+  "message.trainees.packer.rejected": "§eRejected: auto mode does not fill (sneak-right-click to force)",
+  "message.trainees.packer.off_spec_no_fill": "§eOff spec with no hazardous component: not filled (defectives are hazardous batches only)",
+  "message.trainees.packer.output_taken": "§aTook the packer output",
+  "message.trainees.packer.output_empty": "§7Output slot is empty (the machine packs automatically when powered and on-spec)",
+  "message.trainees.packer.no_power": "§cNot enough FE to pack",
+  "message.trainees.packer.output_full": "§eOutput slot full (paused)",
+  "message.trainees.packer.missing_item": "§cItem declared by the spec is not registered: %s",
+  "message.trainees.packer.packed": "§aPacked: %s",
+  "message.trainees.packer.defective": "§cForced fill: %s §7(defective, handle with care)",
+  "gui.trainees.packer.not_enough": "§7Not enough solution for one bottle",
+  "gui.trainees.packer.defect.chlorine": "§cFree chlorine over limit (toxic)",
+  "gui.trainees.packer.defect.alkali": "§cExcess alkali (corrosive)",
+  "gui.trainees.packer.defect.acid": "§cExcess acid (gassing)",
+  "gui.trainees.packer.defect.off_spec": "§7Active ingredient off spec",
+
+  "message.trainees.defective.chlorine": "§cA choking smell bursts out — free chlorine!",
+  "message.trainees.defective.alkali": "§cIt burns your skin — excess alkali!",
+  "message.trainees.defective.acid": "§cThe bottle fizzes and falls apart — excess acid!",
+  "message.trainees.defective.chlorate": "§cAn odd smell, your head swims — chlorate poisoning!",
+
+  "jei.trainees.bleach.info": "Chlorine Bleach (simplified GB reference)\n§7Available chlorine = ClO⁻ counted as Cl₂ equivalent (1 mol ClO⁻ ≡ 1 mol Cl₂)\n§7Pass: 5.0-8.0% (w/w) available chlorine · Premium: 6.0-7.5%\n§7Gates: free chlorine banned / free acid ≤0.05% / free alkali ≤1% / chlorate ≤1%\n§7Process: bubble Cl₂ into COLD alkali for hypochlorite; too hot → chlorate (penalty)",
+  "jei.trainees.bleach.premium_info": "Premium chlorine bleach: available chlorine within a narrower 6.0-7.5% window\n§7Requires tighter control of the alkali ratio and the chlorine endpoint (iterate with the analyzer).",
+  "jei.trainees.defective.info": "Defective bottle (forced fill — hazardous batches only)\n§7Free chlorine → poisoned; excess alkali → chemical burn; excess acid → self-destructs; chlorate over limit → poisoned\n§7Off-spec batches are simply never filled"
 }

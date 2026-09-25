@@ -51,12 +51,16 @@
 
 | 文件 | 方块 | 备注 |
 |---|---|---|
-| `blockstates/electrolysis_cell.json`、`models/block/electrolysis_cell.json`、`textures/block/electrolysis_cell*.png` | 电解槽 | 尚未制作，物品暂无方块模型（需 blockstates + 模型 + 贴图，或用父模型替代） |
+| `blockstates/electrolysis_cell.json`、`models/block/electrolysis_cell.json`、`textures/block/electrolysis_cell*.png` | 电解槽 | 电解槽 blockstate/模型已补，但模型用的是 **`minecraft:block/iron_block` 占位贴图**（游戏里长得像铁块），自制贴图待补 |
+| `textures/block/creative_heat_source.png` | 创造热源（§19.24） | blockstate/模型已补，模型用 **`minecraft:block/redstone_lamp_on` 占位贴图**，自制贴图待补 |
+| `textures/block/metal_crucible.png` / `quartz_crucible.png` / `ceramic_crucible.png` | 金属/石英/陶瓷坩埚（③-3） | blockstate/模型已补，分别用 `iron_block` / `quartz_block_side` / `bricks` 占位 |
+| `textures/block/thermostatic_bath.png` | 恒温浴（③-4） | blockstate/模型已补，用 `light_blue_concrete` 占位 |
 
 ## 6. 其他已知缺失/待定
 
 - `block/black_hole.png` 等黑洞相关贴图已随功能删除（P0-10），无需补。
 - `purification_station*` / `reacting_furnace*` 资源已随功能删除（P2-7），无需补。
+- 创造热源（§19.24）暂无物品 tooltip（未接 `IHoverText`）：操作提示目前只在右键提示条里，后续可补 tooltip 语言键。
 
 ---
 *维护：新增/补齐资源后请从此清单移除对应行。*

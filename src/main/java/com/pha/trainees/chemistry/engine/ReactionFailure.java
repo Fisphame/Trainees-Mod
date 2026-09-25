@@ -27,6 +27,8 @@ public record ReactionFailure(Type type, String ruleId, String detail, long game
     public enum Type {
         /** 温度低于规则最低触发温度 */
         TEMPERATURE_TOO_LOW,
+        /** 温度高于规则可运行上限（相变温度窗口、热分解窗口） */
+        TEMPERATURE_TOO_HIGH,
         /** 前置条件缺失（催化剂/介质等，检测存在但不消耗） */
         PRECONDITION_MISSING,
         /** 反应物种类不齐（存在性检查失败） */

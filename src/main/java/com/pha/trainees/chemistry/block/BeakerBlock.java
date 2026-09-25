@@ -48,8 +48,21 @@ public class BeakerBlock extends BaseEntityBlock {
             0.875, 0.75, 0.875);
     private static final DecimalFormat DF = new DecimalFormat("#0.000");
 
+    /** 容器材料档位（§6.3 / ③-3）：决定耐温上限、热容与换热强度；玻璃烧杯即 GLASS 档。 */
+    private final com.pha.trainees.chemistry.container.ContainerMaterial material;
+
     public BeakerBlock(Properties properties) {
+        this(properties, com.pha.trainees.chemistry.container.ContainerMaterial.GLASS);
+    }
+
+    public BeakerBlock(Properties properties, com.pha.trainees.chemistry.container.ContainerMaterial material) {
         super(properties);
+        this.material = material;
+    }
+
+    /** 该方块对应的容器材料档位（坩埚与烧杯共用同一套引擎，只有材料不同）。 */
+    public com.pha.trainees.chemistry.container.ContainerMaterial getContainerMaterial() {
+        return material;
     }
 
     @Override

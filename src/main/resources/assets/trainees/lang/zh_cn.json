@@ -450,6 +450,7 @@
   "trainees.voltage.5": "过载",
 
   "gui.trainees.analyzer.failure.temperature_too_low": "温度不足",
+  "gui.trainees.analyzer.failure.temperature_too_high": "温度过高",
   "gui.trainees.analyzer.failure.precondition_missing": "缺前置条件",
   "gui.trainees.analyzer.failure.reactant_missing": "缺反应物",
   "gui.trainees.analyzer.failure.not_powered": "未通电",
@@ -461,6 +462,7 @@
   "gui.trainees.analyzer.failure.insufficient_energy": "电能不足",
 
   "gui.trainees.analyzer.failure_detail.temperature_too_low": "§8    温度 %s K < 最低 %s K",
+  "gui.trainees.analyzer.failure_detail.temperature_too_high": "§8    温度 %s K > 上限 %s K",
   "gui.trainees.analyzer.failure_detail.precondition_missing": "§8    前置条件未满足（催化剂/介质等）",
   "gui.trainees.analyzer.failure_detail.reactant_missing": "§8    反应物种类不齐（缺少 %s）",
   "gui.trainees.analyzer.failure_detail.not_powered": "§8    电解/电功反应未通电",
@@ -473,6 +475,7 @@
 
   "gui.trainees.analyzer.predicted.not_powered": "§d未通电",
   "gui.trainees.analyzer.predicted.temperature_too_low": "§b温度不足",
+  "gui.trainees.analyzer.predicted.temperature_too_high": "§6温度过高",
   "gui.trainees.analyzer.predicted.missing_precondition": "§e缺前置",
   "gui.trainees.analyzer.predicted.missing_reactant": "§e缺反应物",
   "gui.trainees.analyzer.predicted.already_balanced": "§7已达平衡",
@@ -480,6 +483,7 @@
 
   "gui.trainees.analyzer.predicted_detail.not_powered": "§8    电解/电功反应未通电",
   "gui.trainees.analyzer.predicted_detail.temperature_too_low": "§8    温度 %s K < 最低 %s K",
+  "gui.trainees.analyzer.predicted_detail.temperature_too_high": "§8    温度 %s K > 上限 %s K",
   "gui.trainees.analyzer.predicted_detail.missing_precondition": "§8    缺前置条件（催化剂/介质等）",
   "gui.trainees.analyzer.predicted_detail.missing_reactant": "§8    缺反应物: %s",
   "gui.trainees.analyzer.predicted_detail.already_balanced.marked": "§8    已被引擎标记为平衡",
@@ -572,5 +576,50 @@
   "jei.trainees.reaction.cond.exothermic": "放热，会自热",
   "jei.trainees.reaction.cond.endothermic": "吸热，需持续供热",
   "jei.trainees.reaction.cond.ea": "§7Ea = §f%s kJ/mol",
-  "jei.trainees.reaction.cond.k": "§7K(298 K) ≈ §f%s"
+  "jei.trainees.reaction.cond.k": "§7K(298 K) ≈ §f%s",
+
+  "block.trainees.creative_heat_source": "创造热源",
+  "block.trainees.metal_crucible": "金属坩埚",
+  "block.trainees.quartz_crucible": "石英坩埚",
+  "block.trainees.ceramic_crucible": "陶瓷坩埚",
+  "block.trainees.thermostatic_bath": "恒温浴",
+  "message.trainees.bath.set": "设定点：%s K（%s ℃）",
+  "message.trainees.bath.medium": "介质：%s · 设定点 %s K",
+  "message.trainees.bath.medium.ice_salt": "冰盐浴",
+  "message.trainees.bath.medium.water": "水浴",
+  "message.trainees.bath.medium.oil": "油浴",
+  "message.trainees.bath.medium.sand": "沙浴",
+  "message.trainees.heat_source.set": "热源设定：%s K（%s ℃） §7· 右键升档 · 潜行右键降档",
+
+  "block.trainees.packer": "打包机",
+  "item.trainees.bleach_good": "含氯消毒液",
+  "item.trainees.bleach_premium": "优质含氯消毒液",
+  "item.trainees.defective_chlorine": "含氯消毒液（游离氯超标）",
+  "item.trainees.defective_alkali": "含氯消毒液（碱超标）",
+  "item.trainees.defective_acid": "含氯消毒液（酸超标）",
+  "item.trainees.defective_chlorate": "含氯消毒液（氯酸盐超标）",
+  "message.trainees.packer.no_container": "§c打包机上方需要放一个容器（烧杯/坩埚/电解槽）",
+  "message.trainees.packer.rejected": "§e不合格：自动模式不灌装（潜行右键可强制灌装）",
+  "message.trainees.packer.off_spec_no_fill": "§e成分不符且无危险成分：不灌装（次品只产危险批次）",
+  "message.trainees.packer.output_taken": "§a已取走输出槽产物",
+  "message.trainees.packer.output_empty": "§7输出槽是空的（机器会在通电且溶液合格时自动打包）",
+  "message.trainees.packer.no_power": "§c电能不足，无法打包",
+  "message.trainees.packer.output_full": "§e输出槽已满（停产中）",
+  "message.trainees.packer.missing_item": "§c规格声明的物品尚未注册：%s",
+  "message.trainees.packer.packed": "§a已灌装：%s",
+  "message.trainees.packer.defective": "§c强制灌装：%s §7（次品，使用时当心）",
+  "gui.trainees.packer.not_enough": "§7溶液不足一瓶",
+  "gui.trainees.packer.defect.chlorine": "§c游离氯超标（放毒）",
+  "gui.trainees.packer.defect.alkali": "§c碱超标（腐蚀）",
+  "gui.trainees.packer.defect.acid": "§c酸超标（放气）",
+  "gui.trainees.packer.defect.off_spec": "§7有效成分不符",
+
+  "message.trainees.defective.chlorine": "§c刺鼻气味涌出——游离氯放毒了！",
+  "message.trainees.defective.alkali": "§c液体灼烧皮肤——碱超标！",
+  "message.trainees.defective.acid": "§c瓶子边冒泡边自毁——酸超标！",
+  "message.trainees.defective.chlorate": "§c一股怪味，头开始发晕——氯酸盐中毒！",
+
+  "jei.trainees.bleach.info": "含氯消毒液（参考国标指标·简化）\n§7有效氯 = 把 ClO⁻ 折算成 Cl₂ 当量（1 mol ClO⁻ ≡ 1 mol Cl₂）\n§7合格：有效氯 5.0~8.0%（w/w）· 优质：6.0~7.5%\n§7门禁：游离氯禁用 / 游离酸 ≤0.05% / 游离碱 ≤1% / 氯酸盐 ≤1%\n§7工艺：氯气通入冷碱得次氯酸盐；温度高了会歧化成氯酸盐（扣分项）",
+  "jei.trainees.bleach.premium_info": "优质含氯消毒液：有效氯落在更窄的 6.0~7.5% 区间\n§7靠更精确地控制碱量与通氯终点、并用分析仪迭代，才能稳定命中。",
+  "jei.trainees.defective.info": "次品（打包机「强制灌装」产出，只会是危险批次）\n§7游离氯超标 → 中毒；碱超标 → 化学烧伤；酸超标 → 自毁放气；氯酸盐超标 → 中毒\n§7而浓度不符不会出次品——直接不灌装"
 }

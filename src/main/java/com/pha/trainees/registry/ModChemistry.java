@@ -3,16 +3,28 @@ package com.pha.trainees.registry;
 import com.pha.trainees.Main;
 import com.pha.trainees.block.CheJibpBlock;
 import com.pha.trainees.chemistry.block.BeakerBlock;
+import com.pha.trainees.chemistry.block.CreativeHeatSourceBlock;
 import com.pha.trainees.chemistry.block.ElectrolysisCellBlock;
+import com.pha.trainees.chemistry.block.PackerBlock;
+import com.pha.trainees.chemistry.block.ThermostaticBathBlock;
 import com.pha.trainees.chemistry.blockentity.BeakerBlockEntity;
+import com.pha.trainees.chemistry.blockentity.CreativeHeatSourceBlockEntity;
 import com.pha.trainees.chemistry.blockentity.ElectrolysisCellBlockEntity;
+import com.pha.trainees.chemistry.blockentity.PackerBlockEntity;
+import com.pha.trainees.chemistry.blockentity.ThermostaticBathBlockEntity;
 //import com.pha.trainees.chemistry.fluid.HydrochloricAcidFluid;
+import com.pha.trainees.chemistry.container.ContainerMaterial;
 import com.pha.trainees.chemistry.item.AnalyzerItemCreative;
+import com.pha.trainees.chemistry.item.DefectiveProductItem;
+import com.pha.trainees.chemistry.product.PackOutcome;
 import com.pha.trainees.chemistry.item.AnalyzerItemNormal;
 import com.pha.trainees.chemistry.item.SubstanceItem;
 import com.pha.trainees.chemistry.particle.IonTags;
 import com.pha.trainees.chemistry.particle.IonType;
 import com.pha.trainees.chemistry.particle.Phase;
+import com.pha.trainees.chemistry.phase.PhaseChangeData;
+import com.pha.trainees.chemistry.phase.PhaseChangeTable;
+import com.pha.trainees.chemistry.phase.PhaseTransition;
 import com.pha.trainees.chemistry.reaction.ReactionEdge;
 import com.pha.trainees.chemistry.reaction.ReactionGraph;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
@@ -144,6 +156,69 @@ public class ModChemistry {
                         .requiresCorrectToolForDrops()
                         .sound(SoundType.METAL)
                 ));
+
+        // 创造热源（§19.24）：设定点型热源，目标温度可任意指定（含 0 ℃ 以下），用于测试温度依赖的化学
+        public static final RegistryObject<CreativeHeatSourceBlock> CREATIVE_HEAT_SOURCE = BLOCKS.register(
+                "creative_heat_source",
+                () -> new CreativeHeatSourceBlock(BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.COLOR_RED)
+                        .strength(2.0f, 6.0f)
+                        .requiresCorrectToolForDrops()
+                        .sound(SoundType.METAL)
+                ));
+
+        // ====== 材料分级坩埚（§6.3 / ③-3）：与烧杯共用引擎，只有材料不同 ======
+        // 耐温上限：金属 1673 K < 石英 1873 K < 陶瓷 2273 K；玻璃烧杯仅 773 K。
+        // 这构成科技树第一道硬墙：要炼钢（1600 K+）就必须先有坩埚。
+        public static final RegistryObject<BeakerBlock> METAL_CRUCIBLE = BLOCKS.register(
+                "metal_crucible",
+                () -> new BeakerBlock(BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.METAL)
+                        .strength(3.0f, 6.0f)
+                        .noOcclusion()
+                        .isViewBlocking((state, level, pos) -> false)
+                        .isSuffocating((state, level, pos) -> false)
+                        .sound(SoundType.METAL), ContainerMaterial.METAL));
+
+        public static final RegistryObject<BeakerBlock> QUARTZ_CRUCIBLE = BLOCKS.register(
+                "quartz_crucible",
+                () -> new BeakerBlock(BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.QUARTZ)
+                        .strength(2.5f, 6.0f)
+                        .noOcclusion()
+                        .isViewBlocking((state, level, pos) -> false)
+                        .isSuffocating((state, level, pos) -> false)
+                        .sound(SoundType.GLASS), ContainerMaterial.QUARTZ));
+
+        public static final RegistryObject<BeakerBlock> CERAMIC_CRUCIBLE = BLOCKS.register(
+                "ceramic_crucible",
+                () -> new BeakerBlock(BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.TERRACOTTA_WHITE)
+                        .strength(2.5f, 6.0f)
+                        .noOcclusion()
+                        .isViewBlocking((state, level, pos) -> false)
+                        .isSuffocating((state, level, pos) -> false)
+                        .sound(SoundType.STONE), ContainerMaterial.CERAMIC));
+
+        // 恒温浴（§19.24 ③-4）：设定点型热源，介质决定可达区间（水浴 ≤100 ℃ / 油浴 ≤250 ℃ / 沙浴 ≤600 ℃ / 冰盐浴）
+        public static final RegistryObject<ThermostaticBathBlock> THERMOSTATIC_BATH = BLOCKS.register(
+                "thermostatic_bath",
+                () -> new ThermostaticBathBlock(BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.COLOR_LIGHT_BLUE)
+                        .strength(2.0f, 6.0f)
+                        .requiresCorrectToolForDrops()
+                        .sound(SoundType.METAL)
+                ));
+
+        // 打包机（§19.18 / Step ④）：读取正上方容器，按规格质检后灌装；无方块实体、无 GUI（V1）
+        public static final RegistryObject<PackerBlock> PACKER = BLOCKS.register(
+                "packer",
+                () -> new PackerBlock(BlockBehaviour.Properties.of()
+                        .mapColor(MapColor.COLOR_GRAY)
+                        .strength(2.5f, 6.0f)
+                        .requiresCorrectToolForDrops()
+                        .sound(SoundType.METAL)
+                ));
     }
 
     public static class ModChemistryBlockItems {
@@ -188,6 +263,28 @@ public class ModChemistry {
                         new Item.Properties()
                 ));
 
+        // 创造热源（§19.24）
+        public static final RegistryObject<Item> CREATIVE_HEAT_SOURCE = ITEMS.register("creative_heat_source",
+                () -> new BlockItem(ModChemistryBlocks.CREATIVE_HEAT_SOURCE.get(),
+                        new Item.Properties()
+                ));
+
+        // 材料分级坩埚（§6.3 / ③-3）
+        public static final RegistryObject<Item> METAL_CRUCIBLE = ITEMS.register("metal_crucible",
+                () -> new BlockItem(ModChemistryBlocks.METAL_CRUCIBLE.get(), new Item.Properties()));
+        public static final RegistryObject<Item> QUARTZ_CRUCIBLE = ITEMS.register("quartz_crucible",
+                () -> new BlockItem(ModChemistryBlocks.QUARTZ_CRUCIBLE.get(), new Item.Properties()));
+        public static final RegistryObject<Item> CERAMIC_CRUCIBLE = ITEMS.register("ceramic_crucible",
+                () -> new BlockItem(ModChemistryBlocks.CERAMIC_CRUCIBLE.get(), new Item.Properties()));
+
+        // 恒温浴（§19.24 ③-4）
+        public static final RegistryObject<Item> THERMOSTATIC_BATH = ITEMS.register("thermostatic_bath",
+                () -> new BlockItem(ModChemistryBlocks.THERMOSTATIC_BATH.get(), new Item.Properties()));
+
+        // 打包机（§19.18 / Step ④）
+        public static final RegistryObject<Item> PACKER = ITEMS.register("packer",
+                () -> new BlockItem(ModChemistryBlocks.PACKER.get(), new Item.Properties()));
+
     }
 
     public static class ModChemistryBlockEntities {
@@ -197,13 +294,34 @@ public class ModChemistry {
         public static final RegistryObject<BlockEntityType<BeakerBlockEntity>> BEAKER =
                 BLOCK_ENTITIES.register("beaker",
                         () -> BlockEntityType.Builder.of(BeakerBlockEntity::new,
-                                ModChemistryBlocks.BEAKER.get()).build(null)
+                                ModChemistryBlocks.BEAKER.get(),
+                                ModChemistryBlocks.METAL_CRUCIBLE.get(),
+                                ModChemistryBlocks.QUARTZ_CRUCIBLE.get(),
+                                ModChemistryBlocks.CERAMIC_CRUCIBLE.get()).build(null)
                 );
 
         public static final RegistryObject<BlockEntityType<ElectrolysisCellBlockEntity>> ELECTROLYSIS_CELL =
                 BLOCK_ENTITIES.register("electrolysis_cell",
                         () -> BlockEntityType.Builder.of(ElectrolysisCellBlockEntity::new,
                                 ModChemistryBlocks.ELECTROLYSIS_CELL.get()).build(null)
+                );
+
+        public static final RegistryObject<BlockEntityType<CreativeHeatSourceBlockEntity>> CREATIVE_HEAT_SOURCE =
+                BLOCK_ENTITIES.register("creative_heat_source",
+                        () -> BlockEntityType.Builder.of(CreativeHeatSourceBlockEntity::new,
+                                ModChemistryBlocks.CREATIVE_HEAT_SOURCE.get()).build(null)
+                );
+
+        public static final RegistryObject<BlockEntityType<PackerBlockEntity>> PACKER =
+                BLOCK_ENTITIES.register("packer",
+                        () -> BlockEntityType.Builder.of(PackerBlockEntity::new,
+                                ModChemistryBlocks.PACKER.get()).build(null)
+                );
+
+        public static final RegistryObject<BlockEntityType<ThermostaticBathBlockEntity>> THERMOSTATIC_BATH =
+                BLOCK_ENTITIES.register("thermostatic_bath",
+                        () -> BlockEntityType.Builder.of(ThermostaticBathBlockEntity::new,
+                                ModChemistryBlocks.THERMOSTATIC_BATH.get()).build(null)
                 );
     }
 
@@ -246,6 +364,26 @@ public class ModChemistry {
                         new Item.Properties()
                                 .stacksTo(16)
                 ));
+
+        // ====== 日化品与次品（§19.18 / Step ④）======
+        // 合格/优质两档；次品**按失败类别**共用 item（反噬取决于违规种类，与产品无关）。
+        public static final RegistryObject<Item> BLEACH_GOOD = ITEMS.register("bleach_good",
+                () -> new Item(new Item.Properties().stacksTo(16)));
+        public static final RegistryObject<Item> BLEACH_PREMIUM = ITEMS.register("bleach_premium",
+                () -> new Item(new Item.Properties().stacksTo(16)));
+        public static final RegistryObject<Item> DEFECTIVE_CHLORINE = ITEMS.register("defective_chlorine",
+                () -> new DefectiveProductItem(PackOutcome.DefectKind.CHLORINE,
+                        new Item.Properties().stacksTo(16)));
+        public static final RegistryObject<Item> DEFECTIVE_ALKALI = ITEMS.register("defective_alkali",
+                () -> new DefectiveProductItem(PackOutcome.DefectKind.ALKALI,
+                        new Item.Properties().stacksTo(16)));
+        public static final RegistryObject<Item> DEFECTIVE_ACID = ITEMS.register("defective_acid",
+                () -> new DefectiveProductItem(PackOutcome.DefectKind.ACID,
+                        new Item.Properties().stacksTo(16)));
+        public static final RegistryObject<Item> DEFECTIVE_CHLORATE = ITEMS.register("defective_chlorate",
+                () -> new DefectiveProductItem(PackOutcome.DefectKind.CHLORATE,
+                        new Item.Properties().stacksTo(16)));
+        // 注：**没有**"浓度不符"次品（§19.18 决策）——非危险失败一律不灌装，次品只能是危险品
         //相酸桶
 //        public static final RegistryObject<Item> CHE_HBP_BUCKET = ITEMS.register("che_hbp_bucket",
 //                () -> new BucketItem(
@@ -589,6 +727,37 @@ public class ModChemistry {
                 .build()
         );
 
+        // 次氯酸根：含氯消毒液的**有效成分**（蓝本 §19.18 Step ②）
+        // 数据来源：Wagman《NBS Tables of Chemical Thermodynamic Properties》水溶液离子数据
+        // 自洽性校验：E°(ClO⁻/Cl⁻)=+0.89 V（碱性）→ ΔG = -nFE° = -2×96.485×0.89 = -171.7 kJ/mol
+        //            = ΔGf(Cl⁻) + ΔGf(H₂O) - ΔGf(OH⁻) - ΔGf(ClO⁻) + 0（与上表一致）
+        public static final IonType ClO_minus = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "clo_minus"), Phase.AQUEOUS)
+                .molarMass(51.45)
+                .formationEnthalpy(-107.1)
+                .formationGibbs(-36.8)
+                .toxicityLevel(3)          // 强氧化性、腐蚀黏膜
+                .tag(IonTags.OXIDIZER)
+                .tag(IonTags.ANION)
+                .displayColor(0xE3F2A0)
+                .build()
+        );
+
+        // 氯酸根：**高温歧化**产物（蓝本 §19.18 Step ②）
+        // ΔHf 由教科书值 ΔH(3ClO⁻ → ClO₃⁻ + 2Cl⁻) = -117 kJ/mol 反推；ΔGf 由标准电极电势反推：
+        //   E°(ClO₃⁻/Cl⁻)=+0.62 V 与 E°(ClO⁻/Cl⁻)=+0.89 V（碱性）→ ΔG = -6F(0.89-0.62) = -156.3 kJ/mol
+        public static final IonType ClO3_minus = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, "clo3_minus"), Phase.AQUEOUS)
+                .molarMass(83.45)
+                .formationEnthalpy(-103.9)
+                .formationGibbs(-4.3)
+                .toxicityLevel(2)          // 氧化剂，可致高铁血红蛋白血症
+                .tag(IonTags.OXIDIZER)
+                .tag(IonTags.ANION)
+                .displayColor(0xF2F2E8)
+                .build()
+        );
+
         public static final IonType OH_minus = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "oh_minus"), Phase.AQUEOUS)
                 .molarMass(17.01)
@@ -823,6 +992,20 @@ public class ModChemistry {
         );
 
         // ---- 固体（默认无后缀即为固态） ----
+
+        // 冰：水的固相节点（§19.17.1 相变）。生成量从 PhaseChangeTable 读出（表是单一真源），
+        // 与水的液/气两相自洽 → 物理 K 在 273.15 K 穿过 1，熔点由热力学自然涌现，无需手写门槛数值。
+        public static final IonType H2O_SOLID = register(new IonType.Builder(
+                new ResourceLocation(Main.MODID, PhaseChangeTable.ICE.id()), Phase.SOLID)
+                .molarMass(PhaseChangeTable.ICE.molarMass())
+                .specificHeat(37.1)
+                .formationEnthalpy(PhaseChangeTable.ICE.formationEnthalpy())
+                .formationGibbs(PhaseChangeTable.ICE.formationGibbs())
+                .displayColor(0xD6F0FF)
+                .form(IonType.Form.CRYSTAL)
+                .build()
+        );
+
         public static final IonType NaCl = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "nacl"), Phase.SOLID)
                 .molarMass(58.44)
@@ -834,12 +1017,15 @@ public class ModChemistry {
                 .build()
         );
 
+        // 熔盐：生成量按相变自洽修正（§19.17.1）——ΔHf = ΔHf(固) + L_f = -411.1 + 28.0，
+        // ΔGf 由 ΔS = L_f/T_m = 0.02607 kJ/(mol·K) 反推，使物理 K 在 T_m = 1074 K 穿过 1。
+        // （原值 -385.8/-359.4 是给电解调参的，用物理 K 反推熔点会得到上万开尔文。）
         public static final IonType NaCl_MOLTEN = register(new IonType.Builder(
                 new ResourceLocation(Main.MODID, "nacl_molten"), Phase.LIQUID)
                 .molarMass(58.44)
                 .specificHeat(66.9)
-                .formationEnthalpy(-385.8)
-                .formationGibbs(-359.4)
+                .formationEnthalpy(-383.1)
+                .formationGibbs(-363.9)
                 .tag(IonTags.MOLTEN_SALT)
                 .displayColor(0xF5F5F5)
                 .form(IonType.Form.LIQUID)
@@ -1279,6 +1465,25 @@ public class ModChemistry {
             // 自环：分解/电离类反应，由 Tick 轮询驱动
             GRAPH.addEdge(ModIons.NaCl, ModIons.NaCl, naclDissociation);
 
+            // ====== 强碱电离：NaOH(s) → Na⁺ + OH⁻（蓝本 §19.18 Step ② 必需的碱源） ======
+            // 修复既有缺口：此前 OH⁻ 在整个反应图中**只被消耗、从不产生**（仅中和反应使用），
+            // 导致"碱"这条线根本无法从零开始——冷/热碱制次氯酸盐、中和滴定都因此无从落地。
+            // ΔH = ΔHf(Na⁺)+ΔHf(OH⁻)-ΔHf(NaOH) = -240.1-230.0+425.6 = -44.5 kJ/mol（溶解强放热，与文献一致）
+            // ΔG = -261.9-157.2+379.7 = -39.4 kJ/mol → K(298)≈8e6，强碱完全电离
+            ReactionRule naohDissociation = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "naoh_dissociation"))
+                    .reactant(ModIons.NaOH, 1)
+                    .product(ModIons.Na_1, 1)
+                    .product(ModIons.OH_minus, 1)
+                    .precondition(ModIons.H2O, 1)
+                    .deltaHComputed()
+                    .deltaGComputed()
+                    .activationEnergy(5.0)      // 极低能垒，遇水即电离
+                    .preExponentialFactor(1e11)
+                    .selfLoop(true)
+                    .build();
+            GRAPH.addEdge(ModIons.NaOH, ModIons.NaOH, naohDissociation);
+
             // ====== 可逆反应：N₂O₄ ⇌ 2NO₂（蓝本 §2 可逆反应） ======
             // 正、逆视为两个独立 ReactionRule（各自自环），ΔH/ΔG 由生成数据计算，
             // 使 K_rev = 1/K_fwd（范特霍夫），引擎以 Q vs K 自动决定反应方向，不震荡
@@ -1498,6 +1703,47 @@ public class ModChemistry {
             // 自环：分解/电离类反应，由 Tick 轮询驱动
             GRAPH.addEdge(ModIons.HCL_AQ, ModIons.HCL_AQ, hclIonize);
 
+            // ====== 含氯消毒液（蓝本 §19.18 Step ②）：冷稀碱 → 次氯酸盐 ======
+            // Cl₂ + 2OH⁻ → ClO⁻ + Cl⁻ + H₂O
+            // ΔH = -107.1 -167.2 -285.8 + 2×230.0 = -100.1 kJ/mol（放热）
+            // ΔG =  -36.8 -131.2 -237.1 + 2×157.2 =  -90.7 kJ/mol（K(298)≈8e15 → 视为不可逆）
+            // 与电化学自洽：ΔG = -nFE° = -2×96.485×(1.358-0.89) = -90.3 kJ/mol
+            // 动力学：氯在碱中的歧化几乎无势垒 → **室温即完成**，所以低温产物 = 次氯酸盐
+            ReactionRule chlorineDisproportionation = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "chlorine_disproportionation"))
+                    .reactant(ModIons.Cl2, 1)
+                    .reactant(ModIons.OH_minus, 2)
+                    .product(ModIons.ClO_minus, 1)
+                    .product(ModIons.Cl_minus, 1)
+                    .product(ModIons.H2O, 1)
+                    .deltaHComputed()
+                    .deltaGComputed()
+                    .activationEnergy(25.0)
+                    .preExponentialFactor(1e9)
+                    .build();
+            GRAPH.addBidirectionalEdges(ModIons.Cl2, ModIons.OH_minus, chlorineDisproportionation);
+
+            // ====== 次氯酸盐受热歧化（蓝本 §19.18 Step ②）：3ClO⁻ → ClO₃⁻ + 2Cl⁻ ======
+            // ⚠ 机理修正：氯酸盐**不是**"Cl₂ 直接与热碱反应"生成的，而是次氯酸盐累积后受热歧化。
+            //   因此它与上一条不是"争夺同一底物的平行规则"，而是**串联**：低温只走到 ClO⁻ 就停，
+            //   高温时 ClO⁻ 继续被吃掉 → 净结果自然呈现 3Cl₂ + 6OH⁻ → ClO₃⁻ + 5Cl⁻ + 3H₂O。
+            //   若按"两条平行规则"实现，高 Ea 那条在任意温度下都更慢，只能靠硬调指前因子压制，不真实。
+            // ΔH = -117 kJ/mol（教科书值）；ΔG = -156.3 kJ/mol（热力学强自发）
+            // 动力学：Ea 高 → 室温冻结、60~80 ℃ 才显著（工业氯酸盐正是加热次氯酸盐制取）
+            // → "低温 → 次氯酸盐 / 高温 → 氯酸盐"由温度依赖速率**自然涌现**，无手写条件分支
+            ReactionRule hypochloriteDisproportionation = new ReactionRule.Builder(
+                    new ResourceLocation(Main.MODID, "hypochlorite_disproportionation"))
+                    .reactant(ModIons.ClO_minus, 3)
+                    .product(ModIons.ClO3_minus, 1)
+                    .product(ModIons.Cl_minus, 2)
+                    .deltaHComputed()
+                    .deltaGComputed()
+                    .activationEnergy(85.0)      // 高能垒：298 K 时 k ≈ 1e-4，353 K 时 k ≈ 2.6e-2
+                    .preExponentialFactor(1e11)
+                    .selfLoop(true)              // 单一反应物：用自环机制触发，否则要求产物已存在
+                    .build();
+            GRAPH.addEdge(ModIons.ClO_minus, ModIons.ClO_minus, hypochloriteDisproportionation);
+
             // ====== 哈伯法：N₂ + 3H₂ ⇌ 2NH₃（可逆合成氨） ======
             ReactionRule haberSynthesis = new ReactionRule.Builder(
                     new ResourceLocation(Main.MODID, "haber_synthesis"))
@@ -1641,6 +1887,9 @@ public class ModChemistry {
                     .build();
             GRAPH.addBidirectionalEdges(ModIons.Fe2O3, ModIons.CO, ironBlast);
 
+            // ====== 相变（§19.17.1）：由相变数据表生成有向边 ======
+            registerPhaseTransitions();
+
             Main.LOGGER.info("[Chemistry] Reaction graph ready: {} nodes, {} edges",
                     GRAPH.getAllNodes().size(), GRAPH.getAllEdges().size());
             // 逐边信息仅用于调试（默认不输出）
@@ -1649,6 +1898,43 @@ public class ModChemistry {
                         edge.getSource().getId().getPath(),
                         edge.getTarget().getId().getPath(),
                         edge.getRule().getId().getPath());
+            }
+        }
+
+        /**
+         * 注册相变边（§19.17.1）：每物质最多 6 条有向边（s⇄l、l⇄g、s⇄g），全部由 {@link PhaseChangeTable} 生成。
+         *
+         * <p>要点：① ΔH/ΔG 由相物种**生成量**推导 → 物理 K 在转变温度穿过 1，方向自动、无需手写优先级；
+         * ② ΔH 经引擎热反馈（{@code reactionHeat = −ΔH·Δξ}）生效 → **潜热天然生效**，
+         * 升温到熔点后温度会"卡"住直到固体熔完 = 相变平台；③ 熔化/汽化设下限门槛、凝固/冷凝设上限门槛
+         * 并留迟滞死区 → 杜绝熔点附近来回抖动；④ 标 {@code quiet} → 门槛外的微小驱动力不写失败诊断；
+         * ⑤ 气体产物自动走 Phase 9 网格（敞口煮沸 → 蒸气逸散）。</p>
+         */
+        private static void registerPhaseTransitions() {
+            for (PhaseChangeData data : PhaseChangeTable.ALL) {
+                for (PhaseTransition transition : PhaseChangeTable.transitions(data)) {
+                    IonType from = ModIons.getById(new ResourceLocation(Main.MODID, transition.fromId()));
+                    IonType to = ModIons.getById(new ResourceLocation(Main.MODID, transition.toId()));
+                    if (from == null || to == null) {
+                        Main.LOGGER.warn("[Phase] 相变边 {} 缺相节点（{} → {}），已跳过",
+                                transition.ruleId(), transition.fromId(), transition.toId());
+                        continue;
+                    }
+                    ReactionRule rule = new ReactionRule.Builder(
+                            new ResourceLocation(Main.MODID, transition.ruleId()))
+                            .reactant(from, 1)
+                            .product(to, 1)
+                            .deltaHComputed()
+                            .deltaGComputed()
+                            .minTemperature(transition.minTemperatureK())
+                            .maxTemperature(transition.maxTemperatureK())
+                            .activationEnergy(transition.activationEnergyKj())
+                            .preExponentialFactor(transition.preExponentialFactor())
+                            .selfLoop(true)   // 单一反应物：靠自环匹配，否则会要求产物已存在
+                            .quiet()          // 相变不算化学反应：不写失败诊断
+                            .build();
+                    GRAPH.addEdge(from, from, rule);
+                }
             }
         }
 
