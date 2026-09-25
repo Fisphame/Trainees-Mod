@@ -22,6 +22,11 @@ public class ModNetwork {
                 OpenGraphPacket::encode, OpenGraphPacket::decode, OpenGraphPacket::handle);
         CHANNEL.registerMessage(id++, AnalyzerReportPacket.class,
                 AnalyzerReportPacket::encode, AnalyzerReportPacket::decode, AnalyzerReportPacket::handle);
+        // 打包机面板（§19.18.5）：S2C 状态 + C2S 动作
+        CHANNEL.registerMessage(id++, PackerStatePacket.class,
+                PackerStatePacket::encode, PackerStatePacket::decode, PackerStatePacket::handle);
+        CHANNEL.registerMessage(id++, PackerActionPacket.class,
+                PackerActionPacket::encode, PackerActionPacket::decode, PackerActionPacket::handle);
     }
 
     public static SimpleChannel get() {

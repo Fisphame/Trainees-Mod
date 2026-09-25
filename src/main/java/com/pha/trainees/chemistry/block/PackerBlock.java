@@ -2,9 +2,10 @@ package com.pha.trainees.chemistry.block;
 
 import com.pha.trainees.chemistry.blockentity.PackerBlockEntity;
 import com.pha.trainees.chemistry.util.AnalyzerAccess;
+import com.pha.trainees.network.ModNetwork;
 import com.pha.trainees.registry.ModChemistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -32,9 +34,10 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p><b>交互</b>：</p>
  * <ul>
- *   <li>空手右键：**取走输出槽产物**（槽空则提示）；</li>
+ *   <li>空手右键：**打开面板**（§19.18.5）——「取出产物」已移进面板按钮，避免两种入口语义重叠；</li>
  *   <li>潜行空手右键：**人工强制灌装一次**（可产危险次品，使用时反噬）——自驱永远是 auto，绝不强制；</li>
- *   <li>手持物品右键：不拦截（交给物品自己处理）；分析仪右键仍看诊断。</li>
+ *   <li>手持物品右键：不拦截（交给物品自己处理）；</li>
+ *   <li>分析仪右键：诊断面板（优先级最高）。</li>
  * </ul>
  */
 public class PackerBlock extends BaseEntityBlock {
@@ -80,15 +83,15 @@ public class PackerBlock extends BaseEntityBlock {
         if (!held.isEmpty()) return InteractionResult.PASS;
 
         if (player.isShiftKeyDown()) {
-            // 人工强制灌装：唯一能产出危险次品的入口
+            // 人工强制灌装：唯一能产出危险次品的入口（熟手快捷方式，不开面板）
             packer.packOnce(level, pos, true, player);
             return InteractionResult.CONSUME;
         }
 
-        if (packer.takeOutput(player)) {
-            player.displayClientMessage(Component.translatable("message.trainees.packer.output_taken"), true);
-        } else {
-            player.displayClientMessage(Component.translatable("message.trainees.packer.output_empty"), true);
+        // 空手右键 = 打开面板（§19.18.5）：把当前状态发给该玩家，客户端据此开屏。
+        // 「取出产物」已移进面板按钮；这里不再直接取物，避免两种入口语义重叠。
+        if (player instanceof ServerPlayer serverPlayer) {
+            ModNetwork.get().send(PacketDistributor.PLAYER.with(() -> serverPlayer), packer.buildStatePacket());
         }
         return InteractionResult.CONSUME;
     }

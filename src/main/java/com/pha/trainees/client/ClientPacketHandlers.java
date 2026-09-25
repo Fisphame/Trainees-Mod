@@ -1,8 +1,10 @@
 package com.pha.trainees.client;
 
 import com.pha.trainees.client.gui.AnalyzerScreen;
+import com.pha.trainees.client.gui.PackerScreen;
 import com.pha.trainees.client.gui.ReactionGraphScreen;
 import com.pha.trainees.network.AnalyzerReportPacket;
+import com.pha.trainees.network.PackerStatePacket;
 import net.minecraft.client.Minecraft;
 
 import java.util.List;
@@ -26,5 +28,20 @@ public final class ClientPacketHandlers {
 
     public static void openAnalyzer(AnalyzerReportPacket report) {
         Minecraft.getInstance().setScreen(new AnalyzerScreen(report));
+    }
+
+    /**
+     * 打开/刷新打包机面板（§19.18.5）。
+     *
+     * <p>若当前已经开着**同一个**打包机的面板，就地更新状态而不是重开屏幕——
+     * 否则每次点按钮（服务端都会回发状态）都会闪一下并丢掉滚动/按钮状态。</p>
+     */
+    public static void openPacker(PackerStatePacket state) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof PackerScreen existing && existing.matches(state.pos())) {
+            existing.updateState(state);
+            return;
+        }
+        mc.setScreen(new PackerScreen(state));
     }
 }

@@ -1,6 +1,7 @@
 package com.pha.trainees.registry;
 
 import com.pha.trainees.Main;
+import com.pha.trainees.recipe.PackerRecipe;
 import com.pha.trainees.recipe.TrainerAltarRecipe;
 import com.pha.trainees.util.game.chemistry.CatalystCondition;
 import com.pha.trainees.util.game.chemistry.MachineChemicalEquation;
@@ -31,6 +32,19 @@ public class ModRecipes {
                 @Override
                 public String toString() {
                     return new ResourceLocation(Main.MODID, "trainer_altar").toString();
+                }
+            });
+
+    // ====== 打包机（§19.18.6）：**展示用配方**，不参与判定/扣料（运行时仍走 PackerService 规格判定）======
+    // V1 没有 JSON 数据文件，因此不经过 RecipeManager；JEI 直接取 PackerRecipe.allFromSpecs()。
+    public static final RegistryObject<RecipeSerializer<PackerRecipe>> PACKER_SERIALIZER =
+            SERIALIZERS.register("packer", PackerRecipe.Serializer::new);
+
+    public static final RegistryObject<RecipeType<PackerRecipe>> PACKER_TYPE =
+            TYPES.register("packer", () -> new RecipeType<>() {
+                @Override
+                public String toString() {
+                    return new ResourceLocation(Main.MODID, "packer").toString();
                 }
             });
 

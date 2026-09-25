@@ -36,3 +36,4 @@ forge*changelog.txt
 
 # 数据生成器缓存（生成物入库，缓存不入库）
 /src/generated/resources/.cache/
+.gradle-home/

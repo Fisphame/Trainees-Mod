@@ -4,6 +4,7 @@ import com.pha.trainees.Main;
 import com.pha.trainees.chemistry.reaction.ReactionEdge;
 import com.pha.trainees.chemistry.reaction.ReactionGraph;
 import com.pha.trainees.chemistry.reaction.ReactionRule;
+import com.pha.trainees.recipe.PackerRecipe;
 import com.pha.trainees.recipe.TrainerAltarRecipe;
 import com.pha.trainees.registry.ModBlocks;
 import com.pha.trainees.registry.ModChemistry;
@@ -43,6 +44,8 @@ public class TraineesJeiPlugin implements IModPlugin {
         registration.addRecipeCategories(new TrainerAltarRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
         // 化学反应（§19.16）：百科式呈现全部反应规则
         registration.addRecipeCategories(new ReactionRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+        // 打包机规格（§19.18.6）：展示用配方（规格 → 规格页 + 产出）
+        registration.addRecipeCategories(new PackerRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     /**
@@ -80,6 +83,11 @@ public class TraineesJeiPlugin implements IModPlugin {
         }
         registration.addRecipes(ReactionRecipeCategory.TYPE, new ArrayList<>(byId.values()));
 
+        // 打包机规格（§19.18.6）：**展示用配方**直接由规格表投影而来（PackerRecipe.allFromSpecs()），
+        // **不经过 RecipeManager** —— V1 没有 JSON 数据文件，getAllRecipesFor 会是空表。
+        // 机器运行时仍走 PackerService 的规格判定，本页只负责"看得懂"（§19.25 展示用配方 ≠ 机器驱动配方）。
+        registration.addRecipes(PackerRecipeCategory.TYPE, PackerRecipe.allFromSpecs());
+
         // 日化品图鉴（§19.16 / §19.18）：把"有效氯"这个国标口径与规格窗口写清楚——
         // 否则玩家只看到一瓶"含氯消毒液"，不知道 5~8% 是怎么量出来的、也不知道次品为什么危险。
         registration.addIngredientInfo(new ItemStack(ModChemistry.ModChemistryItems.BLEACH_GOOD.get()),
@@ -105,5 +113,8 @@ public class TraineesJeiPlugin implements IModPlugin {
                 ReactionRecipeCategory.TYPE);
         registration.addRecipeCatalyst(new ItemStack(ModChemistry.ModChemistryBlockItems.ELECTROLYSIS_CELL.get()),
                 ReactionRecipeCategory.TYPE);
+        // 打包机是"打包机规格"页的催化剂（与烧杯/电解槽作为化学反应催化剂的做法一致）
+        registration.addRecipeCatalyst(new ItemStack(ModChemistry.ModChemistryBlockItems.PACKER.get()),
+                PackerRecipeCategory.TYPE);
     }
 }

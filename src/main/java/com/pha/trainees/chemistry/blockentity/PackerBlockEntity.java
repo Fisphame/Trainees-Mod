@@ -6,6 +6,7 @@ import com.pha.trainees.chemistry.product.PackOutcome;
 import com.pha.trainees.chemistry.product.PackerService;
 import com.pha.trainees.chemistry.product.ProductSpecs;
 import com.pha.trainees.chemistry.spec.ProductSpec;
+import com.pha.trainees.network.PackerStatePacket;
 import com.pha.trainees.registry.ModChemistry.ModIons;
 import com.pha.trainees.registry.ModConfig;
 import net.minecraft.core.BlockPos;
@@ -71,6 +72,8 @@ public class PackerBlockEntity extends BlockEntity {
     /** V1 只有一个产品；留着索引是为了 ⑥ 多产品时直接接 GUI。 */
     private int targetIndex = 0;
     private int cooldown = 0;
+    /** 最近一次失败/拒收的语言键（供 GUI 显示"最近结果"）；成功时清空 */
+    private String lastReasonKey = "";
 
     public PackerBlockEntity(BlockPos pos, BlockState state) {
         super(com.pha.trainees.registry.ModChemistry.ModChemistryBlockEntities.PACKER.get(), pos, state);
@@ -150,6 +153,10 @@ public class PackerBlockEntity extends BlockEntity {
         energy.consume(cost);
         consumeAliquot(container, spec.bottleMoles(), usableMoles);
 
+        // 成功：清掉"最近失败原因"（GUI 的最近结果回到空白）
+        if (!lastReasonKey.isEmpty()) {
+            lastReasonKey = "";
+        }
         if (feedback != null) {
             feedback.displayClientMessage(Component.translatable(
                     outcome.isDefective() ? "message.trainees.packer.defective" : "message.trainees.packer.packed",
@@ -163,10 +170,15 @@ public class PackerBlockEntity extends BlockEntity {
         if (feedback != null) {
             feedback.displayClientMessage(Component.translatable(langKey), true);
         }
+        // 记下原因：GUI 的"最近结果"要显示它（与是否有人看着无关，自动化停产的排查也靠它）
+        if (!langKey.equals(lastReasonKey)) {
+            lastReasonKey = langKey;
+            setChanged();
+        }
         return false;
     }
 
-    /** 取走输出槽产物（空手右键）。@return 是否真的取到了东西 */
+    /** 取走输出槽产物（GUI 按钮 / 潜行外的快捷路径）。@return 是否真的取到了东西 */
     public boolean takeOutput(Player player) {
         ItemStack current = output.getStackInSlot(0);
         if (current.isEmpty()) return false;
@@ -178,8 +190,74 @@ public class PackerBlockEntity extends BlockEntity {
         return true;
     }
 
-    // ==================== 能力（自动化接口） ====================
+    // ==================== GUI 状态（§19.18.5） ====================
 
+    /** 当前目标产品 id（V1 只有含氯消毒液；索引越界时夹到最后一个）。 */
+    public String currentProductId() {
+        return ProductSpecs.ALL.get(Math.min(targetIndex, ProductSpecs.ALL.size() - 1)).id();
+    }
+
+    /** 最近一次失败/拒收的语言键（空串 = 上次成功或尚无记录）。 */
+    public String getLastReasonKey() {
+        return lastReasonKey;
+    }
+
+    /**
+     * 现在能不能打一瓶——**只读判定**（§19.18.5），供 GUI 显示"就绪 / 为什么没就绪"。
+     *
+     * <p>它跑的是与 {@link #packOnce} 同一套 {@code PackerService.evaluateAuto}，但**不扣料、不耗电、
+     * 不写 {@code lastReasonKey}**，所以可以安全地反复调用。</p>
+     *
+     * <p>⚠ <b>性能红线</b>：本方法只允许在 <b>REQUEST_STATE</b>（面板刷新）与动作执行后组装状态包时调用，
+     * <b>绝不允许放进 {@code tick()} 或每帧路径</b>——它要遍历容器内容物并做一次完整规格判定。</p>
+     */
+    public DryRun dryRun(Level level, BlockPos pos) {
+        if (!(level.getBlockEntity(pos.above()) instanceof IChemicalContainer container)) {
+            return new DryRun(false, "message.trainees.packer.no_container", "");
+        }
+        int cost = Math.max(0, ModConfig.COMMON.packerEnergyPerBottle.get());
+        if (energy.stored() < cost) {
+            return new DryRun(false, "message.trainees.packer.no_power", "");
+        }
+        if (!output.getStackInSlot(0).isEmpty()) {
+            return new DryRun(false, "message.trainees.packer.output_full", "");
+        }
+
+        ProductSpec spec = ProductSpecs.ALL.get(Math.min(targetIndex, ProductSpecs.ALL.size() - 1));
+        PackOutcome outcome = PackerService.evaluateAuto(spec, ProductSpecs.adapterFor(spec.id()),
+                toIdKeyedMap(container.getContents()), PackerBlockEntity::molarMassOf,
+                container.getTotalMoles());
+        if (!outcome.producesItem()) {
+            String key = outcome.reasonKey() == null || outcome.reasonKey().isEmpty()
+                    ? "message.trainees.packer.rejected"
+                    : outcome.reasonKey();
+            return new DryRun(false, key, "");
+        }
+        return new DryRun(true, "", outcome.productItemId());
+    }
+
+    /**
+     * 只读判定结果（§19.18.5）。
+     *
+     * @param canPack       此刻能否打一瓶（含规格判定，不只是"电够 + 槽空"）
+     * @param reasonKey     不能打包时的语言键；能打包时为空串
+     * @param productItemId 能打包时的产物 item id；不能时为空串
+     */
+    public record DryRun(boolean canPack, String reasonKey, String productItemId) {
+    }
+
+    /** 组装状态包（S2C）：GUI 显示所需的全部信息（内部跑一次只读判定，调用点见 {@link #dryRun} 的红线） */
+    public PackerStatePacket buildStatePacket() {
+        DryRun dry = level == null
+                ? new DryRun(false, "message.trainees.packer.no_container", "")
+                : dryRun(level, worldPosition);
+        return new PackerStatePacket(worldPosition, energy.stored(),
+                ModConfig.COMMON.packerEnergyCapacity.get(),
+                output.getStackInSlot(0).copy(), currentProductId(),
+                dry.canPack(), dry.reasonKey(), lastReasonKey);
+    }
+
+    // ==================== 能力（自动化接口） ====================
     @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
@@ -206,6 +284,7 @@ public class PackerBlockEntity extends BlockEntity {
         tag.put("Output", output.serializeNBT());
         tag.putInt("TargetIndex", targetIndex);
         tag.putInt("Energy", energy.stored());
+        tag.putString("LastReason", lastReasonKey);
     }
 
     @Override
@@ -214,6 +293,7 @@ public class PackerBlockEntity extends BlockEntity {
         if (tag.contains("Output")) output.deserializeNBT(tag.getCompound("Output"));
         targetIndex = tag.getInt("TargetIndex");
         energy.setStored(tag.getInt("Energy"));
+        lastReasonKey = tag.getString("LastReason");
     }
 
     @Override
@@ -222,6 +302,7 @@ public class PackerBlockEntity extends BlockEntity {
         tag.put("Output", output.serializeNBT());
         tag.putInt("TargetIndex", targetIndex);
         tag.putInt("Energy", energy.stored());
+        tag.putString("LastReason", lastReasonKey);
         return tag;
     }
 
